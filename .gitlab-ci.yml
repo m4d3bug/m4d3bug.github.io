@@ -1,16 +1,21 @@
-image: node:4.2.2
+image: node:6.10.2
+
+cache:
+    paths:
+        - node_modules/
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+
+before_script:
+    - npm install hexo-cli -g
+    - npm install
 
 pages:
-  cache:
-    paths:
-    - node_modules/
-
-  script:
-  - npm install hexo-cli -g
-  - npm install
-  - hexo deploy
-  artifacts:
-    paths:
-    - public
-  only:
-    - master
+    script: 
+        - hexo generate
+    artifacts:
+        paths:
+            - public
+    only:
+        - master
