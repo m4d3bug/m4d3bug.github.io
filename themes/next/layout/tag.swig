@@ -2,7 +2,7 @@
 {% import '_macro/post-collapse.swig' as post_template %}
 {% import '_macro/sidebar.swig' as sidebar_template %}
 
-{% block title %}{{ __('title.tag') }}: {{ page.tag }} | {{ config.title }}{% endblock %}
+{% block title %}{{ __('title.tag') }}: {{ page.tag }} | {{ title }}{% endblock %}
 
 {% block content %}
 
@@ -13,15 +13,15 @@
 
     <div id="posts" class="posts-collapse">
       <div class="collection-title">
-        <{% if theme.seo %}h2{% else %}h1{% endif %}>{#
+        <{%- if theme.seo %}h2{% else %}h1{%- endif %}>{#
         #}{{ page.tag }}{#
-        #}<small>{{  __('title.tag')  }}</small>
-        </{% if theme.seo %}h2{% else %}h1{% endif %}>
+        #}<small>{{ __('title.tag') }}</small>
+        </{%- if theme.seo %}h2{% else %}h1{%- endif %}>
       </div>
 
-      {% for post in page.posts %}
+      {%- for post in page.posts %}
         {{ post_template.render(post) }}
-      {% endfor %}
+      {%- endfor %}
     </div>
 
   </div>
@@ -30,6 +30,7 @@
   {#####################}
 
   {% include '_partials/pagination.swig' %}
+
 {% endblock %}
 
 {% block sidebar %}

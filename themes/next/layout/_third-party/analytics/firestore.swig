@@ -1,9 +1,9 @@
-{% if theme.firestore.enable %}
-  <script src="https://www.gstatic.com/firebasejs/4.6.0/firebase.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/4.6.0/firebase-firestore.js"></script>
-  {% if theme.firestore.bluebird %}
+{%- if theme.firestore.enable %}
+  <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-firestore.js"></script>
+  {%- if theme.firestore.bluebird %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.5.1/bluebird.core.min.js"></script>
-  {% endif %}
+  {%- endif %}
   <script>
     (function () {
 
@@ -50,25 +50,27 @@
       function appendCountTo(el) {
         return function (count) {
           $(el).append(
-            $('<span>').addClass('post-visitors-count').append(
-              $('<span>').addClass('post-meta-divider').text('|')
-            ).append(
-              $('<span>').addClass('post-meta-item-icon').append(
-                $('<i>').addClass('fa fa-users')
+            $('<span>').addClass('post-meta-item')
+              .append(
+                $('<span>').addClass('post-meta-item-icon').append(
+                  $('<i>').addClass('fa fa-users')
+                )
               )
-              ).append($('<span>').text('{{ __("post.visitors")}} ' + count))
-          )
+              .append(
+                $('<span>').text('{{ __("post.views")}} ' + count)
+              )
+          );
         }
       }
 
       var db = firebase.firestore()
       var articles = db.collection('{{ theme.firestore.collection }}')
 
-      //https://hexo.io/zh-tw/docs/variables.html
+      //https://hexo.io/docs/variables.html
       var isPost = '{{ page.title }}'.length > 0
-      var isArchive = '{{ archive }}' === 'true'
-      var isCategory = '{{ category }}'.length > 0
-      var isTag = '{{ tag }}'.length > 0
+      var isArchive = '{{ page.archive }}' === 'true'
+      var isCategory = '{{ page.category }}'.length > 0
+      var isTag = '{{ page.tag }}'.length > 0
 
       if (isPost) { //is article page
         var title = '{{ page.title }}'
@@ -79,7 +81,7 @@
       else if (!isArchive && !isCategory && !isTag) { //is index page
         var titles = [] //array to titles
 
-        var postsstr = '{% for post in page.posts %}titles.push("{{ post.title }}");{% endfor %}' //if you have a better way to get titles of posts, please change it
+        var postsstr = '{%- for post in page.posts %}titles.push("{{ post.title }}");{%- endfor %}' //if you have a better way to get titles of posts, please change it
         eval(postsstr)
 
         var promises = titles.map(function (title) {
@@ -96,4 +98,4 @@
       }
     })()
   </script>
-{% endif %}
+{%- endif %}
