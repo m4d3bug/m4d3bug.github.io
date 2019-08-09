@@ -60,5 +60,7 @@ npm WARN notsup Not compatible with your operating system or architecture: fseve
 INFO  Start blogging with Hexo!
 ```
 
+### f)
+
 
 
