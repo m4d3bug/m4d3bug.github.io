@@ -1,7 +1,7 @@
 title: Hello GitLab
 ---
 
-In this post, I am going to markdown how I build up this blog with ci and custom my own domain by using [gitlab](https://www.gitlab.com) .
+In this post, I am going to markdown how I build up this blog with ci and custom my own domain by using [GitLab](https://www.gitlab.com) .
 
 ## 1. Setup blog environment
 
@@ -79,7 +79,9 @@ origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (fetch)
 origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (push)
 ```
 
-### Setup the access right in the GitLab
+### 3. Setup the access right in the GitLab
+
+----
 
 #### Generate local SSH keys and public keys
 
@@ -107,9 +109,15 @@ The key's randomart image is:
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDC9tTucdCkwSkAh8Pgry3a2DHc4NUgPyYyQiVmTXD0EKwucF3Oo3RQv2KBl.../iiF@@@@@@@@@@@@@@@@@@@@@== m4d3bug@ubuntu
 ```
 
-#### Update the public key in the GitLab
+#### Upload the public key
 
 ![](https://i.loli.net/2019/08/10/grnETp16mayWYlw.png)
+
+#### Update the policy of yourself
+
+![](https://i.loli.net/2019/08/10/UGSMXCbTFYlA1yh.png)
+
+
 
 ### Prepare for submission
 
@@ -121,13 +129,6 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDC9tTucdCkwSkAh8Pgry3a2DHc4NUgPyYyQiVmTXD0
 ```
 
 
-
-
-
-
-
-
-...
 
  
 
