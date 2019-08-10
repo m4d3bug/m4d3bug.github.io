@@ -79,9 +79,9 @@ origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (fetch)
 origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (push)
 ```
 
-### 3. Setup the access right in the GitLab
+## 3. Setup the access right in the GitLab
 
-#### Generate local SSH keys and public keys
+### Generate local SSH keys and public keys
 
 ``` bash
 ~/m4d3bug.gitlab.io# ssh-keygen -t rsa -b 4096 -C "m4d3bug@ubuntu" -N ""
@@ -107,11 +107,11 @@ The key's randomart image is:
 ssh-rsa AAAAB3NzaC1y.../iiF@@@@@@@@@@@@@@@@@@@@@== m4d3bug@ubuntu
 ```
 
-#### Upload the public key
+### Upload the public key
 
 ![](https://i.loli.net/2019/08/10/grnETp16mayWYlw.png)
 
-#### Update the policy of yourself
+### Update the policy of yourself
 
 ![](https://i.loli.net/2019/08/10/UGSMXCbTFYlA1yh.png)
 
