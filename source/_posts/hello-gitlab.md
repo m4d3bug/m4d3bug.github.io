@@ -3,15 +3,15 @@ title: Hello GitLab
 
 In this post, I am going to markdown how I build up this blog with ci and custom my own domain by using [gitlab](https://www.gitlab.com) .
 
-## 1. Setup a local compilation environment
+## 1. Setup blog environment
 
-### a) Install the package
+### Install the package
 
 ``` bash
 # apt update -y && apt install -y nodejs npm git
 ```
 
-### b) Checkout the version of this tools
+### Confirm the version of this tools
 
 ``` bash
 # nodejs -v
@@ -22,13 +22,13 @@ v8.10.0
 git version 2.17.1
 ```
 
-### c) Install the hexo
+### Install the hexo
 
 ``` bash
 # npm install hexo -g
 ```
 
-### d) Checkout the version of the hexo
+### Confirm the version of the hexo
 
 ``` bash
 # hexo -v
@@ -49,7 +49,7 @@ cldr: 32.0.1
 tz: 2017c
 ```
 
-### e)  Setup the directory
+### Initialize the directory
 
 ``` bash
 # mkdir m4d3bug.gitlab.io
@@ -60,7 +60,15 @@ npm WARN notsup Not compatible with your operating system or architecture: fseve
 INFO  Start blogging with Hexo!
 ```
 
-### f)
+## 2. Setup git repository
+
+### New the remote repository
+
+![](https://i.loli.net/2019/08/10/priZIByc4Tfks7S.png)
+
+
+
+ 
 
 
 
