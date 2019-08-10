@@ -66,7 +66,40 @@ INFO  Start blogging with Hexo!
 
 ![](https://i.loli.net/2019/08/10/priZIByc4Tfks7S.png)
 
+![](https://i.loli.net/2019/08/10/2Qau7YVb5IGfjNH.png)
 
+### New the local repository
+
+``` bash
+~/m4d3bug.gitlab.io# git init
+Initialized empty Git repository in /root/m4d3bug.gitlab.io/.git/
+~/m4d3bug.gitlab.io# git remote add origin git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git
+~/m4d3bug.gitlab.io# git remote -v
+origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (fetch)
+origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (push)
+```
+
+### Setup the access right in the GitLab
+
+
+
+
+
+
+
+
+
+
+
+
+
+~/m4d3bug.gitlab.io# git add .
+~/m4d3bug.gitlab.io# git config --global user.email "m4d3bug@gmail.com"
+~/m4d3bug.gitlab.io# git config --global user.name "m4d3bug"
+~/m4d3bug.gitlab.io# git commit -m "Init Commit"
+...
+
+ 
 
  
 
