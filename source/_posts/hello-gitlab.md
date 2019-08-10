@@ -11,7 +11,7 @@ In this post, I am going to markdown how I build up this blog with ci and custom
 # apt update -y && apt install -y nodejs npm git
 ```
 
-### Confirm the version of this tools
+### Confirm the version of tools
 
 ``` bash
 # nodejs -v
@@ -28,7 +28,7 @@ git version 2.17.1
 # npm install hexo -g
 ```
 
-### Confirm the version of the hexo
+### Confirm the version of hexo
 
 ``` bash
 # hexo -v
@@ -111,7 +111,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDC9tTucdCkwSkAh8Pgry3a2DHc4NUgPyYyQiVmTXD0
 
 ![](https://i.loli.net/2019/08/10/grnETp16mayWYlw.png)
 
-### Preparations before submission
+### Prepare for submission
 
 ``` bash
 ~/m4d3bug.gitlab.io# git config --global user.email "m4d3bug@gmail.com"
