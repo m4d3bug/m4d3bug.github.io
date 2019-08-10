@@ -81,22 +81,52 @@ origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (push)
 
 ### Setup the access right in the GitLab
 
+#### Generate local SSH keys and public keys
 
+``` bash
+~/m4d3bug.gitlab.io# ssh-keygen -t rsa -b 4096 -C "m4d3bug@ubuntu" -N ""
+Generating public/private rsa key pair.
+Enter file in which to save the key (/root/.ssh/id_rsa): 
+Your identification has been saved in /root/.ssh/id_rsa.
+Your public key has been saved in /root/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:dGucfhOAOXbHYm@@@@@@@@@@@@@@@/L@@@@@@@@@@@@ m4d3bug@ubuntu
+The key's randomart image is:
++---[RSA 4096]----+
+|          .++.   |
+|         + .  .  |
+|        B * oo . |
+|       =E@ *= O  |
+|       .S.=..* * |
+|       o.oo o.=  |
+|         ..+oB   |
+|          o.=.o  |
+|        .o o..   |
++----[SHA256]-----+
+~/m4d3bug.gitlab.io# cat /root/.ssh/id_rsa.pub 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDC9tTucdCkwSkAh8Pgry3a2DHc4NUgPyYyQiVmTXD0EKwucF3Oo3RQv2KBl.../iiF@@@@@@@@@@@@@@@@@@@@@== m4d3bug@ubuntu
+```
 
+#### Update the public key in the GitLab
 
+![](https://i.loli.net/2019/08/10/grnETp16mayWYlw.png)
 
+### Preparations before submission
 
-
-
-
-
-
-
-
-~/m4d3bug.gitlab.io# git add .
+``` bash
 ~/m4d3bug.gitlab.io# git config --global user.email "m4d3bug@gmail.com"
 ~/m4d3bug.gitlab.io# git config --global user.name "m4d3bug"
+~/m4d3bug.gitlab.io# git add .
 ~/m4d3bug.gitlab.io# git commit -m "Init Commit"
+```
+
+
+
+
+
+
+
+
 ...
 
  
