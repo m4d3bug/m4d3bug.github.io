@@ -115,20 +115,60 @@ ssh-rsa AAAAB3NzaC1y.../iiF@@@@@@@@@@@@@@@@@@@@@== m4d3bug@ubuntu
 
 ![](https://i.loli.net/2019/08/10/UGSMXCbTFYlA1yh.png)
 
-
-
-### Prepare for submission
+## 4. Start up the first commit
 
 ``` bash
+~/m4d3bug.gitlab.io# git checkout -b beta
+Switched to a new branch 'beta'
 ~/m4d3bug.gitlab.io# git config --global user.email "m4d3bug@gmail.com"
 ~/m4d3bug.gitlab.io# git config --global user.name "m4d3bug"
 ~/m4d3bug.gitlab.io# git add .
 ~/m4d3bug.gitlab.io# git commit -m "Init Commit"
+~/m4d3bug.gitlab.io# git push --set-upstream origin beta
+```
+
+##### Now you can see that the remote repository has created a new branch called beta and includes the above files.
+
+![](https://i.loli.net/2019/08/10/OvHGo1j3MutW7rR.png)
+
+## 5. Setup the pipeline
+
+### Create the .gitlab-ci.yml
+
+``` yaml
+image: node:6.10.2
+
+cache:
+    paths:
+        - node_modules/
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+
+before_script:
+    - npm install hexo-cli -g
+    - npm install
+
+pages:
+    script: 
+        - hexo generate
+    artifacts:
+        paths:
+            - public
+    only:
+#       - master
+        - beta
 ```
 
 
 
- 
+
+
+```
+git checkout master
+git merge beta --allow-unrelated-histories
+
+```
 
  
 
