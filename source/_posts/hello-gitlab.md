@@ -1,7 +1,7 @@
 title: Hello GitLab
 ---
 
-In this post, I am going to markdown how I build up this blog with ci and custom my own domain by using [GitLab](https://www.gitlab.com) .
+In this post, I am going to markdown how I build up this blog with ci and custom my own domain in [GitLab](https://www.gitlab.com) .
 
 ## Setup blog environment
 
@@ -62,13 +62,13 @@ INFO  Start blogging with Hexo!
 
 ## Setup git repository
 
-### New the remote repository
+### Create the remote repository
 
 ![](https://i.loli.net/2019/08/10/priZIByc4Tfks7S.png)
 
 ![](https://i.loli.net/2019/08/10/2Qau7YVb5IGfjNH.png)
 
-### New the local repository
+### Create the local repository
 
 ``` bash
 ~/m4d3bug.gitlab.io# git init
@@ -160,17 +160,68 @@ pages:
         - beta
 ```
 
+### Confirm the status of local repository
 
+``` bash
+~/m4d3bug.gitlab.io# git status
+On branch beta
+Your branch is up to date with 'origin/beta'.
 
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
 
+        .gitlab-ci.yml
 
+nothing added to commit but untracked files present (use "git add" to track)
 ```
-git checkout master
-git merge beta --allow-unrelated-histories
 
+### Push the change to the remote repository
+
+``` bash
+~/m4d3bug.gitlab.io# git add .
+~/m4d3bug.gitlab.io# git commit -m "Init Commit"
+~/m4d3bug.gitlab.io# git push --set-upstream origin beta
 ```
 
- 
+### Confirm the pipelines is working
+
+![](https://i.loli.net/2019/08/11/U9xHfalLTC3WpA1.png)
+
+After that, you can get the assigned domain name in Settings >> Pages
+
+![](https://i.loli.net/2019/08/11/KxRXZrL6ohaAVQG.png)
+
+## Custom my own domain
+
+### GitLab generates domain verification text
+
+![](https://i.loli.net/2019/08/11/HykJnsKlj37FxYd.png)
+
+![](https://i.loli.net/2019/08/11/Xz2fk1prdlESvis.png)
+
+### Domain name resolution is set by cloudflare
+
+![](https://i.loli.net/2019/08/11/IZ1jUJEakPe4dsf.png)
+
+### Make sure the https working on custom domain
+
+![](https://i.loli.net/2019/08/11/O12KTspUnuo4CFg.png)
+
+![](https://i.loli.net/2019/08/11/piF2nILMlEKt9mw.png)
+
+
+
+## Done
+
+Now the custom domain name and ci are in effect, and a clean master branch is kept for rollback. When there is no problem with the release, you can choose merge to change to the master branch, through the following command.
+
+``` bash
+~/m4d3bug.gitlab.ios# git checkout master
+~/m4d3bug.gitlab.ios# git merge beta --allow-unrelated-histories
+~/m4d3bug.gitlab.ios# git push --set-upstream origin master
+```
+
+
 
 
 
