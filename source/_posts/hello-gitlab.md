@@ -213,7 +213,7 @@ After that, you can get the assigned domain name in Settings >> Pages
 
 ## Done
 
-Now the custom domain name and CI are in effect, and a clean master branch is kept for rollback. When there is no problem with the release, you can choose merge to change to the master branch, through the following command.
+Now the custom domain name and CI are in effect, and a clean master branch is kept for rollback. When everything is good with the commit, you can choose merge beta to the master branch, by executing the following command.
 
 ``` bash
 ~/m4d3bug.gitlab.ios# git checkout master
