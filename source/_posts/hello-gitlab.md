@@ -3,7 +3,7 @@ title: Hello GitLab
 
 In this post, I am going to markdown how I build up this blog with ci and custom my own domain by using [GitLab](https://www.gitlab.com) .
 
-## 1. Setup blog environment
+## Setup blog environment
 
 ### Install the package
 
@@ -60,7 +60,7 @@ npm WARN notsup Not compatible with your operating system or architecture: fseve
 INFO  Start blogging with Hexo!
 ```
 
-## 2. Setup git repository
+## Setup git repository
 
 ### New the remote repository
 
@@ -79,7 +79,7 @@ origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (fetch)
 origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (push)
 ```
 
-## 3. Setup the access right in the GitLab
+## Setup the access right in the GitLab
 
 ### Generate local SSH keys and public keys
 
@@ -115,7 +115,7 @@ ssh-rsa AAAAB3NzaC1y.../iiF@@@@@@@@@@@@@@@@@@@@@== m4d3bug@ubuntu
 
 ![](https://i.loli.net/2019/08/10/UGSMXCbTFYlA1yh.png)
 
-## 4. Start up the first commit
+## Start up the first commit
 
 ``` bash
 ~/m4d3bug.gitlab.io# git checkout -b beta
@@ -127,11 +127,11 @@ Switched to a new branch 'beta'
 ~/m4d3bug.gitlab.io# git push --set-upstream origin beta
 ```
 
-##### Now you can see that the remote repository has created a new branch called beta and includes the above files.
+Now you can see that the remote repository has created a new branch called beta and includes the above files.
 
 ![](https://i.loli.net/2019/08/10/OvHGo1j3MutW7rR.png)
 
-## 5. Setup the pipeline
+## Setup the pipeline
 
 ### Create the .gitlab-ci.yml
 
