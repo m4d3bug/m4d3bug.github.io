@@ -3,9 +3,9 @@ title: Hello GitLab
 categories:
 - DevOps
 tags:
-- Git >> 
-- CI/CD >> 
-- hexo >> 
+- Git # 
+- CI/CD # 
+- hexo # 
 ---
 
 In this post, I am going to markdown how I build up this blog with CI/CD and custom my own domain in [GitLab](https://www.gitlab.com) .
