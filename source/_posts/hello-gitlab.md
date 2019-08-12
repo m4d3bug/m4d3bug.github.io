@@ -3,7 +3,7 @@ title: Hello GitLab
 categories:
 - DevOps
 tags:
-- Git
+- "Git"
 - CI/CD
 - hexo
 ---
