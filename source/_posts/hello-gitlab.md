@@ -10,7 +10,7 @@ tags:
 
 In this post, I am going to markdown how I build up this blog with CI/CD and custom my own domain in [GitLab](https://www.gitlab.com) .
 
-## Setup blog environment
+## Setup blog environment in local
 
 ### Install the package
 
