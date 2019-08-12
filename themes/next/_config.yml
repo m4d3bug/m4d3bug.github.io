@@ -192,6 +192,7 @@ site_state: true
 social:
   GitLab: https://gitlab.com/m4d3bug || gitlab
   E-Mail: mailto:m4d3bug@gmail.com || envelope
+  GitHub: https://github.com/m4d3bug || github
   #Weibo: https://weibo.com/yourname || weibo
   #Google: https://plus.google.com/yourname || google
   #Twitter: https://twitter.com/yourname || twitter
@@ -437,8 +438,8 @@ codeblock:
     style:
 
 # `Follow me on GitHub` banner in the top-right corner.
-gitlab_banner:
-  enable: m4d3bug
+github_banner:
+  enable: false
   permalink: https://gitlab.com/m4d3bug
   title: Follow me on GitLab
 
