@@ -73,7 +73,7 @@ INFO  Start blogging with Hexo!
 
 ![](https://i.loli.net/2019/08/10/priZIByc4Tfks7S.png)
 
-![](https://i.loli.net/2019/08/10/2Qau7YVb5IGfjNH.png)
+![](https://i.loli.net/2019/08/10/ugAZDkTQHYIOCKV.png)
 
 ### Create the local repository
 
@@ -120,6 +120,8 @@ ssh-rsa AAAAB3NzaC1y.../iiF@@@@@@@@@@@@@@@@@@@@@== m4d3bug@ubuntu
 
 ### Update the policy of yourself
 
+![](https://i.loli.net/2019/08/12/9NeG8lWjYHadt4b.jpg)
+
 ![](https://i.loli.net/2019/08/10/UGSMXCbTFYlA1yh.png)
 
 ## Start up the first commit
@@ -131,6 +133,7 @@ Switched to a new branch 'beta'
 ~/m4d3bug.gitlab.io# git config --global user.name "m4d3bug"
 ~/m4d3bug.gitlab.io# git add .
 ~/m4d3bug.gitlab.io# git commit -m "Init Commit"
+~/m4d3bug.gitlab.io# ssh -T git@gitlab.com
 ~/m4d3bug.gitlab.io# git push --set-upstream origin beta
 ```
 
@@ -140,7 +143,7 @@ Now you can see that the remote repository has created a new branch called beta 
 
 ## Setup the pipeline
 
-### Create the .gitlab-ci.yml
+### Create the .gitlab-ci.yml in local
 
 ``` yaml
 image: node:6.10.2
