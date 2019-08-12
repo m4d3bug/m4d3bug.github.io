@@ -437,7 +437,7 @@ codeblock:
     style:
 
 # `Follow me on GitHub` banner in the top-right corner.
-github_banner:
+gitlab_banner:
   enable: m4d3bug
   permalink: https://gitlab.com/m4d3bug
   title: Follow me on GitLab
