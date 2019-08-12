@@ -1,7 +1,14 @@
+---
 title: Hello GitLab
+categories:
+- DevOps
+tags:
+- Git
+- CI/CD
+- hexo
 ---
 
-In this post, I am going to markdown how I build up this blog with CI and custom my own domain in [GitLab](https://www.gitlab.com) .
+In this post, I am going to markdown how I build up this blog with CI/CD and custom my own domain in [GitLab](https://www.gitlab.com) .
 
 ## Setup blog environment
 
@@ -213,7 +220,7 @@ After that, you can get the assigned domain name in Settings >> Pages
 
 ## Done
 
-Now the custom domain name and CI are in effect, and a clean master branch is kept for rollback. When everything is good with the commit, you can choose merge beta to the master branch, by executing the following command.
+Now the custom domain name and CI/CD are in effect, and a clean master branch is kept for rollback. When everything is good with the commit, you can choose merge beta to the master branch, by executing the following command.
 
 ``` bash
 ~/m4d3bug.gitlab.ios# git checkout master
