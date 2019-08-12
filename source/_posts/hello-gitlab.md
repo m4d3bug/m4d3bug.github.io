@@ -1,5 +1,6 @@
 ---
 title: Hello GitLab
+date: 2019-08-12 18:25:00
 categories:
 - "DevOps "
 tags:
