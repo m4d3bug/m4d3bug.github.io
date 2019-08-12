@@ -156,7 +156,7 @@ menu:
   #categories: /categories/ || th
   archives: /archives/ || archive
   #schedule: /schedule/ || calendar
-  sitemap: /sitemap.xml || sitemap
+  #sitemap: /sitemap.xml || sitemap
   #commonweal: /404/ || heartbeat
 
 # Enable / Disable menu icons / item badges.
@@ -190,7 +190,7 @@ site_state: true
 # Value before `||` delimiter is the target permalink.
 # Value after `||` delimiter is the name of Font Awesome icon. If icon (with or without delimiter) is not specified, globe icon will be loaded.
 social:
-  #GitHub: https://github.com/yourname || github
+  GitLab: https://gitlab.com/m4d3bug || gitlab
   #E-Mail: mailto:yourname@gmail.com || envelope
   #Weibo: https://weibo.com/yourname || weibo
   #Google: https://plus.google.com/yourname || google
@@ -835,7 +835,7 @@ tencent_mta: # <app_id>
 # Dependencies: https://github.com/theme-next/theme-next-algolia-instant-search
 # For more information: https://www.algolia.com
 algolia_search:
-  enable: true
+  enable: false
   hits:
     per_page: 10
   labels:
@@ -858,11 +858,11 @@ local_search:
   preload: false
 
 # Search
-search:
-  path: search.xml
-  field: post
-  format: html
-  limit: 10000
+#search:
+#  path: search.xml
+#  field: post
+#  format: html
+#  limit: 10000
 
 # Swiftype Search API Key
 swiftype_key:
