@@ -1,7 +1,7 @@
 ---
 title: Hello GitLab
 categories:
-- DevOps
+- "DevOps "
 tags:
 - "Git " 
 - "CI/CD " 
