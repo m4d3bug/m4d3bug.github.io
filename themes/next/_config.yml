@@ -51,6 +51,12 @@ favicon:
 # Set rss to false to disable feed link. Set rss to specific value if you have burned your feed already.
 rss:
 
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  content: 'true'
+
 footer:
   # Specify the date when the site was setup. If not defined, current year will be used.
   #since: 2015
