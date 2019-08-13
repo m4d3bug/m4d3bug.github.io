@@ -1,9 +1,0 @@
-User-agent: * Allow: /
-Allow: /archives/
-Disallow: /vendors/
-Disallow: /js/
-Disallow: /css/
-Disallow: /fonts/
-Disallow: /vendors/
-Sitemap: http://m4d3bug.gitlab.io/sitemap.xml
-Sitemap: http://m4d3bug.gitlab.io/baidusitemap.xml
