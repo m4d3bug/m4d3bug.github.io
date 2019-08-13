@@ -6,6 +6,8 @@ tags:
 - "Git " 
 - "CI/CD " 
 - "hexo " 
+date: 2019-08-08 17:34:46
+update: 2019-08-12 17:34:46
 ---
 
 In this post, I am going to markdown how I build up this blog with CI/CD and custom my own domain in [GitLab](https://www.gitlab.com) .
