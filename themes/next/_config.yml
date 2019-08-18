@@ -221,6 +221,8 @@ links_layout: block
 #links_layout: inline
 links:
   #Title: http://example.com
+  ServerWorld: https://www.server-world.info/en/
+
 
 # Sidebar Avatar
 avatar:
