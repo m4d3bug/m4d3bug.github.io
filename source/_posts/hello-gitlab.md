@@ -11,7 +11,7 @@ date: 2019-08-08 17:34:46
 
 In this post, I am going to markdown how I build up this blog with CI/CD and custom my own domain in [GitLab](https://www.gitlab.com) .
 
-## Setup blog environment in local
+## Configure blog environment in local
 
 ### Install the package
 
@@ -68,7 +68,7 @@ npm WARN notsup Not compatible with your operating system or architecture: fseve
 INFO  Start blogging with Hexo!
 ```
 
-## Setup git repository
+## Configure git repository
 
 ### Create the remote repository
 
@@ -87,7 +87,7 @@ origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (fetch)
 origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (push)
 ```
 
-## Setup the access right in the GitLab
+## Configure the access right in the GitLab
 
 ### Generate local SSH keys and public keys
 
@@ -142,7 +142,7 @@ Now you can see that the remote repository has created a new branch called beta 
 
 ![](https://i.loli.net/2019/08/10/OvHGo1j3MutW7rR.png)
 
-## Setup the pipeline
+## Configure the pipeline
 
 ### Create the .gitlab-ci.yml in local
 
