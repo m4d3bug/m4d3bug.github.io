@@ -7,7 +7,6 @@ tags:
 - "CI/CD " 
 - "hexo " 
 date: 2019-08-08 17:34:46
-update: 2019-08-12 17:34:46
 ---
 
 In this post, I am going to markdown how I build up this blog with CI/CD and custom my own domain in [GitLab](https://www.gitlab.com) .
@@ -17,30 +16,30 @@ In this post, I am going to markdown how I build up this blog with CI/CD and cus
 ### Install the package
 
 ``` bash
-# apt update -y && apt install -y nodejs npm git
+~]# apt update -y && apt install -y nodejs npm git
 ```
 
 ### Confirm the version of tools
 
 ``` bash
-# nodejs -v
+~]# nodejs -v
 v8.10.0
-# npm -v
+~]# npm -v
 3.5.2
-# git --version
+~]# git --version
 git version 2.17.1
 ```
 
 ### Install the hexo
 
 ``` bash
-# npm install hexo -g
+~]# npm install hexo -g
 ```
 
 ### Confirm the version of hexo
 
 ``` bash
-# hexo -v
+~]# hexo -v
 hexo-cli: 2.0.0
 os: Linux 4.15.0-20-generic linux x64
 http_parser: 2.7.1
@@ -61,8 +60,8 @@ tz: 2017c
 ### Initialize the directory
 
 ``` bash
-# mkdir m4d3bug.gitlab.io
-# cd m4d3bug.gitlab.io/
+~]# mkdir m4d3bug.gitlab.io
+~]# cd m4d3bug.gitlab.io/
 ~/m4d3bug.gitlab.io# hexo init
 npm WARN optional Skipping failed optional dependency /chokidar/fsevents:
 npm WARN notsup Not compatible with your operating system or architecture: fsevents@1.2.9
