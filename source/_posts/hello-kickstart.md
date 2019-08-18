@@ -115,6 +115,7 @@ label 2
 ``` bash
 ~]# yum -y install httpd
 ~]# rm -f /etc/httpd/conf.d/welcome.conf
+~]# sed -i "277i ServerName 127.0.0.1:80" /etc/httpd/conf/httpd.conf
 ~]# vi /etc/httpd/conf.d/pxeboot.conf
 # create new
 Alias /rhel7 /var/pxe/rhel7
@@ -133,4 +134,68 @@ Alias /rhel7 /var/pxe/rhel7
 Enable network boot on BIOS settings of client computer and start it, then installation menu is shown, push Enter key to proceed to install.
 
 ![](https://i.loli.net/2019/08/18/3a6yE5s4xNDMZCX.png)
+
+## Configure Kickstart Install
+
+```bash
+~]# mkdir /var/www/html/ks 
+~]# yum install -y system-config-kickstart
+~]# system-config-kickstart
+```
+
+### Custom your ks.cfg
+
+![](https://i.loli.net/2019/08/18/NiJG2l7BSgHyvWe.png)
+
+![](https://i.loli.net/2019/08/18/Ukyx7uJDowYIAVQ.png)
+
+![](https://i.loli.net/2019/08/18/K1WNP4OGlFILhCS.png)
+
+![](https://i.loli.net/2019/08/18/GFX76hIsiwB9AzO.png)
+
+![](https://i.loli.net/2019/08/18/VcaJwYrvNjkhDOF.png)
+
+![](https://i.loli.net/2019/08/18/8y5D3huAg2siJ6L.png)
+
+![](https://i.loli.net/2019/08/18/KCMOzcEbmnIoT9t.png)
+
+![](https://i.loli.net/2019/08/18/2wWiAxO8HvVClK6.png)
+
+### Configure packages I need
+
+```bash
+]# cat ~/anaconda-ks.cfg |grep -A 19 %packages >> /var/www/html/ks/rhel-ks.cfg
+%packages
+@^graphical-server-environment
+@base
+@core
+@desktop-debugging
+@dial-up
+@fonts
+@gnome-desktop
+@guest-agents
+@guest-desktop-agents
+@hardware-monitoring
+@input-methods
+@internet-browser
+@multimedia
+@print-client
+@x11
+chrony
+kexec-tools
+
+%end
+```
+
+### Configure disk 
+
+``` bash
+]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' rhel7-ks.cfg
+```
+
+Start the vm machine which is enabled network booting on BIOS settings, then PXE boot menu is shown. After 10 seconds later, installation process starts and will finish and reboot automatically.
+
+## Done
+
+Simply tried to complete the unattended installation of rhel7 by using kickstart.
 
