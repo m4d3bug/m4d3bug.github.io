@@ -65,7 +65,6 @@ SELINUX=disabled
 #   see /usr/share/doc/dhcp*/dhcpd.conf.example
 #   see dhcpd.conf(5) man page
 #
-option domain-name  "srv.world";
 option domain-name-servers 192.168.188.174;
 default-lease-time 300;
 max-lease-time 7200;
