@@ -2,14 +2,14 @@
 title: Hello Kickstart
 date: 2019-08-18 12:21:48
 categories:
-- "Ops"
+- "Ops "
 tags:
-- "Kickstart"
-- "DHCP"
-- "TFTP"
-- "PXE"
-- "httpd"
-- "RHEL 7"
+- "Kickstart "
+- "DHCP "
+- "TFTP "
+- "PXE "
+- "httpd "
+- "RHEL 7 "
 ---
 
 In this post, I am going to markdown how I tested the unattended kickstart installation in vm15.
