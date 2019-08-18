@@ -44,8 +44,10 @@ SELINUX=disabled
 # cat /etc/xinetd.d/tftp |grep disable
 	disable			= no
 # systemctl start xinetd 
-# systemctl enable xinetd 
+# systemctl enable xinetd
 ```
+
+## Start DHCP server
 
 
 
