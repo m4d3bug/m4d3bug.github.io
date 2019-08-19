@@ -1,5 +1,5 @@
 ---
-title: Hello Kickstart
+title: Hello Kickstart+PXE
 date: 2019-08-18 12:21:48
 categories:
 - "Ops "
@@ -12,7 +12,7 @@ tags:
 - "RHEL 7 "
 ---
 
-In this post, I am going to markdown how I tested the unattended kickstart installation in vm15.
+In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using PXE.
 
 And we need to run the following service on the same machine: TFTP, DHCP & httpd.
 
