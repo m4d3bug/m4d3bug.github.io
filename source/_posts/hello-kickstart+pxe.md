@@ -197,5 +197,5 @@ Start the vm machine which is enabled network booting on BIOS settings, then PXE
 
 ## Done
 
-Simply tried to complete the unattended installation of rhel7 by using kickstart.
+Simply tried to complete the unattended installation of RHEL7 by using Kickstart with PXE.
 
