@@ -30,7 +30,7 @@ SELINUX=disabled
 
 ### Stop Virtual Network Editor's dhcp services
 
-![](https://i.loli.net/2019/08/18/eKsX6nHdEc7bMB8.png)
+![](https://i.loli.net/2019/08/19/Yz6fghX8ijlLs9A.jpg)
 
 ### Configure custom ip
 
@@ -129,7 +129,7 @@ Alias /rhel7 /var/pxe/rhel7
 
 ### Create a  vm machines in the same LAN without iso.
 
-![](https://i.loli.net/2019/08/18/bkgTQwx8hzvJp7f.png)
+![](https://i.loli.net/2019/08/19/w8lkvhm1aFeg5ur.jpg)
 
 Enable network boot on BIOS settings of client computer and start it, then installation menu is shown, push Enter key to proceed to install.
 
