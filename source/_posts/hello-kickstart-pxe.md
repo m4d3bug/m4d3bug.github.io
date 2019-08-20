@@ -157,7 +157,7 @@ Enable network boot on BIOS settings of client computer and start it, then insta
 
 ![](https://i.loli.net/2019/08/18/8y5D3huAg2siJ6L.png)
 
-![](https://i.loli.net/2019/08/18/KCMOzcEbmnIoT9t.png)
+![](https://i.loli.net/2019/08/20/YzJ91PCfjvQFKs2.jpg)
 
 ![](https://i.loli.net/2019/08/18/2wWiAxO8HvVClK6.png)
 
