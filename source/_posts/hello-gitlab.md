@@ -72,6 +72,8 @@ INFO  Start blogging with Hexo!
 
 ### Create the remote repository
 
+Please fill up your repository name such as: [ custom name ]+gitlab.io
+
 ![](https://i.loli.net/2019/08/10/priZIByc4Tfks7S.png)
 
 ![](https://i.loli.net/2019/08/10/ugAZDkTQHYIOCKV.png)
