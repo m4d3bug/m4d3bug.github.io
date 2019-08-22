@@ -40,7 +40,7 @@ label linux
   menu label ^Install Red Hat Enterprise Linux 7.4
   menu default
   kernel vmlinuz
-  append initrd=initrd.img inst.stage2=hd:LABEL=RHEL-7.4\x20Server.x86_64 inst.ks=hd:LABEL=RHEL-7.4\x20Server.x86_64:/ks.cfg quiet
+  append initrd=initrd.img inst.stage2=hd:LABEL=RHEL-7.4\x20Server.x86_64:/isolinux/isolinux.cfg inst.ks=hd:LABEL=RHEL-7.4\x20Server.x86_64:/ks.cfg quiet
 
 label check
   menu label Test this ^media & install Red Hat Enterprise Linux 7.4
@@ -97,7 +97,7 @@ isolinux]# system-config-kickstart
 
 ![](https://i.loli.net/2019/08/18/NiJG2l7BSgHyvWe.png)
 
-![1566290827492](/home/m4d3bug/.config/Typora/typora-user-images/1566290827492.png)
+![](https://i.loli.net/2019/08/22/aSnE7IZXBuiNdPC.jpg)
 
 ![](https://i.loli.net/2019/08/18/K1WNP4OGlFILhCS.png)
 
