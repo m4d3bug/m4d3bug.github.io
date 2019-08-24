@@ -190,7 +190,7 @@ kexec-tools
 ### Configure disk 
 
 ``` bash
-]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' rhel7-ks.cfg
+]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' /var/www/html/ks/rhel-ks.cfg
 ```
 
 Start the vm machine which is enabled network booting on BIOS settings, then PXE boot menu is shown. After 10 seconds later, installation process starts and will finish and reboot automatically.
