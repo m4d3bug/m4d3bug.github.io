@@ -30,7 +30,7 @@ SELINUX=disabled
 
 ### Stop Virtual Network Editor's dhcp services
 
-![](https://i.loli.net/2019/08/19/Yz6fghX8ijlLs9A.jpg)
+![](https://i.loli.net/2019/08/26/buNconEfrlS68J3.jpg)
 
 ### Configure custom ip
 
