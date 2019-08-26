@@ -32,15 +32,15 @@ SELINUX=disabled
 ~]# mount /dev/cdrom /mnt/
 ~]# cp -rvf /mnt/* /var/usb/rhel7/
 ============================
-isolinux]# cd /var/usb/rhel7/isolinux
+~]# cd /var/usb/rhel7/isolinux
 isolinux]# chmod +w isolinux.cfg
-isolinux]# sed 's/timeout 600/timeout 100/g' isolinux.cfg
+isolinux]# sed -i 's/timeout 600/timeout 100/g' isolinux.cfg
 isolinux]# more isolinux.cfg|grep -A 9 "label linux"
 label linux
   menu label ^Install Red Hat Enterprise Linux 7.4
   menu default
   kernel vmlinuz
-  append initrd=initrd.img inst.stage2=hd:LABEL=RHEL-7.4\x20Server.x86_64:/isolinux/isolinux.cfg inst.ks=hd:LABEL=RHEL-7.4\x20Server.x86_64:/ks.cfg quiet
+  append initrd=initrd.img inst.stage2=hd:LABEL=RHEL-7.4\x20Server.x86_64 inst.ks=hd:LABEL=RHEL-7.4\x20Server.x86_64:/ks.cfg quiet
 
 label check
   menu label Test this ^media & install Red Hat Enterprise Linux 7.4
@@ -111,6 +111,38 @@ isolinux]# system-config-kickstart
 
 ![](https://i.loli.net/2019/08/20/mXZ4EavRCtbV6F9.jpg)
 
+### Configure packages I need
+
+```bash
+]# cat ~/anaconda-ks.cfg |grep -A 19 %packages >> /var/usb/rhel7/ks.cfg
+%packages
+@^graphical-server-environment
+@base
+@core
+@desktop-debugging
+@dial-up
+@fonts
+@gnome-desktop
+@guest-agents
+@guest-desktop-agents
+@hardware-monitoring
+@input-methods
+@internet-browser
+@multimedia
+@print-client
+@x11
+chrony
+kexec-tools
+
+%end
+```
+
+### Configure disk
+
+```bash
+]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' /var/usb/rhel7/ks.cfg
+```
+
 ## Patch up everything
 
 ### Patch up the iso
@@ -126,6 +158,24 @@ Writing:   Ending Padblock                         Start Block 2043092
 Done with: Ending Padblock                         Block(s)    150
 Max brk space used 541000
 2043242 extents written (3990 MB)
+============================
+rhel7]# isohybrid /tmp/My-RHEL-7.4.x86_64.iso 
+============================
+rhel7]# implantisomd5 /tmp/My-RHEL-7.4.x86_64.iso 
+Inserting md5sum into iso image...
+md5 = 00878c4f7f9ef89a92905cec5d5578e8
+Inserting fragment md5sums into iso image...
+fragmd5 = 8f4e15157268afdb9cd75367769a6ca5bf53b9c377c67f491dfb46be4a36
+frags = 20
+Setting supported flag to 0
+# patch up the md5
+============================
+rhel7]# checkisomd5 /tmp/My-RHEL-7.4.x86_64.iso 
+Press [Esc] to abort check.
+
+The media check is complete, the result is: PASS.
+
+It is OK to use this media.
 ```
 
 ### Patch up the USB
@@ -137,5 +187,10 @@ Max brk space used 541000
 4184559616 bytes (4.2 GB) copied, 94.6365 s, 44.2 MB/s
 ```
 
+### Verification results
 
+![](https://i.loli.net/2019/08/24/QvB4SdpCb9Y6D1c.png)
 
+## Done
+
+Simply tried to complete the unattended installation of RHEL7 by using Kickstart with USB.
