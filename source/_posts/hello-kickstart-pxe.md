@@ -115,7 +115,6 @@ label 2
 ``` bash
 ~]# yum -y install httpd
 ~]# rm -f /etc/httpd/conf.d/welcome.conf
-~]# sed -i "277i ServerName 127.0.0.1:80" /etc/httpd/conf/httpd.conf
 ~]# vi /etc/httpd/conf.d/pxeboot.conf
 # create new
 Alias /rhel7 /var/pxe/rhel7
