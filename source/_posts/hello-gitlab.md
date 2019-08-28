@@ -125,7 +125,13 @@ ssh-rsa AAAAB3NzaC1y.../iiF@@@@@@@@@@@@@@@@@@@@@== m4d3bug@ubuntu
 
 ![](https://i.loli.net/2019/08/12/9NeG8lWjYHadt4b.jpg)
 
+#### Delete origin rule and setup like this. 
+
+![](https://i.loli.net/2019/08/28/jL7n1h3KBOywvZg.png)
+
 ![](https://i.loli.net/2019/08/10/UGSMXCbTFYlA1yh.png)
+
+
 
 ## Start up the first commit
 
