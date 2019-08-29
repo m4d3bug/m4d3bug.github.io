@@ -17,7 +17,7 @@ And I will custom my own image before everything start.
 
 ### Turn off the selinux
 
-``` bash
+``` nohighlight
 ~]# cat /etc/selinux/config |grep ^SELINUX=
 SELINUX=disabled
 ```
@@ -26,7 +26,7 @@ SELINUX=disabled
 
 ### Use the environment's own image and modify the boot menu
 
-``` bash
+``` nohighlight
 ~]# mkdir -p /var/usb/rhel7 
 ============================
 ~]# mount /dev/cdrom /mnt/
@@ -51,7 +51,7 @@ label check
 
 ### Custom my own image
 
-``` bash
+``` nohighlight
 ~]# cat >/etc/yum.repos.d/RHEL-Media.repo<<EOF
 [r7-local]
 name=RHEL-7-CD
@@ -87,7 +87,7 @@ rhel7]# yum install open-vm-tools
 
 ## Configure Kickstart Install
 
-```bash
+```nohighlight
 ~]# cd /var/usb/rhel7/isolinux
 isolinux]# yum install -y system-config-kickstart
 isolinux]# system-config-kickstart
@@ -113,7 +113,7 @@ isolinux]# system-config-kickstart
 
 ### Configure packages I need
 
-```bash
+```nohighlight
 ]# cat ~/anaconda-ks.cfg |grep -A 19 %packages >> /var/usb/rhel7/ks.cfg
 %packages
 @^graphical-server-environment
@@ -139,7 +139,7 @@ kexec-tools
 
 ### Configure disk
 
-```bash
+```nohighlight
 ]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' /var/usb/rhel7/ks.cfg
 ```
 
@@ -147,7 +147,7 @@ kexec-tools
 
 ### Patch up the iso
 
-```bash
+```nohighlight
 rhel7]# mkisofs -o /tmp/My-RHEL-7.4.x86_64.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -joliet-long -R -J -v -T /var/usb/rhel7/
 Total translation table size: 1282022
 Total rockridge attributes bytes: 563634
@@ -180,7 +180,7 @@ It is OK to use this media.
 
 ### Patch up the USB
 
-```bash
+```nohighlight
 ~]# dd if=/tmp/My-RHEL-7.4.x86_64.iso of=/dev/sdb
 8172968+0 records in
 8172968+0 records out
