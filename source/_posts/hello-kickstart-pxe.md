@@ -20,7 +20,7 @@ And we need to run the following service on the same machine: TFTP, DHCP & httpd
 
 ### Turn off the selinux ,firewalld and iptables
 
-``` bash
+``` nohighlight
 ~]# cat /etc/selinux/config |grep ^SELINUX=
 SELINUX=disabled
 ~]# systemctl stop firewalld.service
@@ -40,7 +40,7 @@ SELINUX=disabled
 
 ### Install required packages and copy boot menu program file
 
-```bash
+```nohighlight
 ~]# yum -y install syslinux xinetd tftp-server dhcp
 ~]# mkdir /var/lib/tftpboot/pxelinux.cfg 
 ~]# cp /usr/share/syslinux/pxelinux.0 /var/lib/tftpboot/ 
@@ -48,7 +48,7 @@ SELINUX=disabled
 
 ### Start TFTP server
 
-``` bash
+``` nohighlight
 ~]# cat /etc/xinetd.d/tftp |grep disable
 	disable			= no
 ~]# systemctl start xinetd 
@@ -57,7 +57,7 @@ SELINUX=disabled
 
 ### Start DHCP server and specify PXE server's IP for "next-server"
 
-```bash
+```nohighlight
 ~]# cat /etc/dhcp/dhcpd.conf 
 
 #
@@ -85,7 +85,7 @@ subnet 192.168.188.0 netmask 255.255.255.0 {
 
 ### Use the environment's own image and create boot menu
 
-``` bash
+``` nohighlight
 ~]# mkdir -p /var/pxe/rhel7 
 ~]# mkdir /var/lib/tftpboot/rhel7
 ============================
@@ -112,7 +112,7 @@ label 2
 
 ### Use httpd to provide http services
 
-``` bash
+``` nohighlight
 ~]# yum -y install httpd
 ~]# rm -f /etc/httpd/conf.d/welcome.conf
 ~]# vi /etc/httpd/conf.d/pxeboot.conf
@@ -136,7 +136,7 @@ Enable network boot on BIOS settings of client computer and start it, then insta
 
 ## Configure Kickstart Install
 
-```bash
+```nohighlight
 ~]# mkdir /var/www/html/ks 
 ~]# yum install -y system-config-kickstart
 ~]# system-config-kickstart
@@ -162,7 +162,7 @@ Enable network boot on BIOS settings of client computer and start it, then insta
 
 ### Configure packages I need
 
-```bash
+```nohighlight
 ]# cat ~/anaconda-ks.cfg |grep -A 19 %packages >> /var/www/html/ks/rhel-ks.cfg
 %packages
 @^graphical-server-environment
@@ -188,7 +188,7 @@ kexec-tools
 
 ### Configure disk 
 
-``` bash
+``` nohighlight
 ]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' /var/www/html/ks/rhel-ks.cfg
 ```
 
