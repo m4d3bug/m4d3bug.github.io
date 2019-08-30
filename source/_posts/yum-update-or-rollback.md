@@ -1,5 +1,5 @@
 ---
-title: Yum Update or rollback
+title: Yum update or rollback
 mathjax: true
 copyright: true
 comment: true
@@ -31,6 +31,8 @@ SELINUX=disabled
 ```nohighlight
 [root@localhost ~]# yum update --releasever=7.6
 ```
+
+Everything just done.
 
 ## Rollback yum update 
 
@@ -70,8 +72,10 @@ Error: Trying to remove "systemd", which is protected
 ## Done
 
 In an environment where the system needs to updated, and the host's service is not too much, it must be clear that the rollback will inevitably affect the following:
-dbus
-kernel
-glibc (dependencies of glibc such as gcc)
-selinux-policy*
+
++ dbus
++ kernel
++ glibc (dependencies of glibc such as gcc)
++ selinux-policy*
+
 Although you still need to use caution when you have a snapshot.
