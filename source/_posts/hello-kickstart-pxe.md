@@ -1,5 +1,5 @@
 ---
-title: Hello Kickstart+PXE
+title: Hello Kickstart + PXE
 date: 2019-08-18 12:21:48
 categories:
 - "Ops "

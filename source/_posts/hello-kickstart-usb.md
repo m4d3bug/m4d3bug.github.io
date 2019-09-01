@@ -1,5 +1,5 @@
 ---
-title: Hello Kickstart+USB
+title: Hello Kickstart + USB
 date: 2019-08-20 15:47:23
 categories:
 - "Ops "
