@@ -1,5 +1,5 @@
 ---
-title: Yum update or rollback
+title: Yum Update And Rollback
 mathjax: true
 copyright: true
 comment: true
