@@ -24,9 +24,14 @@ photo:
 ## *Analyse problems from different side*
 
 <center><font size="5"><B>↓<i>From application side(throughput, delay...)</i>↓</B></font></center>
+
+
 ![](https://i.loli.net/2019/09/01/wRrC6fNJWbMFgQd.png)
 
+
+
 <center><font size="5"><B>↑<i>From system side(CPU, memory...)</i>↑</B></font></center>
+
 ## *Linux performance tools*
 
 ![](https://i.loli.net/2019/09/01/9UxpGEs4hHkValJ.png)
