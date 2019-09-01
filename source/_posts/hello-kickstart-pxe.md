@@ -10,15 +10,16 @@ tags:
 - "PXE "
 - "httpd "
 - "RHEL 7 "
+- "Linux "
 ---
 
-In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using PXE.
+*In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using PXE.
 
-And we need to run the following service on the same machine: TFTP, DHCP & httpd.
+And we need to run the following service on the same machine: TFTP, DHCP & httpd.*
 
-## Environmental preparation
+## *Environmental preparation*
 
-### Turn off the selinux ,firewalld and iptables
+### *Turn off the selinux ,firewalld and iptables*
 
 ``` nohighlight
 ~]# cat /etc/selinux/config |grep ^SELINUX=
@@ -28,17 +29,17 @@ SELINUX=disabled
 ~]# iptables -F
 ```
 
-### Stop Virtual Network Editor's dhcp services
+### *Stop Virtual Network Editor's dhcp services*
 
 ![](https://i.loli.net/2019/08/26/buNconEfrlS68J3.jpg)
 
-### Configure custom ip
+### *Configure custom ip*
 
 ![](https://i.loli.net/2019/08/18/AkWE7qphu9iFcSI.png)
 
-## Configure PXE Server
+## *Configure PXE Server*
 
-### Install required packages and copy boot menu program file
+### *Install required packages and copy boot menu program file*
 
 ```nohighlight
 ~]# yum -y install syslinux xinetd tftp-server dhcp
@@ -46,7 +47,7 @@ SELINUX=disabled
 ~]# cp /usr/share/syslinux/pxelinux.0 /var/lib/tftpboot/ 
 ```
 
-### Start TFTP server
+### *Start TFTP server*
 
 ``` nohighlight
 ~]# cat /etc/xinetd.d/tftp |grep disable
@@ -55,7 +56,7 @@ SELINUX=disabled
 ~]# systemctl enable xinetd
 ```
 
-### Start DHCP server and specify PXE server's IP for "next-server"
+### *Start DHCP server and specify PXE server's IP for "next-server"*
 
 ```nohighlight
 ~]# cat /etc/dhcp/dhcpd.conf 
@@ -81,9 +82,9 @@ subnet 192.168.188.0 netmask 255.255.255.0 {
 ~]# systemctl enable dhcpd 
 ```
 
-## Configure Network Install 
+## *Configure Network Install*
 
-### Use the environment's own image and create boot menu
+### *Use the environment's own image and create boot menu*
 
 ``` nohighlight
 ~]# mkdir -p /var/pxe/rhel7 
@@ -110,7 +111,7 @@ label 2
    localboot
 ```
 
-### Use httpd to provide http services
+### *Use httpd to provide http services*
 
 ``` nohighlight
 ~]# yum -y install httpd
@@ -126,15 +127,15 @@ Alias /rhel7 /var/pxe/rhel7
 ~]# systemctl start httpd 
 ```
 
-### Create a  vm machines in the same LAN without iso.
+### *Create a  vm machines in the same LAN without iso.*
 
 ![](https://i.loli.net/2019/08/19/w8lkvhm1aFeg5ur.jpg)
 
-Enable network boot on BIOS settings of client computer and start it, then installation menu is shown, push Enter key to proceed to install.
+*Enable network boot on BIOS settings of client computer and start it, then installation menu is shown, push Enter key to proceed to install.*
 
 ![](https://i.loli.net/2019/08/18/3a6yE5s4xNDMZCX.png)
 
-## Configure Kickstart Install
+## *Configure Kickstart Install*
 
 ```nohighlight
 ~]# mkdir /var/www/html/ks 
@@ -142,7 +143,7 @@ Enable network boot on BIOS settings of client computer and start it, then insta
 ~]# system-config-kickstart
 ```
 
-### Custom your ks.cfg
+### *Custom your ks.cfg*
 
 ![](https://i.loli.net/2019/08/18/NiJG2l7BSgHyvWe.png)
 
@@ -160,7 +161,7 @@ Enable network boot on BIOS settings of client computer and start it, then insta
 
 ![](https://i.loli.net/2019/08/18/2wWiAxO8HvVClK6.png)
 
-### Configure packages I need
+### *Configure packages I need*
 
 ```nohighlight
 ]# cat ~/anaconda-ks.cfg |grep -A 19 %packages >> /var/www/html/ks/rhel-ks.cfg
@@ -186,15 +187,15 @@ kexec-tools
 %end
 ```
 
-### Configure disk 
+### *Configure disk*
 
 ``` nohighlight
 ]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' /var/www/html/ks/rhel-ks.cfg
 ```
 
-Start the vm machine which is enabled network booting on BIOS settings, then PXE boot menu is shown. After 10 seconds later, installation process starts and will finish and reboot automatically.
+*Start the vm machine which is enabled network booting on BIOS settings, then PXE boot menu is shown. After 10 seconds later, installation process starts and will finish and reboot automatically.*
 
-## Done
+## *Done*
 
-Simply tried to complete the unattended installation of RHEL7 by using Kickstart with PXE.
+*Simply tried to complete the unattended installation of RHEL7 by using Kickstart with PXE.*
 

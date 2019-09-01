@@ -5,21 +5,24 @@ categories:
 tags:
 - "Git " 
 - "CI/CD " 
-- "hexo " 
+- "Hexo "
+- "Ubuntu "
+- "Linux "
+- "Nodejs " 
 date: 2019-08-08 23:59:59
 ---
 
-In this post, I am going to markdown how I build up this blog with CI/CD and custom my own domain in [GitLab](https://www.gitlab.com) .
+*In this post, I am going to markdown how I build up this blog with CI/CD and custom my own domain in [GitLab](https://www.gitlab.com) .*
 
-## Configure blog environment in local
+## *Configure blog environment in local*
 
-### Install the package
+### *Install the package*
 
 ``` bash
 ~]# apt update -y && apt install -y nodejs npm git
 ```
 
-### Confirm the version of tools
+### *Confirm the version of tools*
 
 ``` bash
 ~]# nodejs -v
@@ -30,13 +33,13 @@ v8.10.0
 git version 2.17.1
 ```
 
-### Install the hexo
+### *Install the hexo*
 
 ``` bash
 ~]# npm install hexo -g
 ```
 
-### Confirm the version of hexo
+### *Confirm the version of hexo*
 
 ``` bash
 ~]# hexo -v
@@ -57,7 +60,7 @@ cldr: 32.0.1
 tz: 2017c
 ```
 
-### Initialize the directory
+### *Initialize the directory*
 
 ``` bash
 ~]# mkdir m4d3bug.gitlab.io
@@ -68,17 +71,17 @@ npm WARN notsup Not compatible with your operating system or architecture: fseve
 INFO  Start blogging with Hexo!
 ```
 
-## Configure git repository
+## *Configure git repository*
 
-### Create the remote repository
+### *Create the remote repository*
 
-Please fill up your repository name such as: [ custom name ]+gitlab.io
+*Please fill up your repository name such as: [ custom name ]+gitlab.io.*
 
 ![](https://i.loli.net/2019/08/10/priZIByc4Tfks7S.png)
 
 ![](https://i.loli.net/2019/08/10/ugAZDkTQHYIOCKV.png)
 
-### Create the local repository
+### *Create the local repository*
 
 ``` bash
 ~/m4d3bug.gitlab.io# git init
@@ -89,9 +92,9 @@ origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (fetch)
 origin  git@gitlab.com:m4d3bug/m4d3bug.gitlab.io.git (push)
 ```
 
-## Configure the access right in the GitLab
+## *Configure the access right in the GitLab*
 
-### Generate local SSH keys and public keys
+### *Generate local SSH keys and public keys*
 
 ``` bash
 ~/m4d3bug.gitlab.io# ssh-keygen -t rsa -b 4096 -C "m4d3bug@ubuntu" -N ""
@@ -117,23 +120,21 @@ The key's randomart image is:
 ssh-rsa AAAAB3NzaC1y.../iiF@@@@@@@@@@@@@@@@@@@@@== m4d3bug@ubuntu
 ```
 
-### Upload the public key
+### *Upload the public key*
 
 ![](https://i.loli.net/2019/08/10/grnETp16mayWYlw.png)
 
-### Update the policy of yourself
+### *Update the policy of yourself*
 
 ![](https://i.loli.net/2019/08/12/9NeG8lWjYHadt4b.jpg)
 
-#### Delete origin rule and setup like this. 
+#### *Delete origin rule and setup like this. *
 
 ![](https://i.loli.net/2019/08/28/jL7n1h3KBOywvZg.png)
 
 ![](https://i.loli.net/2019/08/10/UGSMXCbTFYlA1yh.png)
 
-
-
-## Start up the first commit
+## *Start up the first commit*
 
 ``` bash
 ~/m4d3bug.gitlab.io# git checkout -b beta
@@ -146,13 +147,13 @@ Switched to a new branch 'beta'
 ~/m4d3bug.gitlab.io# git push --set-upstream origin beta
 ```
 
-Now you can see that the remote repository has created a new branch called beta and includes the above files.
+*Now you can see that the remote repository has created a new branch called beta and includes the above files.*
 
 ![](https://i.loli.net/2019/08/10/OvHGo1j3MutW7rR.png)
 
-## Configure the pipeline
+## *Configure the pipeline*
 
-### Create the .gitlab-ci.yml in local
+### *Create the .gitlab-ci.yml in local*
 
 ``` yaml
 image: node:6.10.2
@@ -179,7 +180,7 @@ pages:
         - beta
 ```
 
-### Confirm the status of local repository
+### *Confirm the status of local repository*
 
 ``` bash
 ~/m4d3bug.gitlab.io# git status
@@ -194,7 +195,7 @@ Untracked files:
 nothing added to commit but untracked files present (use "git add" to track)
 ```
 
-### Push the change to the remote repository
+### *Push the change to the remote repository*
 
 ``` bash
 ~/m4d3bug.gitlab.io# git add .
@@ -202,27 +203,27 @@ nothing added to commit but untracked files present (use "git add" to track)
 ~/m4d3bug.gitlab.io# git push --set-upstream origin beta
 ```
 
-### Confirm the pipelines is working
+### *Confirm the pipelines is working*
 
 ![](https://i.loli.net/2019/08/11/U9xHfalLTC3WpA1.png)
 
-After that, you can get the assigned domain name in Settings >> Pages
+*After that, you can get the assigned domain name in Settings >> Pages .*
 
 ![](https://i.loli.net/2019/08/11/KxRXZrL6ohaAVQG.png)
 
-## Custom my own domain
+## *Custom my own domain*
 
-### GitLab generates domain verification text
+### *GitLab generates domain verification text*
 
 ![](https://i.loli.net/2019/08/11/HykJnsKlj37FxYd.png)
 
 ![](https://i.loli.net/2019/08/11/Xz2fk1prdlESvis.png)
 
-### Domain name resolution is set by cloudflare
+### *Domain name resolution is set by cloudflare*
 
 ![](https://i.loli.net/2019/08/11/IZ1jUJEakPe4dsf.png)
 
-### Make sure the https working on custom domain
+### *Make sure the https working on custom domain*
 
 ![](https://i.loli.net/2019/08/11/O12KTspUnuo4CFg.png)
 
@@ -230,9 +231,9 @@ After that, you can get the assigned domain name in Settings >> Pages
 
 
 
-## Done
+## *Done*
 
-Now the custom domain name and CI/CD are in effect, and a clean master branch is kept for rollback. When everything is good with the commit, you can choose merge beta to the master branch, by executing the following command.
+*Now the custom domain name and CI/CD are in effect, and a clean master branch is kept for rollback. When everything is good with the commit, you can choose merge beta to the master branch, by executing the following command.*
 
 ``` bash
 ~/m4d3bug.gitlab.ios# git checkout master

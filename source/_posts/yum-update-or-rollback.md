@@ -13,30 +13,30 @@ tags:
 photo:
 ---
 
-In this post, I am going to markdown that YUM provides commands for updating to the specified version, and how to rollback the action (not suggest to downgrade the system version If not necessarily).
+*In this post, I am going to markdown that YUM provides commands for updating to the specified version, and how to rollback the action (not suggest to downgrade the system version If not necessarily).*
 
-## Environmental preparation
+## *Environmental preparation*
 
-### Trun off the selinux
+### *Trun off the selinux*
 
 ``` nohighlight
 [root@localhost ~]# cat /etc/selinux/config |grep ^SELINUX=
 SELINUX=disabled
 ```
 
-## Yum update
+## *Yum update*
 
-### Specify the version you need
+### *Specify the version you need*
 
 ```nohighlight
 [root@localhost ~]# yum update --releasever=7.6
 ```
 
-Everything just done.
+*Everything just done.*
 
-## Rollback yum update 
+## *Rollback yum update*
 
-### Listed the history in your machine
+### *Listed the history in your machine*
 
 ```nohighlight
 [root@localhost ~]# yum history list all
@@ -54,28 +54,28 @@ ID     | Login user               | Date and time    | Action(s)      | Altered
      1 | System <unset>           | 2019-07-25 10:45 | Install        | 1363   
 ```
 
-### Specify the action to rollback
+### *Specify the action to rollback*
 
 ```nohighlight
 [root@localhost ~]# yum history undo 8
 ```
 
-## Handling instability error
+## *Handling instability error*
 
-This mechanism is intented to protect users from ending up with a system without systemd.
+*This mechanism is intented to protect users from ending up with a system without systemd.*
 
 ```nohighlight
 Error: Trying to remove "systemd", which is protected
 [root@localhost ~]# mv /etc/yum/protected.d/systemd.conf /tmp/
 ```
 
-## Done
+## *Done*
 
-In an environment where the system needs to updated, and the host's service is not too much, it must be clear that the rollback will inevitably affect the following:
+*In an environment where the system needs to updated, and the host's service is not too much, it must be clear that the rollback will inevitably affect the following:*
 
-+ dbus
-+ kernel
-+ glibc (dependencies of glibc such as gcc)
-+ selinux-policy*
++ *dbus*
++ *kernel*
++ *glibc (dependencies of glibc such as gcc)*
++ *selinux-policy* *
 
-Although you still need to use caution when you have a snapshot.
+*Although you still need to use caution when you have a snapshot.*

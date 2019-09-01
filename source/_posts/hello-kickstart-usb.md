@@ -5,26 +5,27 @@ categories:
 - "Ops "
 tags:
 - "Kickstart "
-- "USB"
+- "USB "
 - "RHEL 7 "
+- "Linux "
 ---
 
-In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using USB.
+*In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using USB.*
 
-And I will custom my own image before everything start.
+*And I will custom my own image before everything start.*
 
-## Environmental preparation
+## *Environmental preparation*
 
-### Turn off the selinux
+### *Turn off the selinux*
 
 ``` nohighlight
 ~]# cat /etc/selinux/config |grep ^SELINUX=
 SELINUX=disabled
 ```
 
- ## Configure USB Install 
+ ## *Configure USB Install*
 
-### Use the environment's own image and modify the boot menu
+### *Use the environment's own image and modify the boot menu*
 
 ``` nohighlight
 ~]# mkdir -p /var/usb/rhel7 
@@ -49,7 +50,7 @@ label check
 # Change these section like this.
 ```
 
-### Custom my own image
+### *Custom my own image*
 
 ``` nohighlight
 ~]# cat >/etc/yum.repos.d/RHEL-Media.repo<<EOF
@@ -85,7 +86,7 @@ rhel7]# yum install open-vm-tools
 #Test it.
 ```
 
-## Configure Kickstart Install
+## *Configure Kickstart Install*
 
 ```nohighlight
 ~]# cd /var/usb/rhel7/isolinux
@@ -93,7 +94,7 @@ isolinux]# yum install -y system-config-kickstart
 isolinux]# system-config-kickstart
 ```
 
-### Custom your ks.cfg
+### *Custom your ks.cfg*
 
 ![](https://i.loli.net/2019/08/18/NiJG2l7BSgHyvWe.png)
 
@@ -111,7 +112,7 @@ isolinux]# system-config-kickstart
 
 ![](https://i.loli.net/2019/08/20/mXZ4EavRCtbV6F9.jpg)
 
-### Configure packages I need
+### *Configure packages I need*
 
 ```nohighlight
 ]# cat ~/anaconda-ks.cfg |grep -A 19 %packages >> /var/usb/rhel7/ks.cfg
@@ -137,15 +138,15 @@ kexec-tools
 %end
 ```
 
-### Configure disk
+### *Configure disk*
 
 ```nohighlight
 ]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' /var/usb/rhel7/ks.cfg
 ```
 
-## Patch up everything
+## *Patch up everything*
 
-### Patch up the iso
+### *Patch up the iso*
 
 ```nohighlight
 rhel7]# mkisofs -o /tmp/My-RHEL-7.4.x86_64.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -joliet-long -R -J -v -T /var/usb/rhel7/
@@ -178,7 +179,7 @@ The media check is complete, the result is: PASS.
 It is OK to use this media.
 ```
 
-### Patch up the USB
+### *Patch up the USB*
 
 ```nohighlight
 ~]# dd if=/tmp/My-RHEL-7.4.x86_64.iso of=/dev/sdb
@@ -187,10 +188,10 @@ It is OK to use this media.
 4184559616 bytes (4.2 GB) copied, 94.6365 s, 44.2 MB/s
 ```
 
-### Verification results
+### *Verification results*
 
 ![](https://i.loli.net/2019/08/24/QvB4SdpCb9Y6D1c.png)
 
-## Done
+## *Done*
 
-Simply tried to complete the unattended installation of RHEL7 by using Kickstart with USB.
+*Simply tried to complete the unattended installation of RHEL7 by using Kickstart with USB.*
