@@ -65,6 +65,8 @@ ID     | Login user               | Date and time    | Action(s)      | Altered
 *This mechanism is intented to protect users from ending up with a system without systemd.*
 
 ```nohighlight
+...
+--> Finished Dependency Resolution
 Error: Trying to remove "systemd", which is protected
 [root@localhost ~]# mv /etc/yum/protected.d/systemd.conf /tmp/
 ```
