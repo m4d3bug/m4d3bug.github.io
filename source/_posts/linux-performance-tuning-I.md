@@ -15,7 +15,7 @@ photo:
 
 *The nature of performance problems is that the system resources have reached the bottleneck, but the processing requests are not fast enough to support more requests.*
 
-性能問題的本質，就是系統資源已經達到瓶頸，但請求的處理卻還不夠快，無法支撐更多的請求无法支撑更多的请求。
+性能問題的本質，就是系統資源已經達到瓶頸，但請求的處理卻還不夠快，無法支撐更多的請求。
 
 *Performance analysis is to find out the bottlenecks of applications or systems and try to avoid or mitigate them.*
 
