@@ -1,5 +1,5 @@
 ---
-title: linux performance tuning study notes II
+title: Linux Performance Tuning Study Notes II
 mathjax: true
 copyright: true
 comment: true
