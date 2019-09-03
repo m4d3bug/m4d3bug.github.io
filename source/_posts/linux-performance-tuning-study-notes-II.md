@@ -48,7 +48,7 @@ photo:
 
   因此，平均負載和 CPU 使用率不一定掛鉤。
 
-###  *R+ = runnable  ↓  D+ = Disk Sleep(uninterruptable)   ↓*
+###  *R+ = runnable  ↓        D+ = Disk Sleep(uninterruptable)   ↓*
 
 ```nohighlight
 [root@localhost ~]# ps -aux
@@ -95,7 +95,8 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
                 <><><><>                
                  'MKKM' 
                    ''
-[root@VM_0_15_centos ~]# yum install -y stress sysstat
+[root@localhost ~]# wget http://download-ib01.fedoraproject.org/pub/fedora/linux/releases/30/Everything/x86_64/os/Packages/s/sysstat-11.7.3-3.fc30.x86_64.rpm
+[root@localhost ~]# yum install -y stress sysstat-11.7.3-3.fc30.x86_64.rpm
 ```
 
 ### *Using CPU*
@@ -107,7 +108,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   stress: info: [19751] dispatching hogs: 1 cpu, 0 io, 0 vm, 0 hd
   ```
 
-  *Will stop util cpu 1 up to 100%.*
+  *Will stop util 10min.*
 
 - #### *Windows 2*
 
@@ -126,18 +127,18 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   [root@localhost ~]# mpstat -P ALL 5
   11:41:18 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
   11:41:23 PM  all 50.15  0.00  0.20  0.10   0.00   0.10    0.00    0.00    0.00  49.45
-  11:41:23 PM    0 100.00 0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00    0.00
-  11:41:23 PM    1  0.20  0.00  0.40  0.00   0.00   0.00    0.00    0.00    0.00   99.40
+  11:41:23 PM    0 100.00 0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00   0.00
+  11:41:23 PM    1  0.20  0.00  0.40  0.00   0.00   0.00    0.00    0.00    0.00  99.40
   
   11:41:23 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
-  11:41:28 PM  all 50.25  0.00  0.30  0.00   0.00   0.00    0.00    0.00    0.00   49.45
-  11:41:28 PM    0 94.81  0.00  0.20  0.00   0.00   0.00    0.00    0.00    0.00    4.99
-  11:41:28 PM    1  5.61  0.00  0.40  0.00   0.00   0.00    0.00    0.00    0.00   93.99
+  11:41:28 PM  all 50.25  0.00  0.30  0.00   0.00   0.00    0.00    0.00    0.00  49.45
+  11:41:28 PM    0 94.81  0.00  0.20  0.00   0.00   0.00    0.00    0.00    0.00   4.99
+  11:41:28 PM    1  5.61  0.00  0.40  0.00   0.00   0.00    0.00    0.00    0.00  93.99
   
   11:41:28 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
-  11:41:33 PM  all 50.25  0.00  0.20  0.10   0.00   0.00    0.00    0.00    0.00   49.45
-  11:41:33 PM    0 98.60  0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00    1.40
-  11:41:33 PM    1  1.80  0.00  0.40  0.20   0.00   0.00    0.00    0.00    0.00   97.60
+  11:41:33 PM  all 50.25  0.00  0.20  0.10   0.00   0.00    0.00    0.00    0.00  49.45
+  11:41:33 PM    0 98.60  0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00   1.40
+  11:41:33 PM    1  1.80  0.00  0.40  0.20   0.00   0.00    0.00    0.00    0.00  97.60
   ```
 
   *Only one cpu's %usr is rising.*
@@ -146,16 +147,154 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   ```nohighlight
   [root@localhost ~]# pidstat -u 5
-  11:50:48 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
-  11:50:53 PM     0      6099    0.00    0.20    0.00    0.20     0  barad_agent
-  11:50:53 PM     0      6100    0.20    0.00    0.00    0.20     0  barad_agent
-  11:50:53 PM     0     12526    0.20    0.00    0.00    0.20     1  YDService
-  11:50:53 PM     0     12760    0.00    0.20    0.00    0.20     1  YDLive
-  11:50:53 PM     0     20334    0.00    0.20    0.00    0.20     1  pidstat
-  11:50:53 PM     0     22927  100.00    0.00    0.00  100.00     0  stress
+  10:40:09 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+  10:40:14 PM     0      2853    0.20    0.20    0.00    0.40    0.40     0  YDService
+  10:40:14 PM     0      3303    0.00    0.20    0.00    0.00    0.20     0  sshd
+  10:40:14 PM     0      3750    0.40    0.40    0.00    0.00    0.80     0  barad_agent
+  10:40:14 PM     0      4179    0.20    0.00    0.00    0.00    0.20     0  watch
+  10:40:14 PM     0     18043  100.00    0.00    0.00    0.00  100.00     1  stress
+  ```
+  
+*Now we can clearly see load average up because of using CPU.*
+
+### *Waiting I/O*
+
+- #### *Windows 1*
+
+  ``` nohighlight
+  [root@localhost ~]# stress -i 1 --timeout 600
+  stress: info: [15703] dispatching hogs: 0 cpu, 1 io, 0 vm, 0 hdd
   ```
 
-  *Now we can clearly see load average up to 1 because of using CPU.*
+  *Will stop util 10min.*
+
+- #### Windows 2*
+
+  ``` nohighlight
+  [root@localhost ~]# watch -d uptime
+  Every 2.0s: uptime                                                          Tue Sep  3 21:34:11 2019
+  
+   21:34:11 up 6 min,  4 users,  load average: 1.05, 0.62, 0.27
+  ```
+
+  *load average of 1 min will close to 1.06.*
+
+- #### Windows 3*
+
+  ```nohighlight
+  [root@localhost ~]# mpstat -P ALL 5 3
+  09:36:05 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
+  09:36:10 PM  all 0.50  0.00 29.03  21.27  0.00   0.00    0.00    0.00    0.00  49.19
+  09:36:10 PM    0 0.81  0.00 25.15  17.44  0.00   0.00    0.00    0.00    0.00  56.59
+  09:36:10 PM    1 0.20  0.00 32.73  25.10  0.00   0.00    0.00    0.00    0.00  41.97
+  
+  09:36:10 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
+  09:36:15 PM  all 0.30  0.00 29.43  21.42  0.00   0.00    0.00    0.00    0.00  48.85
+  09:36:15 PM    0 0.40  0.00 20.61  15.15  0.00   0.00    0.00    0.00    0.00  63.84
+  09:36:15 PM    1 0.00  0.00 38.29  27.58  0.00   0.00    0.00    0.00    0.00  34.13
+  
+  09:36:15 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
+  09:36:20 PM  all 0.30  0.00  28.61 21.54  0.00   0.00    0.00    0.00    0.00  49.54
+  09:36:20 PM    0 0.41  0.00  13.18  9.13  0.00   0.00    0.00    0.00    0.00  77.28
+  09:36:20 PM    1 0.20  0.00  43.75 33.87  0.00   0.00    0.00    0.00    0.00  22.18
+  ```
+
+  *Only one cpu's %iowait is rising.*
+
+- #### *Windows 4*
+
+  ``` nohighlight
+  [root@localhost ~]# pidstat -u 5 1
+  10:37:29 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+  10:37:34 PM     0      1232    0.00    0.40    0.00    0.00    0.40     0 kworker/0:1H
+  10:37:34 PM     0      2853    0.40    0.40    0.00    0.60    0.80     1  YDService
+  10:37:34 PM     0      3750    0.20    0.00    0.00    0.00    0.20     0  barad_agent
+  10:37:34 PM     0     16458    0.00    0.20    0.00    0.00    0.20     0  pidstat
+  10:37:34 PM     0     17460    0.00   85.20    0.00    0.40   85.20     1  stress
+  ```
+  
+  *Now we can clearly see load average up because of waiting I/O.*
+
+### *Waiting CPU*
+
+- #### *Windows 1*
+
+  ``` nohighlight
+  [root@localhost ~]# stress --cpu 8 --timeout 600
+  stress: info: [9168] dispatching hogs: 8 cpu, 0 io, 0 vm, 0 hdd
+  ```
+
+- #### *Windows 2*
+
+  ``` nohighlight
+  [root@localhost ~]# watch -d uptime
+  Every 2.0s: uptime                                                          Tue Sep  3 22:08:46 2019
+  
+   22:08:46 up 41 min,  4 users,  load average: 9.34, 8.13, 4.66
+  ```
+
+  *load average of 1 min will close to 10.00.*
+
+- #### *Windows 3*
+
+  ``` nohighlight
+  [root@localhost ~]# mpstat -P ALL 5 3
+  09:59:51 PM CPU   %usr %nice  %sys %iowait %irq %soft  %steal  %guest  %gnice  %idle
+  09:59:57 PM  all 99.70  0.00  0.20  0.10   0.00  0.10    0.00    0.00    0.00   0.00
+  09:59:57 PM    0 99.80  0.00  0.20  0.00   0.00  0.00    0.00    0.00    0.00   0.00
+  09:59:57 PM    1 99.80  0.00  0.20  0.00   0.00  0.00    0.00    0.00    0.00   0.00
+  
+  09:59:57 PM  CPU %usr  %nice  %sys %iowait %irq %soft  %steal  %guest  %gnice  %idle
+  10:00:02 PM  all 99.60  0.00  0.40  0.00   0.00  0.10    0.00    0.00    0.00   0.00
+  10:00:02 PM    0 99.80  0.00  0.20  0.00   0.10  0.00    0.00    0.00    0.00   0.00
+  10:00:02 PM    1 99.40  0.00  0.60  0.00   0.00  0.00    0.00    0.00    0.00   0.00
+  
+  10:00:02 PM  CPU %usr  %nice  %sys %iowait %irq %soft  %steal  %guest  %gnice  %idle
+  10:00:07 PM  all 99.70  0.00  0.30  0.00   0.00  0.00    0.00    0.00    0.00   0.00
+  10:00:07 PM    0 99.80  0.00  0.20  0.00   0.00  0.00    0.00    0.00    0.00    0.00
+  10:00:07 PM    1 99.60  0.00  0.40  0.00   0.00  0.00    0.00    0.00    0.00    0.00
+  ```
+
+  *All cpu's %usr is rising.*
+
+- #### *Windows 4*
+
+  ```nohighlight
+  [root@localhost ~]# pidstat -u 5 1
+  10:33:44 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+  10:33:49 PM     0      2774    0.00    0.20    0.00    0.00    0.20     1  auditd
+  10:33:49 PM     0      2853    0.20    0.20    0.00   74.45    0.40     1  YDService
+  10:33:49 PM     0     16458    0.00    0.20    0.00    0.20    0.20     0  pidstat
+  10:33:49 PM     0     16488   24.55    0.00    0.00   75.65   24.55     0  stress
+  10:33:49 PM     0     16489   24.55    0.00    0.00   75.05   24.55     0  stress
+  10:33:49 PM     0     16490   24.75    0.00    0.00   75.45   24.75     0  stress
+  10:33:49 PM     0     16491   24.75    0.00    0.00   74.65   24.75     1  stress
+  10:33:49 PM     0     16492   24.95    0.00    0.00   75.45   24.95     1  stress
+  10:33:49 PM     0     16493   24.95    0.00    0.00   75.05   24.95     1  stress
+  10:33:49 PM     0     16494   24.35    0.00    0.00   75.05   24.35     0  stress
+  10:33:49 PM     0     16495   24.75    0.00    0.00   75.65   24.75     1  stress
+  ```
+
+  *Now we can clearly see load average up because of waiting CPU(%wait).* 
+
+## *Done*
+
+### *load averages = runnable(可運行態) + uninterruptable(不可中斷態)*
+
+- *System load averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
+- *System load averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
+- *System load averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
+
+
+
+
+
+
+
+
+
+
+
 
 
 
