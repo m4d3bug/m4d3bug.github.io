@@ -168,7 +168,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *Will stop util 10min.*
 
-- #### Windows 2*
+- #### *Windows 2*
 
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
@@ -179,7 +179,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *load average of 1 min will close to 1.06.*
 
-- #### Windows 3*
+- #### *Windows 3*
 
   ```nohighlight
   [root@localhost ~]# mpstat -P ALL 5 3
