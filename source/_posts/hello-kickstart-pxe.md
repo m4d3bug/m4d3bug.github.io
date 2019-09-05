@@ -42,24 +42,24 @@ SELINUX=disabled
 ### *Install required packages and copy boot menu program file*
 
 ```nohighlight
-~]# yum -y install syslinux xinetd tftp-server dhcp
-~]# mkdir /var/lib/tftpboot/pxelinux.cfg 
-~]# cp /usr/share/syslinux/pxelinux.0 /var/lib/tftpboot/ 
+[root@localhost ~]# yum -y install syslinux xinetd tftp-server dhcp
+[root@localhost ~]# mkdir /var/lib/tftpboot/pxelinux.cfg 
+[root@localhost ~]# cp /usr/share/syslinux/pxelinux.0 /var/lib/tftpboot/ 
 ```
 
 ### *Start TFTP server*
 
 ``` nohighlight
-~]# cat /etc/xinetd.d/tftp |grep disable
+[root@localhost ~]# cat /etc/xinetd.d/tftp |grep disable
 	disable			= no
-~]# systemctl start xinetd 
-~]# systemctl enable xinetd
+[root@localhost ~]# systemctl start xinetd 
+[root@localhost ~]# systemctl enable xinetd
 ```
 
 ### *Start DHCP server and specify PXE server's IP for "next-server"*
 
 ```nohighlight
-~]# cat /etc/dhcp/dhcpd.conf 
+[root@localhost ~]# cat /etc/dhcp/dhcpd.conf 
 
 #
 # DHCP Server Configuration file.
@@ -87,15 +87,27 @@ subnet 192.168.188.0 netmask 255.255.255.0 {
 ### *Use the environment's own image and create boot menu*
 
 ``` nohighlight
-~]# mkdir -p /var/pxe/rhel7 
-~]# mkdir /var/lib/tftpboot/rhel7
+[root@localhost ~]# mkdir -p /var/pxe/rhel7 
+[root@localhost ~]# mkdir /var/lib/tftpboot/rhel7
 ============================
-~]# mount /dev/cdrom /mnt/
-~]# cp -rvf /mnt/* /var/pxe/rhel7/
+[root@localhost ~]# mount /dev/cdrom /mnt/
+[root@localhost ~]# cp -rvf /mnt/* /var/pxe/rhel7/
 ============================
-~]# cp /var/pxe/rhel7/images/pxeboot/vmlinuz /var/lib/tftpboot/rhel7/
-~]# cp /var/pxe/rhel7/images/pxeboot/initrd.img /var/lib/tftpboot/rhel7/
-~]# cp /usr/share/syslinux/menu.c32 /var/lib/tftpboot/
+[root@localhost ~]# cp /var/pxe/rhel7/images/pxeboot/vmlinuz /var/lib/tftpboot/rhel7/
+[root@localhost ~]# cp /var/pxe/rhel7/images/pxeboot/initrd.img /var/lib/tftpboot/rhel7/
+[root@localhost ~]# cp /usr/share/syslinux/menu.c32 /var/lib/tftpboot/
+[root@localhost tftpboot]# tree 
+.
+├── menu.c32
+├── pxelinux.0
+├── pxelinux.cfg
+│   └── default
+└── rhel7
+    ├── initrd.img
+    └── vmlinuz
+
+2 directories, 5 files
+
 ~]# cat /var/lib/tftpboot/pxelinux.cfg/default
 timeout 100
 default menu.c32
@@ -114,17 +126,17 @@ label 2
 ### *Use httpd to provide http services*
 
 ``` nohighlight
-~]# yum -y install httpd
-~]# rm -f /etc/httpd/conf.d/welcome.conf
-~]# vi /etc/httpd/conf.d/pxeboot.conf
+[root@localhost ~]# yum -y install httpd
+[root@localhost ~]# rm -f /etc/httpd/conf.d/welcome.conf
+[root@localhost ~]# vi /etc/httpd/conf.d/pxeboot.conf
 # create new
 Alias /rhel7 /var/pxe/rhel7
 <Directory /var/pxe/rhel7>
     Options Indexes FollowSymLinks
     Require ip 127.0.0.1 192.168.188.0/24
 </Directory>
-~]# systemctl enable httpd 
-~]# systemctl start httpd 
+[root@localhost ~]# systemctl enable httpd 
+[root@localhost ~]# systemctl start httpd 
 ```
 
 ### *Create a  vm machines in the same LAN without iso.*
@@ -138,9 +150,9 @@ Alias /rhel7 /var/pxe/rhel7
 ## *Configure Kickstart Install*
 
 ```nohighlight
-~]# mkdir /var/www/html/ks 
-~]# yum install -y system-config-kickstart
-~]# system-config-kickstart
+[root@localhost ~]# mkdir /var/www/html/ks 
+[root@localhost ~]# yum install -y system-config-kickstart
+[root@localhost ~]# system-config-kickstart
 ```
 
 ### *Custom your ks.cfg*
@@ -164,7 +176,7 @@ Alias /rhel7 /var/pxe/rhel7
 ### *Configure packages I need*
 
 ```nohighlight
-]# cat ~/anaconda-ks.cfg |grep -A 19 %packages >> /var/www/html/ks/rhel-ks.cfg
+[root@localhost ~]# cat ~/anaconda-ks.cfg |grep -A 19 %packages >> /var/www/html/ks/rhel-ks.cfg
 %packages
 @^graphical-server-environment
 @base
@@ -190,7 +202,7 @@ kexec-tools
 ### *Configure disk*
 
 ``` nohighlight
-]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' /var/www/html/ks/rhel-ks.cfg
+[root@localhost ~]# sed -i '/bootloader --location=mbr/a autopart --type=lvm' /var/www/html/ks/rhel-ks.cfg
 ```
 
 *Start the vm machine which is enabled network booting on BIOS settings, then PXE boot menu is shown. After 10 seconds later, installation process starts and will finish and reboot automatically.*
