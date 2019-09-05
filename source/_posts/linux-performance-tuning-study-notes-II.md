@@ -16,9 +16,9 @@ tags:
 photo:
 ---
 
-*In this post, I am going to markdown what is "load averages"*
+*In this post, I am going to markdown what is "Load Averages".*
 
-## *What is "load averages"*
+## *What is "Load Averages"*
 
 *We can see the following information in the uptime manual:*
 
@@ -40,13 +40,13 @@ photo:
 ###目前高負：1min  >>  15min
 ```
 
-### *load averages = runnable(可運行態) + uninterruptable(不可中斷態)*
+### *Load Averages = runnable(可運行態) + uninterruptable(不可中斷態)*
 
-- *System load averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
+- *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
 
-- *System load averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
+- *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
 
-- *System load averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
+- *System Load Averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
 
   因此，平均負載和 CPU 使用率不一定掛鉤。
 
@@ -59,7 +59,7 @@ root      22417  0.0  0.3  39008  3628 pts/0    R+   21:40   0:00 ps -aux
 root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 ```
 
-### *what if load average = 1*：
+### *what if Load Average = 1*：
 
  *CPU NUM = grep 'model name' /proc/cpuinfo | wc -l*
 
@@ -67,7 +67,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
 - *4 CPU system: 1/4 loaded all the time.*
 
-#### *PS: Load averages should be smaller than the number of CPUs 70%.*
+#### *PS: Load Averages should be smaller than the number of CPUs 70%.*
 
 ## *Case simulation*
 
@@ -121,7 +121,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
    23:39:47 up  1:09,  4 users,  load average: 0.85, 0.68, 0.36
   ```
 
-  *load average of 1 min will close to 1.00.*
+  *Load Average of 1 min will close to 1.00.*
 
 - #### *Windows 3*
 
@@ -157,7 +157,8 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   10:40:14 PM     0     18043  100.00    0.00    0.00    0.00  100.00     1  stress
   ```
   
-*Now we can clearly see load average up because of using CPU.*
+
+*Now we can clearly see Load Average up because of using CPU.*
 
 ### *Waiting I/O*
 
@@ -179,7 +180,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
    21:34:11 up 6 min,  4 users,  load average: 1.05, 0.62, 0.27
   ```
 
-  *load average of 1 min will close to 1.06.*
+  *Load Average of 1 min will close to 1.06.*
 
 - #### *Windows 3*
 
@@ -215,7 +216,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   10:37:34 PM     0     17460    0.00   85.20    0.00    0.40   85.20     1  stress
   ```
   
-  *Now we can clearly see load average up because of waiting I/O.*
+  *Now we can clearly see Load Average up because of waiting I/O.*
 
 ### *Waiting CPU*
 
@@ -235,7 +236,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
    22:08:46 up 41 min,  4 users,  load average: 9.34, 8.13, 4.66
   ```
 
-  *load average of 1 min will close to 10.00.*
+  *Load Average of 1 min will close to 10.00.*
 
 - #### *Windows 3*
 
@@ -277,15 +278,15 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   10:33:49 PM     0     16495   24.75    0.00    0.00   75.65   24.75     1  stress
   ```
 
-  *Now we can clearly see load average up because of waiting CPU(%wait).* 
+  *Now we can clearly see Load Average up because of waiting CPU(%wait).* 
 
 ## *Done*
 
-### *load averages = runnable(可運行態) + uninterruptable(不可中斷態)*
+### *Load Averages = runnable(可運行態) + uninterruptable(不可中斷態)*
 
-- *System load averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
-- *System load averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
-- *System load averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
+- *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
+- *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
+- *System Load Averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
 
 
 
