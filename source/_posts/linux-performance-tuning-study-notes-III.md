@@ -71,7 +71,7 @@ CPU上下文涉及的硬件有以下：
 1. *save the virtual memory and stack.* 保存虛擬內存、棧。
 
  	2. *save current state.* 保存當前進程態。
- 	3. *update to next state. *切換下一進程態。
+ 	3. *update to next state.* 切換下一進程態。
  	4. *run the task in the new state.* 加載目標進程態。
  	5. *flash the vitual memory and stack.* 刷新虛擬內存、棧。
 
