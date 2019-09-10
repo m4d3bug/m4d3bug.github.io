@@ -236,9 +236,11 @@ nothing added to commit but untracked files present (use "git add" to track)
 *Now the custom domain name and CI/CD are in effect, and a clean master branch is kept for rollback. When everything is good with the commit, you can choose merge beta to the master branch, by executing the following command.*
 
 ``` bash
-~/m4d3bug.gitlab.ios# git checkout master
-~/m4d3bug.gitlab.ios# git merge beta --allow-unrelated-histories
-~/m4d3bug.gitlab.ios# git push --set-upstream origin master
+~/m4d3bug.gitlab.io# git checkout master
+~/m4d3bug.gitlab.io# git merge beta --allow-unrelated-histories
+~/m4d3bug.gitlab.io# git add .
+~/m4d3bug.gitlab.io# git commit -m "Merge Beta"
+~/m4d3bug.gitlab.io# git push --set-upstream origin master
 ```
 
 
