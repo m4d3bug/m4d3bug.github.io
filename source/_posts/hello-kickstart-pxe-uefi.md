@@ -15,69 +15,78 @@ tags:
 - "Ancanda "
 ---
 
-*In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using PXE.
+*In this post, I am going to markdown how I tested unattended kickstart installation for UEFI in vm15 by using PXE.*
 
-And we need to run the following service on the same machine: TFTP, DHCP & httpd.*
+*Will increase uefi support based on [previous environment](https://blog.madebug.net/Ops/2019-08-18-hello-kickstart-pxe-mbr.html).*
 
 ## *Environmental preparation*
 
-### *Turn off the selinux ,firewalld and iptables*
+### *Unpacking packages*
 
 ``` nohighlight
-~]# cat /etc/selinux/config |grep ^SELINUX=
-SELINUX=disabled
-~]# systemctl stop firewalld.service
-~]# systemctl disable firewalld.service
-Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.
-Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
-~]# iptables -F
+[root@localhost ~]# cp -pr /mnt/RHEL-7/7.4/Packages/shim-x64-12-1.el7.x86_64.rpm /tmp
+[root@localhost tftpboot]# cp -pr /mnt/RHEL-7/7.4/Packages/grub2-efi-x64-2.02-0.64.el7.x86_64.rpm /tmp
+[root@localhost ~]# cd /var/lib/tftpboot/
+[root@localhost tftpboot]# rpm2cpio /tmp/shim-x64-12-1.el7.x86_64.rpm |cpio -dimv
+./boot/efi/EFI/BOOT/BOOTX64.EFI
+./boot/efi/EFI/BOOT/fbx64.efi
+./boot/efi/EFI/redhat/BOOT.CSV
+./boot/efi/EFI/redhat/BOOTX64.CSV
+./boot/efi/EFI/redhat/mmx64.efi
+./boot/efi/EFI/redhat/shim.efi
+./boot/efi/EFI/redhat/shimx64-redhat.efi
+./boot/efi/EFI/redhat/shimx64.efi
+12773 blocks
+[root@localhost tftpboot]# rpm2cpio /tmp/grub2-efi-x64-2.02-0.64.el7.x86_64.rpm |cpio -dimv
+./boot/efi/EFI/redhat
+./boot/efi/EFI/redhat/fonts
+./boot/efi/EFI/redhat/fonts/unicode.pf2
+./boot/efi/EFI/redhat/grubx64.efi
+./boot/grub2/grubenv
+./etc/grub2-efi.cfg
+7054 blocks
+[root@localhost tftpboot]# tree -L 2 .
+.
+├── boot
+│   ├── efi
+│   └── grub2
+├── etc
+│   └── grub2-efi.cfg -> ../boot/efi/EFI/redhat/grub.cfg
+├── pxelinux
+│   ├── initrd.img
+│   ├── pxelinux.0
+│   ├── pxelinux.cfg
+│   ├── vesamenu.c32
+│   └── vmlinuz
+└── usr
+    ├── bin
+    └── share
+
+9 directories, 5 files
 ```
-
-### *Stop Virtual Network Editor's dhcp services*
-
-![](https://i.loli.net/2019/08/26/buNconEfrlS68J3.jpg)
-
-### *Configure custom ip*
-
-![](https://i.loli.net/2019/08/18/AkWE7qphu9iFcSI.png)
 
 ## *Configure PXE Server*
 
 ### *Install required packages and copy boot menu program file*
 
 ```nohighlight
-[root@localhost ~]# yum -y install syslinux tftp-server dhcp
-[root@localhost ~]# mkdir /var/lib/tftpboot/pxelinux
-[root@localhost ~]# mount /dev/cdrom /mnt/
-mount: /dev/sr0 is write-protected, mounting read-only
-[root@localhost ~]# cp -pr /mnt/Packages/syslinux-4.05-13.el7.x86_64.rpm /tmp
+[root@localhost ~]# mkdir /var/lib/tftpboot/uefi
+[root@localhost tftpboot]# cp boot/efi/EFI/redhat/shim.efi /var/lib/tftpboot/uefi/
+[root@localhost tftpboot]# cp boot/efi/EFI/redhat/grubx64.efi /var/lib/tftpboot/uefi/
+
+[root@localhost ~]# cp -pr /mnt/RHEL-7/7.4/Packages/shim-x64-12-1.el7.x86_64.rpm /tmp
+[root@localhost ~]# cp -pr /mnt/RHEL-7/7.4/Packages/grub2-2.02-0.64.el7.x86_64.rpm /tmp
 [root@localhost ~]# cd /var/lib/tftpboot/
 [root@localhost tftpboot]# rpm2cpio /tmp/syslinux-4.05-13.el7.x86_64.rpm |cpio -dimv
 [root@localhost tftpboot]# ls
 pxelinux  usr
-[root@localhost ~]# mkdir /var/lib/tftpboot/pxelinux/pxelinux.cfg
-[root@localhost ~]# cat /var/lib/tftpboot/pxelinux/pxelinux.cfg/default
-default vesamenu.c32
-prompt 1
-timeout 100
-
-label linux
-  menu label ^Install system
-  menu default
-  kernel vmlinuz
-  append initrd=initrd.img ip=dhcp inst.repo=http://192.168.188.174/RHEL-7/7.4/Server/x86_64/
-label vesa
-  menu label Install system with ^basic video driver
-  kernel vmlinuz
-  append initrd=initrd.img ip=dhcp inst.xdriver=vesa nomodeset inst.repo=http://192.168.188.174/RHEL-7/7.x/Server/x86_64/os/
-label rescue
-  menu label ^Rescue installed system
-  kernel vmlinuz
-  append initrd=initrd.img rescue
-label local
-  menu label Boot from ^local drive
-  localboot 0xffff
-[root@localhost ~]# cp /mnt/images/pxeboot/{vmlinuz,initrd.img} /var/lib/tftpboot/pxelinux/
+[root@localhost tftpboot]# more /var/lib/tftpboot/uefi/grub.cfg
+set timeout=60
+  menuentry 'RHEL 7' {
+  linuxefi uefi/vmlinuz ip=dhcp inst.repo=http://192.168.188.174/RHEL-7/7.4/Server/x86_64
+  initrdefi uefi/initrd.img
+}
+[root@localhost tftpboot]# cp /var/lib/tftpboot/pxelinux/{vmlinuz,initrd.img} /var/lib/tftpboot/uefi/
 [root@localhost ~]# cp /var/lib/tftpboot/usr/share/syslinux/pxelinux.0 /var/lib/tftpboot/pxelinux/
 [root@localhost ~]# cp /var/lib/tftpboot/usr/share/syslinux/vesamenu.c32 /var/lib/tftpboot/pxelinux/
 [root@localhost tftpboot]# umount /mnt/
@@ -96,90 +105,31 @@ label local
 5 directories, 4 files
 ```
 
-### *Start TFTP server*
+### *Boot up should get this:*
 
-``` nohighlight
-[root@localhost ~]# cat /etc/xinetd.d/tftp |grep disable
-	disable			= no
-[root@localhost ~]# systemctl start tftp
-[root@localhost ~]# systemctl enable tftp
-Created symlink from /etc/systemd/system/sockets.target.wants/tftp.socket to /usr/lib/systemd/system/tftp.socket.
-```
-
-### *Start DHCP server and specify PXE server's IP for "next-server"*
-
-```nohighlight
-[root@localhost ~]# cat /etc/dhcp/dhcpd.conf 
-
-#
-# DHCP Server Configuration file.
-#   see /usr/share/doc/dhcp*/dhcpd.conf.example
-#   see dhcpd.conf(5) man page
-#
-option space pxelinux;
-option pxelinux.magic code 208 = string;
-option pxelinux.configfile code 209 = text;
-option pxelinux.pathprefix code 210 = text;
-option pxelinux.reboottime code 211 = unsigned integer 32;
-option architecture-type code 93 = unsigned integer 16;
-
-subnet 192.168.188.0 netmask 255.255.255.0 {
-  option routers 192.168.188.2;
-  range 192.168.188.200 192.168.188.253;
-
-  class "pxeclients" {
-      match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
-      next-server 192.168.188.174;
-
-      if option architecture-type = 00:07 {
-        filename "uefi/shim.efi";
-      } else {
-        filename "pxelinux/pxelinux.0";
-      }
-  }
-}
-
-~]# systemctl start dhcpd 
-~]# systemctl enable dhcpd 
-Created symlink from /etc/systemd/system/multi-user.target.wants/dhcpd.service to /usr/lib/systemd/system/dhcpd.service.
-```
-
-*The dhcpd working should get these:*
+#### *Server*
 
 ![dhcplog.png](https://i.loli.net/2019/09/14/r62YRjlST4QObtg.png)
 
+#### *Client*
+
 ![dhcpok.png](https://i.loli.net/2019/09/14/aPyrBv4pixcd6mL.png)
+
+![UEFIboot.png](https://i.loli.net/2019/09/14/1O5BijJv9dlQpTa.png)
 
 ## Configure Network Install*
 
-### *Use httpd to provide http repo*
+### *Monitor httpd*
 
 ``` nohighlight
-[root@localhost ~]# mkdir -p /mnt/RHEL-7/7.4
-[root@localhost ~]# mount /dev/sr0 /mnt/RHEL-7/7.4
-mount: /dev/sr0 is write-protected, mounting read-only
-
-[root@localhost ~]# yum -y install httpd
-[root@localhost ~]# rm -f /etc/httpd/conf.d/welcome.conf
-[root@localhost ~]# cat /etc/httpd/conf.d/iso.conf
-# Create this
-Alias /RHEL-7/7.4/Server/x86_64 /mnt/RHEL-7/7.4
-<Directory /mnt/RHEL-7/7.4>
-    Options Indexes FollowSymLinks
-    Require ip 127.0.0.1 192.168.188.0/24
-</Directory>
-[root@localhost ~]# systemctl enable httpd
-Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service.
-[root@localhost ~]# systemctl start httpd 
-[root@localhost ~]# curl -v http://192.168.188.174/RHEL-7/7.4/Server/x86_64
-...
-* Connection #0 to host 192.168.188.174 left intact
-[root@localhost ~]# tcpdump -i ens33 port 80 and host 172.16.1.100 -vvv >> tcpdump.out
+[root@localhost ~]# tcpdump -i ens33 port 80 and host 172.16.1.100 -vvv
 ```
 
 ### *Create a  vm machines in the same LAN without iso.*
 
 ![](https://i.loli.net/2019/08/19/w8lkvhm1aFeg5ur.jpg)
+
+![vmUEFI.png](https://i.loli.net/2019/09/14/iDueByIX3vYJWT1.png)
 
 *Enable network boot on BIOS settings of client computer and start it, then installation menu is shown, push Enter key to proceed to install.*
 
@@ -189,13 +139,12 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 
 ```nohighlight
 [root@localhost ~]# mkdir /var/www/html/ks 
-[root@localhost ~]# yum install -y system-config-kickstart
 [root@localhost ~]# system-config-kickstart
 ```
 
 ### *Custom your ks.cfg*
 
-[*Also can generate from here*] (https://access.redhat.com/labs/kickstartconfig/)
+*Also can generate from [here](https://access.redhat.com/labs/kickstartconfig/).*
 
 ![](https://i.loli.net/2019/08/18/NiJG2l7BSgHyvWe.png)
 
@@ -211,7 +160,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 
 ![](https://i.loli.net/2019/08/18/8y5D3huAg2siJ6L.png)
 
-![mbr-ks.png](https://i.loli.net/2019/09/14/8aAY9sFUrqibzCp.png)
+![uefi-ks.png](https://i.loli.net/2019/09/14/HQ2bSTAxwv98tsl.png)
 
 ### *Configure packages I need*
 

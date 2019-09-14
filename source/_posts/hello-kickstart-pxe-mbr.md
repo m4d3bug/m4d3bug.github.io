@@ -15,7 +15,7 @@ tags:
 - "Anaconda "
 ---
 
-*In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using PXE.*
+*In this post, I am going to markdown how I tested unattended kickstart installation for MBR in vm15 by using PXE.*
 
 *And we need to run the following service on the same machine: TFTP, DHCP & httpd.*
 
@@ -24,13 +24,13 @@ tags:
 ### *Turn off the selinux ,firewalld and iptables*
 
 ``` nohighlight
-~]# cat /etc/selinux/config |grep ^SELINUX=
+[root@localhost ~]# cat /etc/selinux/config |grep ^SELINUX=
 SELINUX=disabled
-~]# systemctl stop firewalld.service
-~]# systemctl disable firewalld.service
+[root@localhost ~]# systemctl stop firewalld.service
+[root@localhost ~]# systemctl disable firewalld.service
 Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.
 Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
-~]# iptables -F
+[root@localhost ~]# iptables -F
 ```
 
 ### *Stop Virtual Network Editor's dhcp services*
@@ -174,7 +174,6 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 [root@localhost ~]# curl -v http://192.168.188.174/RHEL-7/7.4/Server/x86_64
 ...
 * Connection #0 to host 192.168.188.174 left intact
-[root@localhost ~]# tcpdump -i ens33 port 80 and host 172.16.1.100 -vvv >> tcpdump.out
 ```
 
 ### *Create a  vm machines in the same LAN without iso.*
@@ -277,7 +276,7 @@ label local
 
 *Simply tried to complete the unattended installation of RHEL7 by using Kickstart with PXE.*
 
-## *Acknowledgements*
+## *Refer*
 
 - https://www.cnblogs.com/boowii/p/6475921.html
 - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/installation_guide/index#chap-installation-server-setup
