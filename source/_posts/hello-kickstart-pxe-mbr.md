@@ -1,5 +1,5 @@
 ---
-title: Hello Kickstart + PXE
+title: Hello Kickstart + PXE +MBR
 date: 2019-08-18 12:21:48
 categories:
 - "Ops "
@@ -15,9 +15,9 @@ tags:
 - "Anaconda "
 ---
 
-*In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using PXE.
+*In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using PXE.*
 
-And we need to run the following service on the same machine: TFTP, DHCP & httpd.*
+*And we need to run the following service on the same machine: TFTP, DHCP & httpd.*
 
 ## *Environmental preparation*
 

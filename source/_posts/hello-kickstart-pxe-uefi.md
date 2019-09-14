@@ -1,6 +1,6 @@
 ---
-title: Hello Kickstart + PXE
-date: 2019-08-18 12:21:48
+title: Hello Kickstart + PXE + UEFI
+date: 2019-09-14 12:21:48
 categories:
 - "Ops "
 tags:
@@ -11,7 +11,7 @@ tags:
 - "Httpd "
 - "RHEL 7 "
 - "Linux "
-- "MBR "
+- "UEFI "
 - "Ancanda "
 ---
 
