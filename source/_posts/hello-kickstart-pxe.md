@@ -11,6 +11,8 @@ tags:
 - "Httpd "
 - "RHEL 7 "
 - "Linux "
+- "MBR "
+- "Ancanda "
 ---
 
 *In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using PXE.
