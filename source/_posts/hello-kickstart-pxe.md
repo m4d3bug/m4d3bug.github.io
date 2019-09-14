@@ -195,7 +195,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 
 ### *Custom your ks.cfg*
 
-[*Also can generate from here*] (https://access.redhat.com/labs/kickstartconfig/)
+*Also can generate from here.*[](https://access.redhat.com/labs/kickstartconfig/)
 
 ![](https://i.loli.net/2019/08/18/NiJG2l7BSgHyvWe.png)
 
@@ -280,6 +280,6 @@ label local
 ## *Acknowledgements*
 
 - https://www.cnblogs.com/boowii/p/6475921.html
-- https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/index
+- https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/installation_guide/index#chap-installation-server-setup
 - https://www.server-world.info/en/note?os=CentOS_7&p=pxe&f=1
 
