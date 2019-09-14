@@ -195,7 +195,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 
 ### *Custom your ks.cfg*
 
-*Also can generate from here.*[](https://access.redhat.com/labs/kickstartconfig/)
+*Also can generate from [here](https://access.redhat.com/labs/kickstartconfig/).*
 
 ![](https://i.loli.net/2019/08/18/NiJG2l7BSgHyvWe.png)
 
