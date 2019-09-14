@@ -277,7 +277,7 @@ label local
 
 *Simply tried to complete the unattended installation of RHEL7 by using Kickstart with PXE.*
 
-### *Acknowledgements*
+## *Acknowledgements*
 
 - https://www.cnblogs.com/boowii/p/6475921.html
 - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/index
