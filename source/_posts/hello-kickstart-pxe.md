@@ -12,7 +12,7 @@ tags:
 - "RHEL 7 "
 - "Linux "
 - "MBR "
-- "Ancanda "
+- "Anaconda "
 ---
 
 *In this post, I am going to markdown how I tested unattended kickstart installation in vm15 by using PXE.
