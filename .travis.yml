@@ -4,7 +4,7 @@ node_js:
 
 # S: Build Lifecycle
 before_install:
-          - export TZ='Asia/Shanghai'
+  - export TZ='Asia/Shanghai'
 
 install:
   - npm install hexo-cli -g
