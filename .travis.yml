@@ -23,7 +23,7 @@ after_script:
 
 branches:
   only:
-    - master
+    - beta
 #env:
 # global:
 #   - GH_REF: github.com/m4d3bug/m4d3bug.github.io.git
