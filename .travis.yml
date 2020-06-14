@@ -11,19 +11,19 @@ script:
   - hexo clean
   - hexo generate
 
-#after_script:
-#  - cd ./public
-#  - git init
-#  - git config user.name "m4d3bug"
-#  - git config user.email "m4d3bug@gmail.com"
-#  - git add .
-#  - git commit -m "Travis CI Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
-#  - git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:master
+after_script:
+  - cd ./public
+  - git init
+  - git config user.name "m4d3bug"
+  - git config user.email "m4d3bug@gmail.com"
+  - git add .
+  - git commit -m "Travis CI Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
+  - git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:master
 # E: Build LifeCycle
 
 branches:
   only:
-    - master
-#env:
-# global:
-#   - GH_REF: github.com/m4d3bug/m4d3bug.github.io.git
+    - gh-pages
+env:
+ global:
+   - GH_REF: github.com/m4d3bug/m4d3bug.github.io.git
