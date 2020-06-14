@@ -100,4 +100,4 @@ theme: next
 deploy:
   type: 'git'
   repo: https://github.com/m4d3bug/m4d3bug.github.io.git
-  branch: beta
+  branch: master
