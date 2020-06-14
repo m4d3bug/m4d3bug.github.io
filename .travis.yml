@@ -1,16 +1,15 @@
 language: node_js
-node_js: stable
+node_js: 
+  - lts/*
 
 # S: Build Lifecycle
 install:
+  - npm install hexo-cli -g
   - npm install
 
-
-#before_script:
- # - npm install -g gulp
-
 script:
-  - hexo g
+  - hexo clean
+  - hexo generate
 
 after_script:
   - cd ./public
@@ -18,13 +17,13 @@ after_script:
   - git config user.name "m4d3bug"
   - git config user.email "m4d3bug@gmail.com"
   - git add .
-  - git commit -m "Update docs"
+  - git commit -m "Travis CI Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
   - git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:master
 # E: Build LifeCycle
 
 branches:
   only:
-    - blog-resource
+    - master
 env:
  global:
    - GH_REF: github.com/m4d3bug/m4d3bug.github.io.git
