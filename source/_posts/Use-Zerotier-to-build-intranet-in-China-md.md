@@ -1,15 +1,16 @@
 ---
-title: 使用Zerotier基於國内網絡組建虛擬局域網
+title: Use Zerotier to build intranet in China.md
 mathjax: true
 copyright: true
 comment: true
-date: 2020-06-15 22:54:05
-categories:
-- "Ops"
-tags:
+date: 2020-06-15 22:59:32
+categories: 
+- "Ops "
+tags: 
 - "Linux "
-- "P2P "
+- "Network "
 - "UDP "
+- "P2P "
 - "Zerotier "
 ---
 
