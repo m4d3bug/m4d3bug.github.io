@@ -61,7 +61,7 @@ footer:
     # If you want to animate the icon, set it to true.
     animated: false
     # Change the color of icon, using Hex Code.
-    color: "#808080" #color: "#ff0000"
+    color: "#ff0000"
 
   # If not defined, `author` from Hexo `_config.yml` will be used.
   copyright:
@@ -284,7 +284,7 @@ reward:
 # Usage: `Key: permalink || icon` (Font Awesome)
 follow_me:
   #Twitter: https://twitter.com/username || fab fa-twitter
-  Telegram: https://t.me/m4d3bug || fab fa-telegram
+  #Telegram: https://t.me/m4d3bug || fab fa-telegram
   #WeChat: /images/wechat_channel.jpg || fab fa-weixin
   #RSS: /atom.xml || fa fa-rss
 
@@ -363,12 +363,12 @@ codeblock:
   # Code Highlight theme
   # Available values: normal | night | night eighties | night blue | night bright | solarized | solarized dark | galactic
   # See: https://github.com/chriskempson/tomorrow-theme
-  highlight_theme: normal
+  highlight_theme: night
   # Add copy button on codeblock
   copy_button:
-    enable: false
+    enable: true
     # Show text copy result.
-    show_result: false
+    show_result: true
     # Available values: default | flat | mac
     style:
 
@@ -487,7 +487,7 @@ yandex_site_verification:
 baidu_site_verification:
 
 # Enable baidu push so that the blog will push the url to baidu automatically which is very helpful for SEO.
-baidu_push: false
+baidu_push: true
 
 
 # ---------------------------------------------------------------
@@ -549,8 +549,8 @@ quicklink:
 
   # Home page and archive page can be controlled through home and archive options below.
   # This configuration item is independent of `enable`.
-  home: false
-  archive: false
+  home: true
+  archive: true
 
   # Default (true) will initialize quicklink after the load event fires.
   delay: true
@@ -590,7 +590,7 @@ comments:
 
 # Disqus
 disqus:
-  enable: false
+  enable: true
   shortname:
   count: true
   #post_meta_order: 0
@@ -857,7 +857,7 @@ pace:
   # Themes list:
   # big-counter | bounce | barber-shop | center-atom | center-circle | center-radar | center-simple
   # corner-indicator | fill-left | flat-top | flash | loading-bar | mac-osx | material | minimal
-  theme: minimal
+  theme: mac-osx #theme: minimal
 
 # JavaScript 3D library.
 # Dependencies: https://github.com/theme-next/theme-next-three
