@@ -1,5 +1,5 @@
 ---
-title: Use Zerotier to build intranet in China.md
+title: Use Zerotier to build intranet in China
 mathjax: true
 copyright: true
 comment: true
