@@ -179,6 +179,7 @@ site_state: true
 social:
   GitHub: https://github.com/m4d3bug || fab fa-github
   G-Mail: mailto:m4d3bug@gmail.com || fa fa-envelope
+  Telegram: https://t.me/m4d3bug || fab fa-telegram
   #Weibo: https://weibo.com/yourname || fab fa-weibo
   #Google: https://plus.google.com/yourname || fab fa-google
   #Twitter: https://twitter.com/yourname || fab fa-twitter
