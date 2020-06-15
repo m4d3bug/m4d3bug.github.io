@@ -177,8 +177,8 @@ site_state: true
 # Key is the link label showing to end users.
 # Value before `||` delimiter is the target permalink, value after `||` delimiter is the name of Font Awesome icon.
 social:
-  #GitHub: https://github.com/yourname || fab fa-github
-  #E-Mail: mailto:yourname@gmail.com || fa fa-envelope
+  GitHub: https://github.com/m4d3bug || fab fa-github
+  G-Mail: mailto:m4d3bug@gmail.com || fa fa-envelope
   #Weibo: https://weibo.com/yourname || fab fa-weibo
   #Google: https://plus.google.com/yourname || fab fa-google
   #Twitter: https://twitter.com/yourname || fab fa-twitter
@@ -202,6 +202,12 @@ links_settings:
 
 links:
   #Title: http://yoursite.com
+  ServerWorld: https://www.server-world.info/en/
+  乌云公开漏洞、知识库搜索: http://www.madebug.net
+  ericnie的技术博客: https://www.cnblogs.com/ericnie 
+  Bingli's Blog: https://blog.bingli9.com
+  OneOneの日常: https://www.0ne0ne.com
+
 
 # Table of Contents in the Sidebar
 # Front-matter variable (unsupport wrap expand_all).
