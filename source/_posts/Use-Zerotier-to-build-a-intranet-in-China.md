@@ -1,5 +1,5 @@
 ---
-title: 使用Zerotier基於國内網絡組建虛擬局域網
+title: 使用Zerotier基於國内網絡組建局域網
 mathjax: true
 copyright: true
 comment: true
@@ -13,8 +13,6 @@ tags:
 - "P2P "
 - "Zerotier "
 ---
-
-#  test
 
 #  什麽是Zerotier
 
