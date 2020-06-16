@@ -14,9 +14,9 @@ tags:
 - "Zerotier "
 ---
 
-# 使用Zerotier基於國内網絡組建虛擬局域網
+# <center>使用Zerotier基於國内網絡組建虛擬局域網</center>
 
-# a) 什麽是Zerotier
+#  什麽是Zerotier
 
 ---
 
@@ -26,7 +26,7 @@ ZeroTier is a smart Ethernet switch for planet Earth.
 
 It’s a distributed network hypervisor built atop a cryptographically secure global peer to peer network. It provides advanced network virtualization and management capabilities on par with an enterprise SDN switch, but across both local and wide area networks and connecting almost any kind of app or device.
 
-# b) 如何使用
+#  如何使用
 
 ---
 
@@ -59,7 +59,7 @@ It’s a distributed network hypervisor built atop a cryptographically secure gl
    *** Success! You are ZeroTier address [ xxxxxxxx ].
    ```
 
-# c) 如何建立中轉服務器moon
+#  如何建立中轉服務器moon
 
 ---
 
@@ -123,7 +123,7 @@ LEAF 節點級服務器，就是每臺連接到該網絡的機器節點。
    # systemctl restart zerotier-one.service
    ```
 
-# d) 如何使用自建的moon節點
+#  如何使用自建的moon節點
 
 ---
 
@@ -145,7 +145,7 @@ LEAF 節點級服務器，就是每臺連接到該網絡的機器節點。
    # zerotier-cli deorbit 000000xxxxxxxxxx
    ```
 
-# e) 結語
+#  結語
 
 ---
 
