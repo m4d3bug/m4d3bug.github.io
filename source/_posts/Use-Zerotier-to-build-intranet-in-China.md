@@ -22,9 +22,9 @@ tags:
 
 來自[官網](https://www.zerotier.com/manual/#1)的説明：
 
-ZeroTier is a smart Ethernet switch for planet Earth.
+> ZeroTier is a smart Ethernet switch for planet Earth.
 
-It’s a distributed network hypervisor built atop a cryptographically secure global peer to peer network. It provides advanced network virtualization and management capabilities on par with an enterprise SDN switch, but across both local and wide area networks and connecting almost any kind of app or device.
+> It’s a distributed network hypervisor built atop a cryptographically secure global peer to peer network. It provides advanced network virtualization and management capabilities on par with an enterprise SDN switch, but across both local and wide area networks and connecting almost any kind of app or device.
 
 #  如何使用
 
@@ -65,9 +65,9 @@ It’s a distributed network hypervisor built atop a cryptographically secure gl
 
  這是關於它的定義：
 
-PLANET 行星級服務器，Zerotier位於各地的根服務器，有日本、新加坡等地。
-MOON 衛星級服務器，用戶自建的私有根服務器，起到中轉加速的作用。
-LEAF 節點級服務器，就是每臺連接到該網絡的機器節點。
+> PLANET 行星級服務器，Zerotier位於各地的根服務器，有日本、新加坡等地。
+> MOON 衛星級服務器，用戶自建的私有根服務器，起到中轉加速的作用。
+> LEAF 節點級服務器，就是每臺連接到該網絡的機器節點。
 
 不得不驚嘆這個方案的明智之處 ，自帶支持中轉服務器的架設，這也是吸引我選擇它的初衷，p2p的組網方式本質是去中心化，不僅維護起來簡單，而且這種扁平化的網絡架構，其誕生迄今我一直認爲是一個計算機史上的思維方式的[奇異點](https://www.youtube.com/watch?v=sjx_rpay9rk)，也十分方便後期加入或者退出節點。
 
