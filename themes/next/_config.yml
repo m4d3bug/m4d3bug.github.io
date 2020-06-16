@@ -384,7 +384,7 @@ back2top:
 reading_progress:
   enable: true
   # Available values: top | bottom
-  position: top
+  position: bottom
   color: "#37c6c0"
   height: 3px
 
