@@ -17,10 +17,9 @@ tags:
 
 #  什麽是Zerotier
 
-<!-- more -->
----
-
 來自[官網](https://www.zerotier.com/manual/#1)的説明：
+
+<!-- more -->
 
 > ZeroTier is a smart Ethernet switch for planet Earth.
 
