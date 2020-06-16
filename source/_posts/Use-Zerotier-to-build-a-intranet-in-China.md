@@ -15,7 +15,8 @@ tags:
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/ZeroTier.png" width=50% /></center>
 
-1. # 什麽是Zerotier
+<!-- more -->
+# 什麽是Zerotier
 
    來自[官網](https://www.zerotier.com/manual/#1)的説明：
 
@@ -23,7 +24,7 @@ tags:
 
    > It’s a distributed network hypervisor built atop a cryptographically secure global peer to peer network. It provides advanced network virtualization and management capabilities on par with an enterprise SDN switch, but across both local and wide area networks and connecting almost any kind of app or device.
 
-   # 如何使用
+# 如何使用
 
    ---
 
@@ -49,7 +50,7 @@ tags:
       apt -y install gnupgapt-key adv --keyserver keyserver.ubuntu.com --recv-keys  1657198823E52A61curl -s https://install.zerotier.com/ | sudo bash*** Waiting for identity generation...*** Success! You are ZeroTier address [ xxxxxxxx ].
       ```
 
-   # 如何建立中轉服務器moon
+# 如何建立中轉服務器moon
 
    ---
 
@@ -95,7 +96,7 @@ tags:
       systemctl restart zerotier-one.service
       ```
 
-   # 如何使用自建的moon節點
+# 如何使用自建的moon節點
 
    ---
 
@@ -117,7 +118,7 @@ tags:
       zerotier-cli deorbit 000000xxxxxxxxxx
       ```
 
-   # 結語
+# 結語
 
    ---
 
