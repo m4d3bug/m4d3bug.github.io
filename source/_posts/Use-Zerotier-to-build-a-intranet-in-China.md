@@ -149,9 +149,9 @@ tags:
 
 1. p2p組網天下第一，可以通過以下簡單的類比方式來理解其中原理，其實也是區塊鏈組網的基礎。
 
-   PLANET節點就是BT網絡中的根服務器
-   MOON節點就是BT網絡中的tracker服務器
-   LEAF節點就是BT網絡中客戶端的qBittorrent
+   > PLANET節點就是BT網絡中的根服務器
+   > MOON節點就是BT網絡中的tracker服務器
+   > LEAF節點就是BT網絡中客戶端的qBittorrent
 
 2. 組了一張大内網，我們來玩點什麽呢？
 
