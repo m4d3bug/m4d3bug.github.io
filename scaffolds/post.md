@@ -6,4 +6,5 @@ tags:
 mathjax: true
 copyright: true
 comment: true
+photos:
 ---

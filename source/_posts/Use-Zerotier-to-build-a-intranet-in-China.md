@@ -12,6 +12,8 @@ tags:
 - "UDP "
 - "P2P "
 - "Zerotier "
+photos:
+- "https://img.madebug.net/m4d3bug/images-of-website/master/blog/ZeroTier.png"
 ---
 
 #  什麽是Zerotier
