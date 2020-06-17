@@ -36,7 +36,9 @@ tags:
    3. 在apt系安裝zerotier：
 
       ```
-      apt -y updateapt -y install curl sudo net-toolscurl -s https://install.zerotier.com/ | sudo bash
+      apt -y update
+      apt -y install curl 
+      sudo net-toolscurl -s https://install.zerotier.com/ | sudo bash
       ```
 
       其中遇到了關於gpg error的問題：
