@@ -37,8 +37,8 @@ tags:
 
       ```
       apt -y update
-      apt -y install curl 
-      sudo net-toolscurl -s https://install.zerotier.com/ | sudo bash
+      apt -y install curl sudo net-tools
+      curl -s https://install.zerotier.com/ | sudo bash
       ```
 
       其中遇到了關於gpg error的問題：
@@ -50,7 +50,10 @@ tags:
       安裝gnupg來對其進行驗證導入再進行安裝。
 
       ```
-      apt -y install gnupgapt-key adv --keyserver keyserver.ubuntu.com --recv-keys  1657198823E52A61curl -s https://install.zerotier.com/ | sudo bash*** Waiting for identity generation...*** Success! You are ZeroTier address [ xxxxxxxx ].
+      apt -y install gnupg
+      apt-key adv --keyserver keyserver.ubuntu.com --recv-keys  1657198823E52A61
+      curl -s https://install.zerotier.com/ | sudo bash
+      *** Waiting for identity generation...*** Success! You are ZeroTier address [ xxxxxxxx ].
       ```
 
 # 如何建立中轉服務器moon
