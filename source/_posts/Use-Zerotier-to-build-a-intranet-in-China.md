@@ -21,9 +21,9 @@ tags:
 
    來自[官網](https://www.zerotier.com/manual/#1)的説明：
 
-   > ZeroTier is a smart Ethernet switch for planet Earth.
+   > *ZeroTier is a smart Ethernet switch for planet Earth.*
 
-   > It’s a distributed network hypervisor built atop a cryptographically secure global peer to peer network. It provides advanced network virtualization and management capabilities on par with an enterprise SDN switch, but across both local and wide area networks and connecting almost any kind of app or device.
+   > *It’s a distributed network hypervisor built atop a cryptographically secure global peer to peer network. It provides advanced network virtualization and management capabilities on par with an enterprise SDN switch, but across both local and wide area networks and connecting almost any kind of app or device.*
 
 # 如何使用
 
