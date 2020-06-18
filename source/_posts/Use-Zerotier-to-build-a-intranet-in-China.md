@@ -75,13 +75,28 @@ tags:
    2. 通過自身工具生成moon.json配置文件。
 
       ```
-      cd /var/lib/zerotier-onezerotier-idtool initmoon identity.public > moon.json
+      cd /var/lib/zerotier-one
+      zerotier-idtool initmoon identity.public > moon.json
       ```
 
    3. 將公網IP加入其中。
 
       ```
-      cat moon.json { "id": "xxxxxxxx", "objtype": "world", "roots": [  {   "identity": "dd31a3ee4c:0:40971299f1f4875edfadfc221ffba68a283cf51a67a27fbc223da18b6257d236474b9f13e3e50b46c0ae8096339d3eb450e12ab0361bf5e8ef82c69acd86ebb8",   "stableEndpoints": []        # 把它改成"stableEndpoints": [ "xxx.xxx.xxx.xxx/9993" ]  } ], "signingKey": "592c748e40de1bd39db07bcdc98ad220ac82d67494483b410c0133939fc0c03059d3a2b2c9948ec1939c4d42e2c3f07b310a337bc47a77b94153e4f9f6df56d7", "signingKey_SECRET": "c2810d04474b737ada418e1407bdc49ea9a0879393e5cb8b585eaec0feadbb0dcbbc52c6c85db9db2a2d83b6a36c01ed839e105d67f7bd4e0ea8d22559f29fd6", "updatesMustBeSignedBy": "592c748e40de1bd39db07bcdc98ad220ac82d67494483b410c0133939fc0c03059d3a2b2c9948ec1939c4d42e2c3f07b310a337bc47a77b94153e4f9f6df56d7", "worldType": "moon"}
+      cat moon.json 
+      {
+       "id": "xxxxxxxx", 
+       "objtype": "world", 
+       "roots": [  
+        {
+         "identity": "dd31a3ee4c:0:40971299f1f4875edfadfc221ffba68a283cf51a67a27fbc223da18b6257d236474b9f13e3e50b46c0ae8096339d3eb450e12ab0361bf5e8ef82c69acd86ebb8",   
+         "stableEndpoints": []        # 把它改成"stableEndpoints": [ "xxx.xxx.xxx.xxx/9993" ]  
+        } 
+       ], 
+       "signingKey": "592c748e40de1bd39db07bcdc98ad220ac82d67494483b410c0133939fc0c03059d3a2b2c9948ec1939c4d42e2c3f07b310a337bc47a77b94153e4f9f6df56d7", 
+       "signingKey_SECRET": "c2810d04474b737ada418e1407bdc49ea9a0879393e5cb8b585eaec0feadbb0dcbbc52c6c85db9db2a2d83b6a36c01ed839e105d67f7bd4e0ea8d22559f29fd6", 
+       "updatesMustBeSignedBy": "592c748e40de1bd39db07bcdc98ad220ac82d67494483b410c0133939fc0c03059d3a2b2c9948ec1939c4d42e2c3f07b310a337bc47a77b94153e4f9f6df56d7", 
+       "worldType": "moon"
+      }
       ```
 
    4. 生成moon節點的籤名文件。
