@@ -21,7 +21,7 @@ tags:
 
 *In this post, I am going to markdown what is "Load Averages".*
 
-## *What is "Load Averages"*
+# *What is "Load Averages"*
 
 *We can see the following information in the uptime manual:*
 
@@ -29,21 +29,21 @@ tags:
 [root@localhost ~]# man uptime
 ...
   System load averages is the average number of processes that are either in a runnable or uninterruptable state. 
-###平均負載是指單位時間內，系統處於可運行態和不可中斷態的平均進程數。
+##平均負載是指單位時間內，系統處於可運行態和不可中斷態的平均進程數。
   A process in a runnable state is either using the CPU or waiting to use the CPU. 
-###可運行態則正使用CPU或等待CPU。
+##可運行態則正使用CPU或等待CPU。
   A process in uninterruptable state is waiting for some I/O access, eg waiting for disk. 
-###不可中斷態則正處於內核態關鍵流程，萬不可打斷，諸如等待磁盤I/O響應。
-###“不可中斷態實際上是系統對進程和硬件設備的一種保護機制。”
+##不可中斷態則正處於內核態關鍵流程，萬不可打斷，諸如等待磁盤I/O響應。
+##“不可中斷態實際上是系統對進程和硬件設備的一種保護機制。”
   The averages are taken over the three time intervals.
-###參數取自三個時間間隔：1min、5min、15min
+##參數取自三個時間間隔：1min、5min、15min
   Load averages are not normalized for the number of CPUs in a system, so a load average of 1 means a single CPU system is loaded all the time while on a 4 CPU system it means it was idle 75% of the time.
-###一直穩定：1min≈5min≈15min
-###過去高負：1min  <<  15min  
-###目前高負：1min  >>  15min
+##一直穩定：1min≈5min≈15min
+##過去高負：1min  <<  15min  
+##目前高負：1min  >>  15min
 ```
 
-### *Load Averages = runnable(可運行態) + uninterruptable(不可中斷態)*
+## *Load Averages = runnable(可運行態) + uninterruptable(不可中斷態)*
 
 - *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
 
@@ -53,7 +53,7 @@ tags:
 
   因此，平均負載和 CPU 使用率不一定掛鉤。
 
-###  *R+ = runnable  ↓        D+ = Disk Sleep(uninterruptable)   ↓*
+##  *R+ = runnable  ↓        D+ = Disk Sleep(uninterruptable)   ↓*
 
 ```nohighlight
 [root@localhost ~]# ps -aux
@@ -62,7 +62,7 @@ root      22417  0.0  0.3  39008  3628 pts/0    R+   21:40   0:00 ps -aux
 root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 ```
 
-### *what if Load Average = 1*：
+## *what if Load Average = 1*：
 
  *CPU NUM = grep 'model name' /proc/cpuinfo | wc -l*
 
@@ -70,11 +70,11 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
 - *4 CPU system: 1/4 loaded all the time.*
 
-#### *PS: Load Averages should be smaller than the number of CPUs 70%.*
+### *PS: Load Averages should be smaller than the number of CPUs 70%.*
 
-## *Case simulation*
+# *Case simulation*
 
-### *Prerequisites*
+## *Prerequisites*
 
 - *test tools              >   stress - tool to impose load on and stress test systems.*  
 - analyzing tools   >   *sysstat - sysstat configuration file.(only use mpstat[CPU] and pidstat[pid])*
@@ -104,9 +104,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 [root@localhost ~]# yum install -y stress sysstat-11.7.3-3.fc30.x86_64.rpm
 ```
 
-### *Using CPU*
+## *Using CPU*
 
-- #### *Windows 1*
+- ### *Windows 1*
 
   ```nohighlight
   [root@localhost ~]# stress --cpu 1 --timeout 600
@@ -115,7 +115,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *Will stop util 10min.*
 
-- #### *Windows 2*
+- ### *Windows 2*
 
   ```nohighlight
   [root@localhost ~]# watch -d uptime
@@ -126,7 +126,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *Load Average of 1 min will close to 1.00.*
 
-- #### *Windows 3*
+- ### *Windows 3*
 
   ```nohighlight
   [root@localhost ~]# mpstat -P ALL 5
@@ -148,7 +148,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *Only one cpu's %usr is rising.*
 
-- #### *Windows 4*
+- ### *Windows 4*
 
   ```nohighlight
   [root@localhost ~]# pidstat -u 5
@@ -163,9 +163,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
 *Now we can clearly see Load Average up because of using CPU.*
 
-### *Waiting I/O*
+## *Waiting I/O*
 
-- #### *Windows 1*
+- ### *Windows 1*
 
   ``` nohighlight
   [root@localhost ~]# stress -i 1 --timeout 600
@@ -174,7 +174,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *Will stop util 10min.*
 
-- #### *Windows 2*
+- ### *Windows 2*
 
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
@@ -185,7 +185,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *Load Average of 1 min will close to 1.06.*
 
-- #### *Windows 3*
+- ### *Windows 3*
 
   ```nohighlight
   [root@localhost ~]# mpstat -P ALL 5 3
@@ -207,7 +207,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *Only one cpu's %iowait is rising.*
 
-- #### *Windows 4*
+- ### *Windows 4*
 
   ``` nohighlight
   [root@localhost ~]# pidstat -u 5 1
@@ -221,16 +221,16 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   
   *Now we can clearly see Load Average up because of waiting I/O.*
 
-### *Waiting CPU*
+## *Waiting CPU*
 
-- #### *Windows 1*
+- ### *Windows 1*
 
   ``` nohighlight
   [root@localhost ~]# stress --cpu 8 --timeout 600
   stress: info: [9168] dispatching hogs: 8 cpu, 0 io, 0 vm, 0 hdd
   ```
 
-- #### *Windows 2*
+- ### *Windows 2*
 
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
@@ -241,7 +241,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *Load Average of 1 min will close to 10.00.*
 
-- #### *Windows 3*
+- ### *Windows 3*
 
   ``` nohighlight
   [root@localhost ~]# mpstat -P ALL 5 3
@@ -263,7 +263,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *All cpu's %usr is rising.*
 
-- #### *Windows 4*
+- ### *Windows 4*
 
   ```nohighlight
   [root@localhost ~]# pidstat -u 5 1
@@ -283,9 +283,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
   *Now we can clearly see Load Average up because of waiting CPU(%wait).* 
 
-## *Done*
+# *Done*
 
-### *Load Averages = runnable(可運行態) + uninterruptable(不可中斷態)*
+## *Load Averages = runnable(可運行態) + uninterruptable(不可中斷態)*
 
 - *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
 - *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
