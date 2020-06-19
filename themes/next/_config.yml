@@ -597,9 +597,10 @@ comments:
 
 # Disqus
 disqus:
-  enable: false
-  shortname:
+  enable: true
+  shortname: m4d3bug
   count: true
+  lazyload: false
   #post_meta_order: 0
 
 # DisqusJS
