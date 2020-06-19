@@ -597,7 +597,7 @@ comments:
 
 # Disqus
 disqus:
-  enable: true
+  enable: false
   shortname: m4d3bug
   count: true
   lazyload: false
@@ -613,7 +613,7 @@ disqusjs:
   # Leave api empty if you are able to connect to Disqus API. Otherwise you need a reverse proxy for it.
   # For example:
   # api: https://disqus.skk.moe/disqus/
-  api:
+  api: 
   apikey: # Register new application from https://disqus.com/api/applications/
   shortname: # See: https://disqus.com/admin/settings/general/
 
@@ -645,7 +645,7 @@ valine:
 
 # LiveRe comments system
 # You can get your uid from https://livere.com/insight/myCode (General web site)
-livere_uid: # <your_uid>
+livere_uid: MTAyMC80NjAxNi8yMjUyNw== # <your_uid>
 
 # Gitalk
 # For more information: https://gitalk.github.io, https://github.com/gitalk/gitalk
