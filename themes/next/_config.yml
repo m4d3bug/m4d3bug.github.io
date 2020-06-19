@@ -600,7 +600,7 @@ disqus:
   enable: true
   shortname: m4d3bug
   count: true
-  lazyload: false
+  #lazyload: false
   #post_meta_order: 0
 
 # DisqusJS
