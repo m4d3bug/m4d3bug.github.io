@@ -44,7 +44,7 @@ tags:
 ##目前高負：1min  >>  15min
 ```
 
-## *Load Averages = runnable(可運行態) + uninterruptable(不可中斷態)*
+## *Load Averages*包含 *running*(可運行態) 和*uninterruptable sleep*(不可中斷態)
 
 - *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
 
@@ -54,7 +54,7 @@ tags:
 
   因此，平均負載和 CPU 使用率不一定掛鉤。
 
-##  *R+ = runnable  ↓        D+ = Disk Sleep(uninterruptable)   ↓*
+##  *R+ = running↓ D+ = Disk Sleep(uninterruptable sleep)↓*
 
 ```nohighlight
 [root@localhost ~]# ps -aux
@@ -292,16 +292,10 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 - *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
 - *System Load Averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+## 平均負載可以通過以下公式進行計算。
+  
+>load(t) = n+((load(t-1)-n)/e^(interval/(min*60)))
+>load(t): 平均負載的時間.
+>n: 運行態和不可中斷態的綫程數
+>interval: 計算間隔，RHEL是5秒
+>min: 負載的時長(分鐘數)
