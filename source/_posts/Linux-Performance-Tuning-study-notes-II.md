@@ -286,7 +286,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
 # *Done*
 
-## *Load Averages = runnable(可運行態) + uninterruptable(不可中斷態)*
+## *Load Averages = running(可運行態) + uninterruptable(不可中斷態)*
 
 - *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
 - *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
