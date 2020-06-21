@@ -186,3 +186,6 @@ kubelet-1.18.4-0.x86_64
 其後，通過睡了一覺，白天時分，QOS緩和的時候，順利將剩下搬瓦工節點加入。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png)
+
+但也證明，SDN跨運營商組建K8S集群式可行的，但是需要money💰
+
