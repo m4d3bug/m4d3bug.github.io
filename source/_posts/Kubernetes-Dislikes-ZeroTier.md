@@ -187,7 +187,9 @@ kubelet-1.18.4-0.x86_64
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png)
 
-但也證明，SDN跨運營商，以node為最小單位組建K8S集群是可行的，但是需要money💰，因此不難理解爲什麽現在混合雲架構都是傾向于以一個K8S為最小單位組件集群。~或許可以試試每個節點都是單master的去污點化部署。~
+但也證明，SDN跨運營商，以node為最小單位組建K8S集群是可行的，但是需要money💰
+
+因此不難理解爲什麽現在混合雲架構都是傾向于以一個K8S為最小單位組件集群。~或許可以試試每個節點都是單master的去污點化部署。~
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8scurl.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8scurl.png)
 
