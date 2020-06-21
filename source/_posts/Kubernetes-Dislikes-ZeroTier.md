@@ -47,7 +47,7 @@ tags:
 
 ### 機器網絡狀況
 
-![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png)
+![https://img.madebug.net/m4d3bug/images-of-website/master/blog/machinesNetworks.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png)
 
 ### 寫入靜態IP和hostname
 
