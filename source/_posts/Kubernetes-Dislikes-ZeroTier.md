@@ -167,6 +167,21 @@ kubelet-1.18.4-0.x86_64
 # kubeadm config images pull
 ```
 
+### 附加設置
+
+鑒於這是node為最小單位的部署方法，爲了dns可控，每個機器加裝dnsmasq并且指定本機解析。
+
+```bash
+# yum install -y dnsmasq
+# vim /etc/dnsmasq.conf
+strict-order    #在解析域名地址时严格按照 DNS 服务器列表的从上到下的顺序去解析
+# vim /etc/resolv.conf
+search local
+....
+# systemctl enable dnsmasq.service 
+# systemctl start dnsmasq.service
+```
+
 ### 安裝集群
 
 注意加入master節點的ZeroTier IP
