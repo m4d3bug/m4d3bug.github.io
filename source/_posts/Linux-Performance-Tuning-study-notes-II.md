@@ -13,6 +13,7 @@ tags:
 - "Load Averages "
 - "Sysstat "
 - "Stress "
+- "Linux性能調優實戰筆記"
 ---
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>       
