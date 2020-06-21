@@ -177,7 +177,7 @@ kubelet-1.18.4-0.x86_64
 
 # 結語
 
-一套下來，UDP的通信可靠性還是名不虛傳，除非等待HTTP3.0的quic協議出來吧，這樣子運營商也許就不會對UDP那麽狠了，所以奉勸各位還是別折騰這條路了，後面或許會嘗試使用[GRE方式](https://feisky.xyz/posts/2015-03-02-setting-up-gre-for-kubernetes/)來再嘗試一次。以下是部署后情況：
+一套下來，UDP的通信可靠性還是名不虛傳，除非等待HTTP3.0/quic協議普及吧，這樣子運營商也許就不會對UDP那麽狠了，所以奉勸各位還是別折騰這條路了，後面或許會嘗試使用[GRE方式](https://feisky.xyz/posts/2015-03-02-setting-up-gre-for-kubernetes/)來再嘗試一次。以下是部署后情況：
 
 可以見到，即使加入成功也都是充斥著大量因爲timeout造成的failed的信息在其中。
 
