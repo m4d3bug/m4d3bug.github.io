@@ -1,5 +1,5 @@
 ---
-title: 基於Zerotier搭建"跨供應商"的K8S集群的失敗嘗試
+title: 基於Zerotier搭建"跨供應商"的K8S集群的帶阻嘗試
 mathjax: true
 copyright: true
 comment: true
@@ -177,8 +177,12 @@ kubelet-1.18.4-0.x86_64
 
 # 結語
 
-一套下來，UDP的通信可靠性還是名不虛傳，所以奉勸各位還是別折騰這條路了，後面或許會嘗試使用[GRE方式](https://feisky.xyz/posts/2015-03-02-setting-up-gre-for-kubernetes/)來達成類似目的。以下是部署后情況：
+一套下來，UDP的通信可靠性還是名不虛傳，除非等待HTTP3.0的quic協議出來吧，這樣子運營商也許就不會對UDP那麽狠了，所以奉勸各位還是別折騰這條路了，後面或許會嘗試使用[GRE方式](https://feisky.xyz/posts/2015-03-02-setting-up-gre-for-kubernetes/)來再嘗試一次。以下是部署后情況：
 
-可以見到，即使加入成功也都是充斥著大量failed的信息在其中。
+可以見到，即使加入成功也都是充斥著大量因爲timeout造成的failed的信息在其中。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/failedzerotier.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/failedzerotier.png)
+
+其後，通過睡了一覺，白天時分，QOS緩和的時候，順利將剩下搬瓦工節點加入。
+
+![https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png)
