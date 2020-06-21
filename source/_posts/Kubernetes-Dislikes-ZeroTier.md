@@ -1,5 +1,5 @@
 ---
-title: 基於Zerotier搭建"跨供應商"的K8S集群的失敗嘗試
+title: 基於Zerotier搭建"跨供應商"的K8S集群带阻嘗試
 mathjax: true
 copyright: true
 comment: true
@@ -14,8 +14,6 @@ tags:
 - "Zerotier "
 - "Kubernetes "
 ---
-
-
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/kubernetes%26zerotier.png" width=50% /></center>
 
