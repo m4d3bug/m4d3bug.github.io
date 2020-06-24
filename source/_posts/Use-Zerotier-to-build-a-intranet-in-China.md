@@ -108,7 +108,8 @@ tags:
    5. 將該moon節點加入網絡。
 
       ```
-      mkdir moons.dmv 000000xxxxxxxxxx.moon moons.d/
+      mkdir moons.d
+      mv 000000xxxxxxxxxx.moon moons.d/
       ```
 
    6. 重啓zerotier-one服務即可完成moon節點的設置。
