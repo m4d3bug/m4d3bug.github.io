@@ -1,5 +1,5 @@
 ---
-title: 關於firewalld與iptables趣事
+title: 關於iptables與firewalld趣事
 mathjax: true
 copyright: true
 comment: true
