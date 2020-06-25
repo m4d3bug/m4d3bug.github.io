@@ -29,6 +29,8 @@ tags:
 
 ## 事情經過
 
+---
+
 ### firewalld部分
 
 問題1和2咋一看，似乎應該選擇trusted zone，firewalld裏唯一一個默認放行所有端口的zone。但實驗下來，trusted zone下并不能再做黑名單的過濾，遂放棄。（如有錯誤，請斧正）
@@ -104,5 +106,7 @@ Chain OUTPUT (policy ACCEPT 712 packets, 71120 bytes)
 ```
 
 ## 結語
+
+---
 
 firewalld還是蠻好用的，有時候想東西得反過來想。

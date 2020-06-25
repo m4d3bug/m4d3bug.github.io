@@ -19,7 +19,9 @@ tags:
 
 <!-- more -->
 
-# 機器情況
+## 機器情況
+
+---
 
 | 供應商 | 規格 | 機房位置   |
 | ------ | ---- | ---------- |
@@ -27,27 +29,29 @@ tags:
 | 搬瓦工 | 2C2G | 美國洛杉磯 |
 | Ucloud | 1C1G | 中國香港   |
 
-# ZeroTier部分
+## ZeroTier部分
 
-## 加入ZeroTier組網
+---
 
-### 安裝軟體
+### 加入ZeroTier組網
+
+#### 安裝軟體
 
 ```bash
 # curl -s https://install.zerotier.com/ | sudo bash
 ```
 
-### 加入網絡
+#### 加入網絡
 
 ```bash
 # zerotier-cli join xxxxxxxxxxxxxxxx
 ```
 
-### 機器網絡狀況
+#### 機器網絡狀況
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/machinesNetworks.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png)
 
-### 寫入靜態IP和hostname
+#### 寫入靜態IP和hostname
 
 ```bash
 # cat >> /etc/hosts << EOF
@@ -58,18 +62,20 @@ EOF
 # hostnamectl set-hostname xxx.m4d3bug.com
 ```
 
-# K8S部分
+## K8S部分
 
-## 系統預設定
+---
 
-### 確保selinux為寬容模式
+### 系統預設定
+
+#### 確保selinux為寬容模式
 
 ```bash
 # setenforce 0
 setenforce: SELinux is disabled
 ```
 
-### 關閉firewalld
+#### 關閉firewalld
 
 云供應商們基本都關掉了，所以沒什麽回顯。
 
@@ -78,7 +84,7 @@ setenforce: SELinux is disabled
 # systemctl stop firewalld
 ```
 
-### 选择性關閉swap
+#### 选择性關閉swap
 
 ```bash
 # swapoff -a
@@ -96,7 +102,7 @@ master節點只是一隻小鷄鷄，所以就不關它的swap了，安裝kubelet
 KUBELET_EXTRA_ARGS=--fail-swap-on=false
 ```
 
-### 設置并啓用内核參數
+#### 設置并啓用内核參數
 
 ```bash
 # cat <<EOF > /etc/sysctl.d/k8s.conf
@@ -107,9 +113,9 @@ EOF
 # sysctl -p /etc/sysctl.d/k8s.conf
 ```
 
-## 開始安裝
+### 開始安裝
 
-### 安裝Docker軟體
+#### 安裝Docker軟體
 
 ```bash
 # yum -y install docker
@@ -120,7 +126,7 @@ Docker version 1.13.1, build 64e9980/1.13.1
 Created symlink from /etc/systemd/system/multi-user.target.wants/docker.service to /usr/lib/systemd/system/docker.service.
 ```
 
-### 加入代理設定到Docker中
+#### 加入代理設定到Docker中
 
 順便説一嘴，可以在ZeroTier組網裏起一個代理。
 
@@ -136,7 +142,7 @@ EOF
 # systemctl restart docker
 ```
 
-### 加入谷歌倉庫
+#### 加入谷歌倉庫
 
 同樣加入ZeroTier中的代理地址。
 
@@ -153,7 +159,7 @@ proxy=http://10.9.8.10:1081
 EOF
 ```
 
-### 獲得必須的軟體及鏡像
+#### 獲得必須的軟體及鏡像
 
 ```bash
 # yum -y install kubeadm kubelet kubectl
@@ -165,7 +171,7 @@ kubelet-1.18.4-0.x86_64
 # kubeadm config images pull
 ```
 
-### 附加設置
+#### 附加設置
 
 鑒於這是node為最小單位的部署方法，爲了dns可控，每個機器加裝dnsmasq并且指定本機解析。
 
@@ -180,7 +186,7 @@ search local
 # systemctl start dnsmasq.service
 ```
 
-### 安裝集群
+#### 安裝集群
 
 注意加入master節點的ZeroTier IP
 
@@ -188,7 +194,9 @@ search local
 # kubeadm init --apiserver-advertise-address=10.9.8.118 --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Swap 
 ```
 
-# 結語
+## 結語
+
+---
 
 一套下來，UDP的通信可靠性還是名不虛傳，除非等待HTTP3.0/quic協議普及吧，這樣子運營商也許就不會對UDP那麽狠了，所以奉勸各位還是別折騰這條路了，後面或許會嘗試使用[GRE方式](https://feisky.xyz/posts/2015-03-02-setting-up-gre-for-kubernetes/)來再嘗試一次。以下是部署后情況：
 
