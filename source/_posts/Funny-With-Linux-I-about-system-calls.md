@@ -459,6 +459,8 @@ dynamiccreateprocess→ PLT⇋GOT→ld-linux.so→libdynamicprocess.so(create_pr
 
 ## 執行程序的主體-load_elf_binary等函數
 
+---
+
 系統中大體通過以下的調用順序執行：
 
 ```bash
@@ -476,6 +478,8 @@ sys_execve->do_execve->do_execveat_common->exec_binprm->search_binary_handler。
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/execnamerule.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/execnamerule.jpg)
 
 ## 而執行函數的主體—-進程！
+
+---
 
 ```bash
 [root@deployer ~]# ps -ef
@@ -506,6 +510,8 @@ root     32901 32794  0 00:01 pts/0    00:00:00 ps -ef
 ```
 
 ## 結語
+
+---
 
 終於啃完進程了，耗時好幾天，果然寫博客方便整理思路。
 
