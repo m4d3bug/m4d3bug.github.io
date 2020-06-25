@@ -17,7 +17,9 @@ tags:
 
 <!-- more -->
 
-# 什麽是Zerotier
+## 什麽是Zerotier
+  
+   ---
 
    來自[官網](https://www.zerotier.com/manual/#1)的説明：
 
@@ -25,7 +27,7 @@ tags:
 
    > *It’s a distributed network hypervisor built atop a cryptographically secure global peer to peer network. It provides advanced network virtualization and management capabilities on par with an enterprise SDN switch, but across both local and wide area networks and connecting almost any kind of app or device.*
 
-# 如何使用
+## 如何使用
 
    ---
 
