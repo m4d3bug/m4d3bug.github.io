@@ -79,7 +79,7 @@ EOF
 [root@learn ~]# gcc -c -fPIC createprocess.c
 ```
 
-對其進行查看。
+對其内部sections進行檢視。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/relocatableFileFormat.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/relocatableFileFormat.jpg)
 
@@ -187,11 +187,11 @@ Key to Flags:
              編譯       輸出文件                               -l 指定library並補全lib和.a
 ```
 
-對其進行查看。
+對其内部sections進行檢視。
 
-ELF Header，e_entry虛擬地址入口。
+> ELF Header，e_entry虛擬地址入口。
 
-Section Header Table（段頭表，struct elf32_phdr 和 struct elf64_phdr兩個描述代碼運行于32/64位。還有p_vaddr加載内存地址）
+> Section Header Table（段頭表，struct elf32_phdr 和 struct elf64_phdr兩個描述代碼運行于32/64位。還有p_vaddr加載内存地址）
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/executableFileFormat.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/executableFileFormat.jpg)
 
@@ -290,7 +290,7 @@ total 228
 [root@learn ~]# gcc -shared -fPIC -o libdynamicprocess.so process.o
 ```
 
-進行查看。
+對其内部sections進行檢視。
 
 ```bash
 [root@learn ~]# readelf -S libdynamicprocess.so 
