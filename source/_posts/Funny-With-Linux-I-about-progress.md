@@ -1,5 +1,5 @@
 ---
-title: 趣談Linux操作系統筆記I（之剖析系統調用創建進程）
+title: 趣談Linux操作系統筆記I（之剖析系統進程）
 mathjax: true
 copyright: true
 comment: true

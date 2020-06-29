@@ -60,13 +60,19 @@ int main(int argc, char *argv[])
    int t;
    int downloadtime;
 
-   pthread_attr_t thread_attr;                                         //設置綫程屬性
-   pthread_attr_init(&thread_attr);                                    //初始化綫程
-   pthread_attr_setdetachstate(&thread_attr,PTHREAD_CREATE_JOINABLE);  //設置其屬性為主綫程等待子綫程，並獲取其退出狀態方便調試
+   
+   //設置綫程屬性
+   pthread_attr_t thread_attr;                                         
+   //初始化綫程
+   pthread_attr_init(&thread_attr);                                   
+   //設置其屬性為主綫程等待子綫程，並獲取其退出狀態方便調試
+   pthread_attr_setdetachstate(&thread_attr,PTHREAD_CREATE_JOINABLE);  
 
    for(t=0;t<NUM_OF_TASKS;t++){
-     printf("creating thread %d, please help me to download %s\n", t+1, files[t]);  //打印
-     rc = pthread_create(&threads[t], &thread_attr, downloadfile, (void *)files[t]); //創建並開啓綫程&thread_attr，然後指定子綫程的函數downloadfile
+     //打印
+     printf("creating thread %d, please help me to download %s\n", t+1, files[t]);
+     //創建並開啓綫程&thread_attr，然後指定子綫程的函數downloadfile
+     rc = pthread_create(&threads[t], &thread_attr, downloadfile, (void *)files[t]); 
      if (rc){
        printf("ERROR; return code from pthread_create() is %d\n", rc);
        exit(-1);
@@ -76,7 +82,8 @@ int main(int argc, char *argv[])
    pthread_attr_destroy(&thread_attr);  //銷毀綫程屬性
 
    for(t=0;t<NUM_OF_TASKS;t++){
-     pthread_join(threads[t],(void**)&downloadtime);   //等待綫程結束，並取得返回的downloadtime數值
+     //等待綫程結束，並取得返回的downloadtime數值
+     pthread_join(threads[t],(void**)&downloadtime);  
      printf("Thread %d downloads the file %s in %d minutes.\n",t+1,files[t],downloadtime);
    }
 
