@@ -5,7 +5,7 @@ copyright: true
 comment: true
 date: 2020-06-25 21:21:52
 categories:
-- "Ops"
+- "Ops "
 tags:
 - "Linux "
 - "趣談Linux操作系統筆記"
