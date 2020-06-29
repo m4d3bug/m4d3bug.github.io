@@ -25,17 +25,17 @@ tags:
 
 > **進程相當於一個項目，而綫程則是爲了完成項目需求，而建立的一個個開發任務。**
 
-因此，儅開發任務間無先後次序時，適當拆分出支綫來并發，可顯著提升效率（而科學的分工，符合[**宇宙法則**](https://zh.wikipedia.org/zh-tw/%E5%B8%95%E7%B4%AF%E6%89%98%E6%B3%95%E5%88%99)）。
+因此，儅開發任務無次序要求时，拆分出支綫來并發，可顯著提升效率（而科學的分工，符合[**宇宙法則**](https://zh.wikipedia.org/zh-tw/%E5%B8%95%E7%B4%AF%E6%89%98%E6%B3%95%E5%88%99)）。
 
 ## 如何創建綫程*(how?)*
 
 ---
 
-要創建我們就要預先瞭解其函數的調用過程。
+創建前，先瞭解調用綫程的必經步驟。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howtaskwork.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howtaskwork.jpg)
 
-有了骨架，我們可以構建與之對應的測試代碼。
+根據步驟，構建與之對應的測試代碼。
 
 ```c
 #include <pthread.h>
@@ -44,18 +44,22 @@ tags:
 
 #define NUM_OF_TASKS 5
 
-void *downloadfile(void *filename) //聲明綫程函數
+//聲明綫程函數
+void *downloadfile(void *filename) 
 {
    printf("I am downloading the file %s!\n", (char *)filename);
    sleep(10);
    long downloadtime = rand()%100;
    printf("I finish downloading the file within %d minutes!\n", downloadtime);
-   pthread_exit((void *)downloadtime); //次綫程結束並返回隨機生成的downloadtime
+   //次綫程結束並返回隨機生成的downloadtime
+   pthread_exit((void *)downloadtime); 
 }
 
 int main(int argc, char *argv[])
-   char files[NUM_OF_TASKS][20]={"file1.avi","file2.rmvb","file3.mp4","file4.wmv","file5.flv"}; //聲明數組
-   pthread_t threads[NUM_OF_TASKS];                                    //聲明該數組為綫程對象
+   //聲明數組
+   char files[NUM_OF_TASKS][20]={"file1.avi","file2.rmvb","file3.mp4","file4.wmv","file5.flv"}; 
+   //聲明該數組為綫程對象
+   pthread_t threads[NUM_OF_TASKS];                                    
    int rc;
    int t;
    int downloadtime;
@@ -79,7 +83,8 @@ int main(int argc, char *argv[])
      }
    }
 
-   pthread_attr_destroy(&thread_attr);  //銷毀綫程屬性
+   //銷毀綫程屬性
+   pthread_attr_destroy(&thread_attr);  
 
    for(t=0;t<NUM_OF_TASKS;t++){
      //等待綫程結束，並取得返回的downloadtime數值
@@ -87,7 +92,8 @@ int main(int argc, char *argv[])
      printf("Thread %d downloads the file %s in %d minutes.\n",t+1,files[t],downloadtime);
    }
 
-   pthread_exit(NULL); //主綫程結束
+   //主綫程結束
+   pthread_exit(NULL); 
 }
 ```
 
@@ -203,7 +209,8 @@ int money_of_jerry = 100;
 //暂不启用mutex
 //pthread_mutex_t g_money_lock;
 
-void *transfer(void *notused)   //子綫程用於執行金額轉賬
+//創建子綫程用於執行金額轉賬
+void *transfer(void *notused)   
 {
   pthread_t tid = pthread_self();
   printf("Thread %u is transfering money!\n", (unsigned int)tid);
@@ -219,7 +226,8 @@ void *transfer(void *notused)   //子綫程用於執行金額轉賬
   pthread_exit((void *)0);
 }
 
-int main(int argc, char *argv[])  //使用主綫程來輸出總額方便觀察
+//主綫程負責輸出總額，子綫程負責交易細節
+int main(int argc, char *argv[])  
 {
   pthread_t threads[NUM_OF_TASKS];
   int rc;
@@ -228,7 +236,8 @@ int main(int argc, char *argv[])  //使用主綫程來輸出總額方便觀察
   //pthread_mutex_init(&g_money_lock, NULL);
 
   for(t=0;t<NUM_OF_TASKS;t++){
-    rc = pthread_create(&threads[t], NULL, transfer, NULL); //創建子綫程開啓轉賬
+    //創建子綫程開啓轉賬
+    rc = pthread_create(&threads[t], NULL, transfer, NULL); 
     if (rc){
       printf("ERROR; return code from pthread_create() is %d\n", rc);
       exit(-1);
@@ -239,7 +248,8 @@ int main(int argc, char *argv[])  //使用主綫程來輸出總額方便觀察
     //暂不启用mutex
     //pthread_mutex_lock(&g_money_lock);
     printf("money_of_tom + money_of_jerry = %d\n", money_of_tom + money_of_jerry);
-    sleep(rand()%3);  //隨機輸出時間
+    //隨機輸出時間
+    sleep(rand()%3);  
     //暂不启用mutex
     //pthread_mutex_unlock(&g_money_lock);
   }
@@ -328,12 +338,14 @@ void *transfer(void *notused)
 {
   pthread_t tid = pthread_self();
   printf("Thread %u is transfering money!\n", (unsigned int)tid);
-  pthread_mutex_lock(&g_money_lock);   //開始轉賬前，等待互斥鎖獨占共享變量。
+  //開始轉賬前，等待互斥鎖獨占共享變量
+  pthread_mutex_lock(&g_money_lock);   
   sleep(rand()%10);
   money_of_tom+=10;
   sleep(rand()%10);
   money_of_jerry-=10;
-  pthread_mutex_unlock(&g_money_lock);  //完成轉賬後，釋放互斥鎖。
+  //完成轉賬後，釋放互斥鎖
+  pthread_mutex_unlock(&g_money_lock);  
   printf("Thread %u finish transfering money!\n", (unsigned int)tid);
   pthread_exit((void *)0);
 }
@@ -343,7 +355,8 @@ int main(int argc, char *argv[])
   pthread_t threads[NUM_OF_TASKS];
   int rc;
   int t;
-  pthread_mutex_init(&g_money_lock, NULL); //開始創建綫程前，初始化一個互斥鎖&g_money_lock。
+  //開始創建綫程前，初始化一個互斥鎖&g_money_lock
+  pthread_mutex_init(&g_money_lock, NULL); 
 
   for(t=0;t<NUM_OF_TASKS;t++){
     rc = pthread_create(&threads[t], NULL, transfer, NULL);
@@ -354,12 +367,15 @@ int main(int argc, char *argv[])
   }
   
   for(t=0;t<100;t++){
-    pthread_mutex_lock(&g_money_lock);   //開始打印共享變量前，等待互斥鎖獨占共享變量。
+    //開始打印共享變量前，等待互斥鎖獨占共享變量
+    pthread_mutex_lock(&g_money_lock);   
     printf("money_of_tom + money_of_jerry = %d\n", money_of_tom + money_of_jerry);
     sleep(rand()%10);
-    pthread_mutex_unlock(&g_money_lock);  //完成輸出后解鎖。
+    //完成輸出后解鎖
+    pthread_mutex_unlock(&g_money_lock);  
   }
-  pthread_mutex_destroy(&g_money_lock); //全部完成後，銷毀鎖。
+  //全部完成後，銷毀鎖
+  pthread_mutex_destroy(&g_money_lock); 
   pthread_exit(NULL);
 }
 [root@learn ~]# gcc mutex.c -lpthread -o after.out
@@ -417,9 +433,12 @@ void *coder(void *notused)                  // 定義子綫程工作内容
         pthread_mutex_unlock(&g_task_lock); // 釋放互斥鎖
         pthread_exit((void *)0);            // 退出綫程
       }
-      printf("No task now! Thread %u is waiting!\n", (unsigned int)tid);  // 打印等待綫程
-      pthread_cond_wait(&g_task_cv, &g_task_lock);     // 一直等待條件變量和互斥鎖的入參將自動搶鎖。
-      printf("Have task now! Thread %u is grabing the task !\n", (unsigned int)tid); //綫程id開始執行綫程
+      // 打印等待綫程
+      printf("No task now! Thread %u is waiting!\n", (unsigned int)tid);  
+      // 一直等待條件變量和互斥鎖的入參將自動搶鎖。
+      pthread_cond_wait(&g_task_cv, &g_task_lock); 
+      //綫程id開始執行綫程
+      printf("Have task now! Thread %u is grabing the task !\n", (unsigned int)tid); 
     }
     char task = tasklist[head++];          // 推進已完成head
     pthread_mutex_unlock(&g_task_lock);    // 釋放整個子綫程的互斥鎖
@@ -440,8 +459,9 @@ int main(int argc, char *argv[])            // 定義主綫程工作内容
   pthread_mutex_init(&g_task_lock, NULL);   // 初始化互斥鎖
   pthread_cond_init(&g_task_cv, NULL);      // 初始化條件變量
 
-  for(t=0;t<NUM_OF_TASKS;t++){       
-    rc = pthread_create(&threads[t], NULL, coder, NULL); // 創建無屬性綫程，調用coder之後就繼續往下。
+  for(t=0;t<NUM_OF_TASKS;t++){  
+    // 創建無屬性綫程，調用coder之後就繼續往下。
+    rc = pthread_create(&threads[t], NULL, coder, NULL); 
     if (rc){
       printf("ERROR; return code from pthread_create() is %d\n", rc);
       exit(-1);
