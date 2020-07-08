@@ -26,7 +26,7 @@ tags:
 
 平均負載依賴於有多少空閑核心，運行態，不可中斷態。我們可以從uptime的manual中查看到以下訊息：
 
-># man uptime
+>man uptime
 >...
 >System load averages is the average number of processes that are either in a runnable or uninterruptable state. (平均負載：單位時間內，系統處於運行態和不可中斷態的進程數。)
 >A process in a runnable state is either using the CPU or waiting to use the CPU.(運行態指正使用CPU或等待CPU。)
@@ -61,7 +61,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 - 1個CPU系統：滿載
 - 4個CPU系統：1/4滿載
 
-**注意：平均負載應該小於CPU數的70%.**
+**注意：** 平均負載應該小於CPU數的70%。
 
 ## 案例模擬
 
@@ -275,9 +275,9 @@ stress: info: [15703] dispatching hogs: 0 cpu, 1 io, 0 vm, 0 hdd
 
   *Now we can clearly see Load Average up because of waiting CPU(%wait).* 
 
-## *Done*
+## 結語
 
-### *Load Averages = running(可運行態) + uninterruptable(不可中斷態)*
+### Load Averages = running(運行態) + uninterruptable(不可中斷態)
 
 - *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
 - *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
