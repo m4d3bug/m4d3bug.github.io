@@ -58,7 +58,7 @@ tags:
       *** Waiting for identity generation...*** Success! You are ZeroTier address [ xxxxxxxx ].
       ```
 
-# 如何建立中轉服務器moon
+## 如何建立中轉服務器moon
 
    ---
 
@@ -120,7 +120,7 @@ tags:
       systemctl restart zerotier-one.service
       ```
 
-# 如何使用自建的moon節點
+## 如何使用自建的moon節點
 
    ---
 
@@ -142,7 +142,7 @@ tags:
       zerotier-cli deorbit 000000xxxxxxxxxx
       ```
 
-# 結語
+## 結語
 
    ---
 
