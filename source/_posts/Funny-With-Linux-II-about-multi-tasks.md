@@ -13,9 +13,9 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
-<!-- more -->
-
 本文旨在剖析线程的五個W和一個H。
+
+<!-- more -->
 
 ## 什麽是綫程*(what and why?)*
 

@@ -13,9 +13,9 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
-<!-- more -->
-
 本文旨在從三個方面（被執行的主體，執行程序的主體，執行函數的主體）闡述系統調用的全過程。
+
+<!-- more -->
 
 ## 被執行的主體-ELF(Executable and Linkable Format)
 

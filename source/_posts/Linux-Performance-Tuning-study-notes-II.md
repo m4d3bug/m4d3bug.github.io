@@ -18,9 +18,9 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>       
 
-<!-- more -->
-
 本文旨在闡述，關於平均負載的知識點。
+
+<!-- more -->
 
 ## 什麽是平均負載 (*Load Averages*)
 

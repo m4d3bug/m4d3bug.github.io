@@ -15,6 +15,8 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/firewall.jpg" width=50% /></center>
 
+本文旨在記錄解決關於iptables和firewalld的一個~<font color=#808080>奇葩</font>需求。
+
 <!-- more -->
 
 ## 事情起因

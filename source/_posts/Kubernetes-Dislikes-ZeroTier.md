@@ -17,6 +17,8 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/kubernetes%26zerotier.png" width=50% /></center>
 
+本文旨在嘗試驗證自己的一個~~<font color=#808080>奇葩</font>~~想法。
+
 <!-- more -->
 
 ## 機器情況
