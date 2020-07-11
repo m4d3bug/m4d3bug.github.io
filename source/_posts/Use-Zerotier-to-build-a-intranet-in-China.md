@@ -15,6 +15,8 @@ tags:
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/ZeroTier.png" width=50% /></center>
 
+本文將簡單闡述個人理解的Zerotier。
+
 <!-- more -->
 
 ## 什麽是Zerotier
