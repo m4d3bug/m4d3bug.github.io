@@ -6,7 +6,6 @@ comment: true
 date: 2020-07-11 18:23:31
 categories:
 - "Sec "
-- "Ops "
 tags:
 - "Linux "
 - "NFS "
@@ -15,7 +14,7 @@ tags:
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/tpotsocial.png" width=50% /></center>
 
-本文將通過[Zerotier](https://blog.madebug.net/ops/2020-06-15-use-zerotier-to-build-a-intranet-in-china)嘗試搭建nfs來給~~ <font color=#808080>因爲沒錢</font>~~硬盤空間不足的雲服務器提供後端存儲以滿足TPOT的安裝需求。
+本文將通過[Zerotier](https://blog.madebug.net/ops/2020-06-15-use-zerotier-to-build-a-intranet-in-china)嘗試搭建nfs來給~~<font color=#808080>因爲沒錢</font>~~硬盤空間不足的雲服務器提供後端存儲以滿足TPOT的安裝需求。
 
 <!-- more -->
 
@@ -23,7 +22,7 @@ tags:
 
 ---
 
-略
+[略](https://blog.madebug.net/ops/2020-06-15-use-zerotier-to-build-a-intranet-in-china)
 
 ## NFS部分
 
@@ -85,7 +84,7 @@ storage1.madebug.net:/home   /data  nfs     defaults        0       0
 
 ---
 
-設置好所需的代理。~~不知道怎麽設置的可以等我以後水一篇再補上。~~
+設置好所需的代理。~~<font color=#808080>不知道怎麽設置的可以等我以後水一篇再補上。</font>~~
 
 ```bash
 ~# grep -vE '^#|^$' /etc/apt/sources.list
