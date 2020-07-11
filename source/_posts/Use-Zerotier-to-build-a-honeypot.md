@@ -125,7 +125,7 @@ deb-src http://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main
 
 - Zerotier組網天下第一，甚至用來提供後端存儲也是可行的。
 
-- ~~<font color=#808080>甚至還能這樣玩。</font>~~
+- ~~<font color=#808080>[甚至還能這樣玩。](https://www.freebuf.com/articles/network/208895.html)</font>~~
 - 以及鳴謝以下鏈接：
   - [开源蜜罐t-pot-19-03安装和使用](https://www.izhuhn.cn/index.php/2019/05/24/开源蜜罐t-pot-19-03安装和使用/)
   - [T-Pot多蜜罐平台：让蜜罐实现更简单](https://www.freebuf.com/sectool/134504.html)
