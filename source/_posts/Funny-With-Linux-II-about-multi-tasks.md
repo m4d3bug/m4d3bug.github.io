@@ -150,7 +150,7 @@ Thread 5 downloads the file file5.flv in 77 minutes.
 
 ---
 
-在瞭解了并发多綫程的運作模式及優勢，緊接要解決綫程對**三種不同位置類別數據的處理方式**。
+在瞭解了并发多綫程的運作模式及優勢，緊接要解決綫程對**三種不同位置類別數據**的處理方式。
 
 ### 綫程棧上的本地數據
 
@@ -176,7 +176,7 @@ virtual memory          (kbytes, -v) unlimited
 file locks                      (-x) unlimited
 ```
 
-而内存中綫程棧間有用小塊區域來隔離各自空間，儅被踏入則會引發[段錯誤](https://baike.baidu.com/item/%E6%AE%B5%E9%94%99%E8%AF%AF)***[(Segmentation fault)](https://en.wikipedia.org/wiki/Segmentation_fault)***。
+而内存中綫程棧間有用小塊區域來隔離各自空間，當被踏入則會引發[段錯誤](https://baike.baidu.com/item/%E6%AE%B5%E9%94%99%E8%AF%AF)***[(Segmentation fault)](https://en.wikipedia.org/wiki/Segmentation_fault)***。
 
 可以通過函數pthread_attr_t來修改單個綫程棧大小，或者通過ulimit -s來進行全局修改。
 
