@@ -651,7 +651,7 @@ valine:
 # For more information: https://gitalk.github.io, https://github.com/gitalk/gitalk
 gitalk:
   enable: true
-  github_id: m4d3bug# GitHub repo owner
+  github_id: m4d3bug # GitHub repo owner
   repo: m4d3bug.github.io # Repository name to store issues
   client_id: 6a4c96424f3dba5bfb91 # GitHub Application Client ID
   client_secret: 2740eb0b36d717b9a601fe8f44f011a48a8d0454 # GitHub Application Client Secret
