@@ -108,8 +108,3 @@ deploy:
   type: 'git'
   repo: https://github.com/m4d3bug/m4d3bug.github.io.git
   branch: master
-
-#autoissue
-owner: m4d3bug-bot
-comment_repo: m4d3bug.github.io
-labels: ["Gitalk"]
