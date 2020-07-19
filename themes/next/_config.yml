@@ -653,7 +653,7 @@ gitalk:
   enable: true
   github_id: m4d3bug # GitHub repo owner
   repo: m4d3bug.github.io # Repository name to store issues
-  client_id: 0d4f63a6991663a1496a
+  client_id: # GitHub Application Client ID
   client_secret:  # GitHub Application Client Secret
   admin_user: m4d3bug # GitHub repo owner and collaborators, only these guys can initialize gitHub issues
   distraction_free_mode: true # Facebook-like distraction free mode
