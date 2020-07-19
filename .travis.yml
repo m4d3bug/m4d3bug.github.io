@@ -15,8 +15,8 @@ install:
 #  - sed -n "657c \ \ client_id: $GT_SECRET" themes/next/_config.yml
 
 script:
-  - pwd
-  - ls
+  - sed -n "656c \ \ client_id: $GT_ID" themes/next/_config.yml
+  - sed -n "657c \ \ client_id: $GT_SECRET" themes/next/_config.yml
   - hexo clean
   - hexo generate
 
