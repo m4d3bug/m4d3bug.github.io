@@ -10,14 +10,10 @@ install:
   - npm install hexo-cli -g
   - npm install
 
-#before_script:
-#  - sed -n "656c \ \ client_id: $GT_ID" themes/next/_config.yml
-#  - sed -n "657c \ \ client_id: $GT_SECRET" themes/next/_config.yml
-
 script:
-  - cat themes/next/_config.yml | wc -l
-  - sed -i "656c \ \ client_id: $GT_ID" themes/next/_config.yml
-  - sed -i "657c \ \ client_id: $GT_SECRET" themes/next/_config.yml
+#  - cat themes/next/_config.yml | wc -l
+#  - sed -i "656c \ \ client_id: $GT_ID" themes/next/_config.yml
+#  - sed -i "657c \ \ client_id: $GT_SECRET" themes/next/_config.yml
   - hexo clean
   - hexo generate
 
