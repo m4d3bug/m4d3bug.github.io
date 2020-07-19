@@ -15,8 +15,8 @@ install:
 #  - sed -n "657c \ \ client_id: $GT_SECRET" themes/next/_config.yml
 
 script:
-  - sed -n "656c \ \ client_id: $GT_ID" themes/next/_config.yml
-  - sed -n "657c \ \ client_id: $GT_SECRET" themes/next/_config.yml
+  - sed -n "656c \ \ client_id: $GT_ID" /home/travis/build/m4d3bug/m4d3bug.github.io/themes/next/_config.yml
+  - sed -n "657c \ \ client_id: $GT_SECRET" /home/travis/build/m4d3bug/m4d3bug.github.io/themes/next/_config.yml
   - hexo clean
   - hexo generate
 
