@@ -574,13 +574,13 @@ No task now! Thread 3491833600 is waiting!
 
 與本地數據的區別在於，前者只是局部變量，私有數據是于綫程創建的全局變量，亦非進程的全局變量。
 
-創建方式
+#### 創建方式
 
 ```c
 int pthread_setspecific(pthread_key_t key, const void *value)
 ```
 
-獲得方式
+#### 獲得方式
 
 ```c
 void *pthread_getspecific(pthread_key_t key)
