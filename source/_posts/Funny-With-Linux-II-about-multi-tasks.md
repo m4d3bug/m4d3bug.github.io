@@ -11,7 +11,6 @@ tags:
 - "Linux "
 - "趣談Linux操作系統筆記"
 ---
-
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
 本文旨在剖析线程的五個W和一個H。
@@ -26,7 +25,7 @@ tags:
 
 > **進程相當於一個項目，而綫程則是爲了完成項目需求，而建立的一個個開發任務。**
 
-因此，儅開發任務無次序要求时，拆分出支綫來并發，可顯著提升效率（而科學的分工，符合[**宇宙法則**](https://zh.wikipedia.org/zh-tw/%E5%B8%95%E7%B4%AF%E6%89%98%E6%B3%95%E5%88%99)）。
+因此，當開發任務間無先後次序時，拆分出支綫來并發，可顯著提升效率（而科學的分工，符合[**宇宙法則**](https://zh.wikipedia.org/zh-tw/%E5%B8%95%E7%B4%AF%E6%89%98%E6%B3%95%E5%88%99)）。
 
 ## 如何創建綫程*(how?)*
 
@@ -36,7 +35,7 @@ tags:
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howtaskwork.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howtaskwork.jpg)
 
-根據步驟，構建與之對應的測試代碼。
+根據流程圖，構建與之對應的測試代碼。
 
 ```c
 #include <pthread.h>
@@ -150,7 +149,7 @@ Thread 5 downloads the file file5.flv in 77 minutes.
 
 ---
 
-在瞭解了并发多綫程的運作模式及優勢，緊接要解決綫程對**三種不同位置類別數據**的處理方式。
+在瞭解并发多綫程的運作模式及優勢，緊接要解決綫程對**三種不同位置類別數據**的處理方式。
 
 ### 綫程棧上的本地數據
 
@@ -176,7 +175,7 @@ virtual memory          (kbytes, -v) unlimited
 file locks                      (-x) unlimited
 ```
 
-而内存中綫程棧間有用小塊區域來隔離各自空間，當被踏入則會引發[段錯誤](https://baike.baidu.com/item/%E6%AE%B5%E9%94%99%E8%AF%AF)***[(Segmentation fault)](https://en.wikipedia.org/wiki/Segmentation_fault)***。
+而内存中綫程棧間有用小塊區域來隔離各自空間，儅被踏入則會引發[段錯誤](https://baike.baidu.com/item/%E6%AE%B5%E9%94%99%E8%AF%AF)***[(Segmentation fault)](https://en.wikipedia.org/wiki/Segmentation_fault)***。
 
 可以通過函數pthread_attr_t來修改單個綫程棧大小，或者通過ulimit -s來進行全局修改。
 
@@ -192,217 +191,223 @@ ulimit -s 16384
 
 - 無條件變量的等待互斥鎖
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexwork.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexwork.jpg)
+    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexwork.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexwork.jpg)
 
-無互斥鎖下，受多綫程影響的全局變量***(money_of_tom + money_of_jerry)***：
+    **有無鎖的情況對比，可幫助明白鎖的重要性。**
 
-```bash
-[root@learn ~]# cat mutex.c 
+    **無互斥鎖**，受多綫程影響的全局變量***(money_of_tom + money_of_jerry)***：
 
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define NUM_OF_TASKS 5
-
-int money_of_tom = 100;
-int money_of_jerry = 100;
-//暂不启用mutex
-//pthread_mutex_t g_money_lock;
-
-//創建子綫程用於執行金額轉賬
-void *transfer(void *notused)   
-{
-  pthread_t tid = pthread_self();
-  printf("Thread %u is transfering money!\n", (unsigned int)tid);
-  //暂不启用mutex
-  //pthread_mutex_lock(&g_money_lock);
-  sleep(rand()%10);
-  money_of_tom+=10;
-  sleep(rand()%10);
-  money_of_jerry-=10;
-  //暂不启用mutex
-  //pthread_mutex_unlock(&g_money_lock);
-  printf("Thread %u finish transfering money!\n", (unsigned int)tid);
-  pthread_exit((void *)0);
-}
-
-//主綫程負責輸出總額，子綫程負責交易細節
-int main(int argc, char *argv[])  
-{
-  pthread_t threads[NUM_OF_TASKS];
-  int rc;
-  int t;
-  //暂不启用mutex
-  //pthread_mutex_init(&g_money_lock, NULL);
-
-  for(t=0;t<NUM_OF_TASKS;t++){
-    //創建子綫程開啓轉賬
-    rc = pthread_create(&threads[t], NULL, transfer, NULL); 
-    if (rc){
-      printf("ERROR; return code from pthread_create() is %d\n", rc);
-      exit(-1);
-    }
-  }
-  
-  for(t=0;t<18;t++){
+    ```bash
+    [root@learn ~]# cat mutex.c 
+    
+    #include <pthread.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    
+    #define NUM_OF_TASKS 5
+    
+    int money_of_tom = 100;
+    int money_of_jerry = 100;
     //暂不启用mutex
-    //pthread_mutex_lock(&g_money_lock);
-    printf("money_of_tom + money_of_jerry = %d\n", money_of_tom + money_of_jerry);
-    //隨機輸出時間
-    sleep(rand()%3);  
-    //暂不启用mutex
-    //pthread_mutex_unlock(&g_money_lock);
-  }
-  //暂不启用mutex
-  //pthread_mutex_destroy(&g_money_lock);
-  pthread_exit(NULL);
-}
-[root@learn ~]# gcc mutex.c -lpthread -o before.out
-[root@learn ~]# ./before.out 
-Thread 4143912704 is transfering money!
-Thread 4135520000 is transfering money!
-Thread 4152305408 is transfering money!
-Thread 4127127296 is transfering money!
-money_of_tom + money_of_jerry = 200
-Thread 4118734592 is transfering money!
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 210
-money_of_tom + money_of_jerry = 210
-money_of_tom + money_of_jerry = 210
-Thread 4118734592 finish transfering money!
-Thread 4143912704 finish transfering money!
-money_of_tom + money_of_jerry = 220
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 230
-Thread 4127127296 finish transfering money!
-money_of_tom + money_of_jerry = 220
-Thread 4152305408 finish transfering money!
-money_of_tom + money_of_jerry = 210
-money_of_tom + money_of_jerry = 210
-money_of_tom + money_of_jerry = 210
-Thread 4135520000 finish transfering money!
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 200
-[root@learn ~]# ./before.out 
-money_of_tom + money_of_jerry = 200
-Thread 4152305408 is transfering money!
-Thread 4135520000 is transfering money!
-Thread 4118734592 is transfering money!
-Thread 4143912704 is transfering money!
-Thread 4127127296 is transfering money!
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 210
-money_of_tom + money_of_jerry = 210
-Thread 4143912704 finish transfering money!
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 240
-Thread 4127127296 finish transfering money!
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 230
-money_of_tom + money_of_jerry = 230
-Thread 4152305408 finish transfering money!
-Thread 4135520000 finish transfering money!
-money_of_tom + money_of_jerry = 210
-Thread 4118734592 finish transfering money!
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 200
-```
-
-有互斥鎖下，受多綫程影響的全局變量***(money_of_tom + money_of_jerry)***：
-
-```bash
-[root@learn ~]# cat mutex.c 
-
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define NUM_OF_TASKS 5
-
-int money_of_tom = 100;
-int money_of_jerry = 100;
-//第一次运行去掉下面这行
-pthread_mutex_t g_money_lock;
-
-void *transfer(void *notused)
-{
-  pthread_t tid = pthread_self();
-  printf("Thread %u is transfering money!\n", (unsigned int)tid);
-  //開始轉賬前，等待互斥鎖獨占共享變量
-  pthread_mutex_lock(&g_money_lock);   
-  sleep(rand()%10);
-  money_of_tom+=10;
-  sleep(rand()%10);
-  money_of_jerry-=10;
-  //完成轉賬後，釋放互斥鎖
-  pthread_mutex_unlock(&g_money_lock);  
-  printf("Thread %u finish transfering money!\n", (unsigned int)tid);
-  pthread_exit((void *)0);
-}
-
-int main(int argc, char *argv[])
-{
-  pthread_t threads[NUM_OF_TASKS];
-  int rc;
-  int t;
-  //開始創建綫程前，初始化一個互斥鎖&g_money_lock
-  pthread_mutex_init(&g_money_lock, NULL); 
-
-  for(t=0;t<NUM_OF_TASKS;t++){
-    rc = pthread_create(&threads[t], NULL, transfer, NULL);
-    if (rc){
-      printf("ERROR; return code from pthread_create() is %d\n", rc);
-      exit(-1);
+    //pthread_mutex_t g_money_lock;
+    
+    //創建子綫程用於執行金額轉賬
+    void *transfer(void *notused)   
+    {
+      pthread_t tid = pthread_self();
+      printf("Thread %u is transfering money!\n", (unsigned int)tid);
+      //暂不启用mutex
+      //pthread_mutex_lock(&g_money_lock);
+      sleep(rand()%10);
+      money_of_tom+=10;
+      sleep(rand()%10);
+      money_of_jerry-=10;
+      //暂不启用mutex
+      //pthread_mutex_unlock(&g_money_lock);
+      printf("Thread %u finish transfering money!\n", (unsigned int)tid);
+      pthread_exit((void *)0);
     }
-  }
-  
-  for(t=0;t<100;t++){
-    //開始打印共享變量前，等待互斥鎖獨占共享變量
-    pthread_mutex_lock(&g_money_lock);   
-    printf("money_of_tom + money_of_jerry = %d\n", money_of_tom + money_of_jerry);
-    sleep(rand()%10);
-    //完成輸出后解鎖
-    pthread_mutex_unlock(&g_money_lock);  
-  }
-  //全部完成後，銷毀鎖
-  pthread_mutex_destroy(&g_money_lock); 
-  pthread_exit(NULL);
-}
-[root@learn ~]# gcc mutex.c -lpthread -o after.out
-[root@learn ~]# ./after.out 
-money_of_tom + money_of_jerry = 200
-Thread 4152305408 is transfering money!
-Thread 4143912704 is transfering money!
-Thread 4118734592 is transfering money!
-Thread 4135520000 is transfering money!
-Thread 4127127296 is transfering money!
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 200
-...
-money_of_tom + money_of_jerry = 200
-Thread 4135520000 finish transfering money!
-Thread 4152305408 finish transfering money!
-Thread 4143912704 finish transfering money!
-Thread 4118734592 finish transfering money!
-money_of_tom + money_of_jerry = 200
-money_of_tom + money_of_jerry = 200
-...
-money_of_tom + money_of_jerry = 200
-Thread 4127127296 finish transfering money!
-```
+    
+    //主綫程負責輸出總額，子綫程負責交易細節
+    int main(int argc, char *argv[])  
+    {
+      pthread_t threads[NUM_OF_TASKS];
+      int rc;
+      int t;
+      //暂不启用mutex
+      //pthread_mutex_init(&g_money_lock, NULL);
+    
+      for(t=0;t<NUM_OF_TASKS;t++){
+        //創建子綫程開啓轉賬
+        rc = pthread_create(&threads[t], NULL, transfer, NULL); 
+        if (rc){
+          printf("ERROR; return code from pthread_create() is %d\n", rc);
+          exit(-1);
+        }
+      }
+      
+      for(t=0;t<18;t++){
+        //暂不启用mutex
+        //pthread_mutex_lock(&g_money_lock);
+        printf("money_of_tom + money_of_jerry = %d\n", money_of_tom + money_of_jerry);
+        //隨機輸出時間
+        sleep(rand()%3);  
+        //暂不启用mutex
+        //pthread_mutex_unlock(&g_money_lock);
+      }
+      //暂不启用mutex
+      //pthread_mutex_destroy(&g_money_lock);
+      pthread_exit(NULL);
+    }
+    [root@learn ~]# gcc mutex.c -lpthread -o before.out
+    [root@learn ~]# ./before.out 
+    Thread 4143912704 is transfering money!
+    Thread 4135520000 is transfering money!
+    Thread 4152305408 is transfering money!
+    Thread 4127127296 is transfering money!
+    money_of_tom + money_of_jerry = 200
+    Thread 4118734592 is transfering money!
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 210
+    money_of_tom + money_of_jerry = 210
+    money_of_tom + money_of_jerry = 210
+    Thread 4118734592 finish transfering money!
+    Thread 4143912704 finish transfering money!
+    money_of_tom + money_of_jerry = 220
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 230
+    Thread 4127127296 finish transfering money!
+    money_of_tom + money_of_jerry = 220
+    Thread 4152305408 finish transfering money!
+    money_of_tom + money_of_jerry = 210
+    money_of_tom + money_of_jerry = 210
+    money_of_tom + money_of_jerry = 210
+    Thread 4135520000 finish transfering money!
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 200
+    [root@learn ~]# ./before.out 
+    money_of_tom + money_of_jerry = 200
+    Thread 4152305408 is transfering money!
+    Thread 4135520000 is transfering money!
+    Thread 4118734592 is transfering money!
+    Thread 4143912704 is transfering money!
+    Thread 4127127296 is transfering money!
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 210
+    money_of_tom + money_of_jerry = 210
+    Thread 4143912704 finish transfering money!
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 240
+    Thread 4127127296 finish transfering money!
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 230
+    money_of_tom + money_of_jerry = 230
+    Thread 4152305408 finish transfering money!
+    Thread 4135520000 finish transfering money!
+    money_of_tom + money_of_jerry = 210
+    Thread 4118734592 finish transfering money!
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 200
+    ```
+
+    **有互斥鎖**，受多綫程影響的全局變量***(money_of_tom + money_of_jerry)***：
+
+    ```bash
+    [root@learn ~]# cat mutex.c 
+    
+    #include <pthread.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    
+    #define NUM_OF_TASKS 5
+    
+    int money_of_tom = 100;
+    int money_of_jerry = 100;
+    //第一次运行去掉下面这行
+    pthread_mutex_t g_money_lock;
+    
+    void *transfer(void *notused)
+    {
+      pthread_t tid = pthread_self();
+      printf("Thread %u is transfering money!\n", (unsigned int)tid);
+      //開始轉賬前，等待互斥鎖獨占共享變量
+      pthread_mutex_lock(&g_money_lock);   
+      sleep(rand()%10);
+      money_of_tom+=10;
+      sleep(rand()%10);
+      money_of_jerry-=10;
+      //完成轉賬後，釋放互斥鎖
+      pthread_mutex_unlock(&g_money_lock);  
+      printf("Thread %u finish transfering money!\n", (unsigned int)tid);
+      pthread_exit((void *)0);
+    }
+    
+    int main(int argc, char *argv[])
+    {
+      pthread_t threads[NUM_OF_TASKS];
+      int rc;
+      int t;
+      //開始創建綫程前，初始化一個互斥鎖&g_money_lock
+      pthread_mutex_init(&g_money_lock, NULL); 
+    
+      for(t=0;t<NUM_OF_TASKS;t++){
+        rc = pthread_create(&threads[t], NULL, transfer, NULL);
+        if (rc){
+          printf("ERROR; return code from pthread_create() is %d\n", rc);
+          exit(-1);
+        }
+      }
+      
+      for(t=0;t<100;t++){
+        //開始打印共享變量前，等待互斥鎖獨占共享變量
+        pthread_mutex_lock(&g_money_lock);   
+        printf("money_of_tom + money_of_jerry = %d\n", money_of_tom + money_of_jerry);
+        sleep(rand()%10);
+        //完成輸出后解鎖
+        pthread_mutex_unlock(&g_money_lock);  
+      }
+      //全部完成後，銷毀鎖
+      pthread_mutex_destroy(&g_money_lock); 
+      pthread_exit(NULL);
+    }
+    [root@learn ~]# gcc mutex.c -lpthread -o after.out
+    [root@learn ~]# ./after.out 
+    money_of_tom + money_of_jerry = 200
+    Thread 4152305408 is transfering money!
+    Thread 4143912704 is transfering money!
+    Thread 4118734592 is transfering money!
+    Thread 4135520000 is transfering money!
+    Thread 4127127296 is transfering money!
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 200
+    ...
+    money_of_tom + money_of_jerry = 200
+    Thread 4135520000 finish transfering money!
+    Thread 4152305408 finish transfering money!
+    Thread 4143912704 finish transfering money!
+    Thread 4118734592 finish transfering money!
+    money_of_tom + money_of_jerry = 200
+    money_of_tom + money_of_jerry = 200
+    ...
+    money_of_tom + money_of_jerry = 200
+    Thread 4127127296 finish transfering money!
+    ```
 
 - 有條件變量的等待互斥鎖
+
+    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg)
+
+    根據流程圖，構建與之對應的測試代碼。
 
 ```bash
 [root@learn ~]# cat varmutex.c
@@ -567,8 +572,6 @@ No task now! Thread 3483440896 is waiting!
 Thread 3491833600 finish the task J !
 No task now! Thread 3491833600 is waiting!
 ```
-
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg)
 
 ### 綫程的私有數據
 
