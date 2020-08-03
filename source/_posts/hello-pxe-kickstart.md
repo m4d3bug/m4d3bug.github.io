@@ -241,7 +241,15 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 ~]# mkdir /var/www/html/ks
 ```
 
-### 創建*BIOS*引導的配置文件
+### 創建密碼的加密字段
+```nohighlight
+python -c 'import crypt,getpass;pw=getpass.getpass();print(crypt.crypt(pw) if (pw==getpass.getpass("Confirm: ")) else exit())'
+Password: 
+Confirm: 
+$6$SXp9tsalYxyM41qQ$mG3TbO58L9m3.Hhlec.7aoAU2AeATpJ4p.5dmTXy1iKZkoqALFi9VOhFEWWJ7Tvk6bDYbTx4SRqHw14mVnbV2.
+```
+
+### 創建*BIOS*自應答文件
 
 ```nohighlight
 ~]# cat >> /var/www/html/ks/bios-ks.cfg << EOF
@@ -252,7 +260,7 @@ install
 # Keyboard layouts:
 keyboard 'us'
 # Root password
-rootpw --iscrypted $1$MHXtAAGd$k9MrCZ5lII6h9cqL1w15h/
+rootpw --iscrypted $6$SXp9tsalYxyM41qQ$mG3TbO58L9m3.Hhlec.7aoAU2AeATpJ4p.5dmTXy1iKZkoqALFi9VOhFEWWJ7Tvk6bDYbTx4SRqHw14mVnbV2.
 # System language
 lang en_US
 # System authorization information
@@ -319,7 +327,7 @@ pwpolicy luks --minlen=6 --minquality=1 --notstrict --nochanges --notempty
 EOF
 ```
 
-### 創建*UEFI*引導的配置文件
+### 創建*UEFI*自應答文件
 
 ```nohighlight
 ~]# cat >> /var/www/html/ks/uefi-ks.cfg << EOF
@@ -330,7 +338,7 @@ install
 # Keyboard layouts
 keyboard 'us'
 # Root password
-rootpw --iscrypted $1$CnXC/qBC$W8vXGWY/oN7RvtVGh0mQT1
+rootpw --iscrypted $6$SXp9tsalYxyM41qQ$mG3TbO58L9m3.Hhlec.7aoAU2AeATpJ4p.5dmTXy1iKZkoqALFi9VOhFEWWJ7Tvk6bDYbTx4SRqHw14mVnbV2.
 # System language
 lang en_US
 # System authorization information
@@ -412,7 +420,7 @@ EOF
 
 ## 結語
 
-簡單嘗試了基於PXE搭配kickstart的無人值守安裝搭建。
+簡單嘗試了基於*PXE*搭配*Kickstart*的無人值守安裝搭建。
 
 ## 鳴謝
 
