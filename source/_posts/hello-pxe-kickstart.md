@@ -243,7 +243,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 
 ### 創建密碼的加密字段
 ```nohighlight
-python -c 'import crypt,getpass;pw=getpass.getpass();print(crypt.crypt(pw) if (pw==getpass.getpass("Confirm: ")) else exit())'
+~]# python -c 'import crypt,getpass;pw=getpass.getpass();print(crypt.crypt(pw) if (pw==getpass.getpass("Confirm: ")) else exit())'
 Password: 
 Confirm: 
 $6$SXp9tsalYxyM41qQ$mG3TbO58L9m3.Hhlec.7aoAU2AeATpJ4p.5dmTXy1iKZkoqALFi9VOhFEWWJ7Tvk6bDYbTx4SRqHw14mVnbV2.
