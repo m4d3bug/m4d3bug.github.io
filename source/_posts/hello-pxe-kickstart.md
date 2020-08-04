@@ -1,5 +1,5 @@
 ---
-title: PXE加Kickstart搭建无人值守自动安装环境
+title: PXE加Kickstart搭建無人值守自動化安裝環境
 date: 2020-08-01 15:16:19
 categories:
 - "Ops "
