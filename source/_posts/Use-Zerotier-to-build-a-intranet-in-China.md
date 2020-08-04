@@ -40,24 +40,24 @@ tags:
 
    3. 在apt系安裝zerotier：
 
-      ```
-      apt -y update
-      apt -y install curl sudo net-tools
-      curl -s https://install.zerotier.com/ | sudo bash
+      ```bash
+      ~]# apt -y update
+      ~]# apt -y install curl sudo net-tools
+      ~]# curl -s https://install.zerotier.com/ | sudo bash
       ```
 
       其中遇到了關於gpg error的問題：
 
-      ```
+      ```nohighlight
       The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 1657198823E52A61
       ```
 
       安裝gnupg來對其進行驗證導入再進行安裝。
 
-      ```
-      apt -y install gnupg
-      apt-key adv --keyserver keyserver.ubuntu.com --recv-keys  1657198823E52A61
-      curl -s https://install.zerotier.com/ | sudo bash
+      ```bash
+      ~]# apt -y install gnupg
+      ~]# apt-key adv --keyserver keyserver.ubuntu.com --recv-keys  1657198823E52A61
+      ~]# curl -s https://install.zerotier.com/ | sudo bash
       *** Waiting for identity generation...*** Success! You are ZeroTier address [ xxxxxxxx ].
       ```
 
@@ -74,20 +74,20 @@ tags:
    1. 加入你的網絡，填入你的16位network ID。
 
       ```
-      zerotier-cli join xxxxxxxxx
+      ~]# zerotier-cli join xxxxxxxxx
       ```
 
    2. 通過自身工具生成moon.json配置文件。
 
       ```
-      cd /var/lib/zerotier-one
-      zerotier-idtool initmoon identity.public > moon.json
+      ~]# cd /var/lib/zerotier-one
+      ~]# zerotier-idtool initmoon identity.public > moon.json
       ```
 
    3. 將公網IP加入其中。
 
       ```
-      cat moon.json 
+      ~]# cat moon.json 
       {
        "id": "xxxxxxxx", 
        "objtype": "world", 
@@ -107,20 +107,20 @@ tags:
    4. 生成moon節點的籤名文件。
 
       ```
-      zerotier-idtool genmoon moon.json
+      ~]# zerotier-idtool genmoon moon.json
       ```
 
    5. 將該moon節點加入網絡。
 
       ```
-      mkdir moons.d
-      mv 000000xxxxxxxxxx.moon moons.d/
+      ~]# mkdir moons.d
+      ~]# mv 000000xxxxxxxxxx.moon moons.d/
       ```
 
    6. 重啓zerotier-one服務即可完成moon節點的設置。
 
       ```
-      systemctl restart zerotier-one.service
+      ~]# systemctl restart zerotier-one.service
       ```
 
 ## 如何使用自建的moon節點
@@ -130,19 +130,19 @@ tags:
    1. 在其他leaf節點完成安裝后加入你的網絡，其後通過以下命令加入自建的moon節點。( ⚠️注意moon的id輸入兩次。)
 
       ```
-      zerotier-cli orbit 000000xxxxxxxxxx 000000xxxxxxxxxx
+      ~]# zerotier-cli orbit 000000xxxxxxxxxx 000000xxxxxxxxxx
       ```
 
    2. 其後在leaf節點查看加入情況。
 
       ```
-      zerotier-cli listpeers|grep MOON
+      ~]# zerotier-cli listpeers|grep MOON
       ```
 
    3. 離開節點也很容易。( ⚠️注意moon的id輸入壹次。)
 
       ```
-      zerotier-cli deorbit 000000xxxxxxxxxx
+      ~]# zerotier-cli deorbit 000000xxxxxxxxxx
       ```
 
 ## 結語
