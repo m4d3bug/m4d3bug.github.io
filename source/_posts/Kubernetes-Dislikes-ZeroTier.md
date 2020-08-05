@@ -89,6 +89,8 @@ setenforce: SELinux is disabled
 
 #### 选择性關閉swap
 
+在master節點以外操作
+
 ```bash
 # swapoff -a
 # vi /etc/fstab
@@ -96,13 +98,6 @@ setenforce: SELinux is disabled
 # disable swap line
 #/swap none swap sw 0 0
 # mount -a
-```
-
-master節點只是一隻小鷄鷄，所以就不關它的swap了，安裝kubelet之後再設置。
-
-```bash
-# vim /etc/sysconfig/kubelet
-KUBELET_EXTRA_ARGS=--fail-swap-on=false
 ```
 
 #### 設置并啓用内核參數
@@ -172,6 +167,13 @@ kubectl-1.18.4-0.x86_64
 kubelet-1.18.4-0.x86_64
 # systemctl enable kubelet
 # kubeadm config images pull
+```
+
+master節點只是一隻小鷄鷄，所以就不關它的swap了。
+
+```nohighlight
+# vim /etc/sysconfig/kubelet
+KUBELET_EXTRA_ARGS=--fail-swap-on=false
 ```
 
 #### 附加設置
