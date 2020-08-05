@@ -193,7 +193,7 @@ search local
 
 #### 安裝集群
 
-注意加入master節點的ZeroTier IP
+注意master節點的ZeroTier IP
 
 ```bash
 # kubeadm init --apiserver-advertise-address=10.9.8.118 --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Swap 
