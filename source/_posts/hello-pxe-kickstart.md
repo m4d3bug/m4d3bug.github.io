@@ -131,7 +131,7 @@ menuentry 'Install Red Hat Enterprise Linux 7.8' {
 EOF
 ```
 
-## 啓動*TFTP*服務器
+## 啓動*TFTP* 服務器
 
 ``` nohighlight
 ~]# sed -i '/disable/s/yes/no/g' /etc/xinetd.d/tftp
@@ -142,7 +142,7 @@ EOF
 Created symlink from /etc/systemd/system/sockets.target.wants/tftp.socket to /usr/lib/systemd/system/tftp.socket.
 ```
 
-## 啓動*DHCP*服務器
+## 啓動*DHCP* 服務器
 
 ```nohighlight
 ~]# cat >> /etc/dhcp/dhcpd.conf << EOF
@@ -195,9 +195,9 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dhcpd.service t
 
 ```
 
-### 檢查*DHCP*工作情況
+### 檢查*DHCP* 工作情況
 
-在相同*LAN*下啓動無盤*VM*用於測試*DHCP*，測試期間檢查：開機提示、日志和抓包。
+在相同*LAN* 下啓動無盤*VM* 用於測試*DHCP*，測試期間檢查：開機提示、日志和抓包。
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/DHCPresult.png?raw=true)
 
@@ -207,7 +207,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dhcpd.service t
 
 ## 配置網絡安裝源
 
-### 使用*http*來提供*repo*源
+### 使用*http* 來提供*repo* 源
 
 ``` nohighlight
 ~]# yum -y install httpd
@@ -246,7 +246,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 ~]# tcpdump -i ens38 port 80 and host 172.16.7.1 -vvv >> tcpdump.out
 ```
 
-## 設定*Kickstart*配置
+## 設定*Kickstart* 配置
 
 ### 創建相關目錄
 
