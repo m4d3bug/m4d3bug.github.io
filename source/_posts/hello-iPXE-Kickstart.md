@@ -26,7 +26,7 @@ tags:
 
 <!-- more -->
 
-沒仔細看是不是以爲我一篇博客寫~<font color=#808080>水</font>~兩次。其實不然，*iPXE* 作爲*PXE* 的擴展版，在[*Satellite*](https://www.redhat.com/en/technologies/management/satellite), [*OpenStack*](https://www.redhat.com/en/technologies/linux-platforms/openstack-platform)乃至於[*Openshift*](https://www.redhat.com/en/technologies/cloud-computing/openshift)之中都有應用。因此來簡單學習一下。
+沒仔細看是不是以爲我一篇博客寫~<font color=#808080>水</font>~兩次。其實不然，*iPXE* 作爲*PXE* 的擴展版，在[*Satellite*](https://www.redhat.com/en/technologies/management/satellite), [*OpenStack*](https://www.redhat.com/en/technologies/linux-platforms/openstack-platform) 乃至於[*Openshift*](https://www.redhat.com/en/technologies/cloud-computing/openshift) 之中都有應用。因此來簡單學習一下。
 
 ## 環境準備
 
