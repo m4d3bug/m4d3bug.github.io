@@ -61,11 +61,24 @@ Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 
 請在下面提取引導菜單程序文件步驟前，確認自己的*ISO* 挂載在*/dev/sr0* 下。
 
-```nohighlight
+```bash
 ~]# yum install -y syslinux tftp-server dhcp tree tcpdump
 ~]# mkdir /var/lib/tftpboot/pxelinux
 ~]# mkdir -p /mnt/RHEL-7/7.8
 ~]# mount -o loop /dev/sr0 /mnt/RHEL-7/7.8
+~]# df -TH
+Filesystem            Type      Size  Used Avail Use% Mounted on
+devtmpfs              devtmpfs  2.0G     0  2.0G   0% /dev
+tmpfs                 tmpfs     2.0G     0  2.0G   0% /dev/shm
+tmpfs                 tmpfs     2.0G   14M  2.0G   1% /run
+tmpfs                 tmpfs     2.0G     0  2.0G   0% /sys/fs/cgroup
+/dev/mapper/rhel-root xfs        54G  8.6G   46G  16% /
+/dev/mapper/rhel-home xfs        48G   34M   48G   1% /home
+/dev/sda1             xfs       1.1G  192M  872M  19% /boot
+tmpfs                 tmpfs     396M  8.2k  396M   1% /run/user/42
+tmpfs                 tmpfs     396M   25k  396M   1% /run/user/0
+/dev/sr0              iso9660   4.6G  4.6G     0 100% /run/media/root/RHEL-7.8 Server.x86_64
+/dev/loop0            iso9660   4.6G  4.6G     0 100% /mnt/RHEL-7/7.8
 ~]# cp -pr /mnt/RHEL-7/7.8/Packages/syslinux-4.05-15.el7.x86_64.rpm /tmp/
 ~]# cd /var/lib/tftpboot/
 tftpboot]# rpm2cpio /tmp/syslinux-4.05-15.el7.x86_64.rpm | cpio -dimv
@@ -75,7 +88,7 @@ pxelinux  usr
 
 ###  *BIOS* 的準備工作
 
-```nohighlight
+```bash
 ~]# mkdir /var/lib/tftpboot/pxelinux/pxelinux.cfg
 ~]# cat >> /var/lib/tftpboot/pxelinux/pxelinux.cfg/default << EOF
 default vesamenu.c32
@@ -107,7 +120,7 @@ EOF
 
 在*UEFI* 中，我們用*grubx64.efi* 來代替*pxelinux* 作爲*UEFI* 的設定。
 
-```nohighlight
+```bash
 ~]# cp /mnt/RHEL-7/7.8/EFI/BOOT/grubx64.efi /var/lib/tftpboot/
 ~]# cat >> /var/lib/tftpboot/grub.cfg << EOF
 set timeout=9
