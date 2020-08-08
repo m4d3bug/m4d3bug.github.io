@@ -30,9 +30,7 @@ tags:
 
 ## 環境準備
 
----
-
-如果是物理服務器，請事先確認其[支持*iPXE*](https://ipxe.org/appnote/hardware_drivers) .
+如果是物理服務器，請事先確認其[支持*iPXE*](https://ipxe.org/appnote/hardware_drivers) 。
 
 重複的東西不再贅述，谷歌商店安裝Link to Text Fragment直接跳轉~<font color=#808080>騙點擊率</font>~即可。
 
