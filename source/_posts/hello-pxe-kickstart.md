@@ -144,6 +144,8 @@ Created symlink from /etc/systemd/system/sockets.target.wants/tftp.socket to /us
 
 ## 配置*DHCP* 服務器
 
+### 寫入*dhcp* 設置
+
 ```nohighlight
 ~]# cat >> /etc/dhcp/dhcpd.conf << EOF
 # FILL THIS UP
