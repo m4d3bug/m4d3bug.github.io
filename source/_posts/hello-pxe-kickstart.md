@@ -39,13 +39,13 @@ Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 ~]# iptables -F
 ```
 
-### 確保局域網内無*DHCP*服務器
+### 確保局域網内無*DHCP* 服務器
 
-1. 停用vmnet的DHCP功能。
+1. 停用*vmnet* 的*DHCP* 功能。
 
    ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20191012215006.png?raw=true)
 
-2. 新建一個LAN區段。(本文采用方法)
+2. 新建一個*LAN* 區段。(本文采用方法)
 
    ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/setupLAN.png?raw=true)
 
@@ -59,7 +59,7 @@ Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 
 ### 安裝必需包和調試工具
 
-請在下面提取引導菜單程序文件步驟前，確認自己的*ISO*挂載在*/dev/sr0*下。
+請在下面提取引導菜單程序文件步驟前，確認自己的*ISO* 挂載在*/dev/sr0* 下。
 
 ```nohighlight
 ~]# yum install -y syslinux tftp-server dhcp tree tcpdump
@@ -73,7 +73,7 @@ tftpboot]# ls
 pxelinux  usr
 ```
 
-###  *BIOS*的準備工作
+###  *BIOS* 的準備工作
 
 ```nohighlight
 ~]# mkdir /var/lib/tftpboot/pxelinux/pxelinux.cfg
@@ -103,9 +103,9 @@ EOF
 ~]# cp /var/lib/tftpboot/usr/share/syslinux/{pxelinux.0,vesamenu.c32}  /var/lib/tftpboot/pxelinux/
 ```
 
-### *UEFI*的準備工作
+### *UEFI* 的準備工作
 
-在UEFI中，我們用grubx64.efi來代替pxelinux作爲UEFI的設定。
+在*UEFI* 中，我們用*grubx64.efi* 來代替*pxelinux* 作爲*UEFI* 的設定。
 
 ```nohighlight
 ~]# cp /mnt/RHEL-7/7.8/EFI/BOOT/grubx64.efi /var/lib/tftpboot/
