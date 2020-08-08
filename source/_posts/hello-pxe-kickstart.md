@@ -250,7 +250,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 
 ## 設定*Kickstart* 配置
 
-### 創建相關目錄
+### 創建目錄
 
 ```nohighlight
 ~]# mkdir /var/www/html/ks
