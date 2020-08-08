@@ -17,13 +17,13 @@ tags:
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/PXE_diagram.png" width=50% /></center>
 
-本文將簡單搭建一個基於*PXE*網絡使用*Kickstart*自動化安裝*BIOS*或*UEFI*架構的自動化安裝環境。其中*TFTP, DHCP & httpd*將運行在同一個機器底下。
+本文將簡單搭建一個基於*PXE* 網絡使用*Kickstart* 自動化安裝*BIOS* 或*UEFI* 架構的自動化安裝環境。其中*TFTP, DHCP & httpd* 將運行在同一個機器底下。
 
 <!-- more -->
 
 ## 環境準備
 
-### 關閉*selinux, firewalld*和*iptables*
+### 關閉*selinux, firewalld* 和 *iptables*
 
 排除不在本文涉及範圍内的内容影響。~<font color=#808080>會考慮單獨開坑記錄selinux的相關。 </font>~
 
