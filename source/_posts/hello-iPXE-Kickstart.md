@@ -34,7 +34,7 @@ tags:
 
 如果是物理服務器，請事先確認其[支持*iPXE*](https://ipxe.org/appnote/hardware_drivers) .
 
-重複的東西不在贅述，谷歌商店安裝Link to Text Fragment直接跳轉~<font color=#808080>騙點擊率</font>~即可。
+重複的東西不再贅述，谷歌商店安裝Link to Text Fragment直接跳轉~<font color=#808080>騙點擊率</font>~即可。
 
 ### [關閉*selinux, firewalld* 和 *iptables*](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#關閉selinux-firewalld-和-iptables:~:text=%E9%97%9C%E9%96%89selinux%2C%20firewalld%20%E5%92%8C%20iptables,-%E6%8E%92%E9%99%A4%E4%B8%8D%E5%9C%A8%E6%9C%AC%E6%96%87%E6%B6%89%E5%8F%8A%E7%AF%84%E5%9C%8D%E5%86%85%E7%9A%84%E5%86%85%E5%AE%B9%E5%BD%B1%E9%9F%BF%E3%80%82)
 
