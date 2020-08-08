@@ -209,7 +209,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dhcpd.service t
 
 ## 配置網絡安裝源
 
-### 使用*http* 來提供*repo* 源
+### 使用*HTTP* 來提供*repo* 源
 
 ``` nohighlight
 ~]# yum -y install httpd
