@@ -131,7 +131,7 @@ menuentry 'Install Red Hat Enterprise Linux 7.8' {
 EOF
 ```
 
-## 啓動*TFTP* 服務器
+## 配置*TFTP* 服務器
 
 ``` nohighlight
 ~]# sed -i '/disable/s/yes/no/g' /etc/xinetd.d/tftp
@@ -142,7 +142,7 @@ EOF
 Created symlink from /etc/systemd/system/sockets.target.wants/tftp.socket to /usr/lib/systemd/system/tftp.socket.
 ```
 
-## 啓動*DHCP* 服務器
+## 配置*DHCP* 服務器
 
 ```nohighlight
 ~]# cat >> /etc/dhcp/dhcpd.conf << EOF
