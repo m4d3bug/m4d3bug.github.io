@@ -39,7 +39,7 @@ Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 ~]# iptables -F
 ```
 
-### 確保局域網内無DHCP服務器
+### 確保局域網内無*DHCP*服務器
 
 1. 停用vmnet的DHCP功能。
 
