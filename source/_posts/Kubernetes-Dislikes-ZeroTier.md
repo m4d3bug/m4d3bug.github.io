@@ -32,11 +32,11 @@ tags:
 | 搬瓦工 | 2C2G | 美國洛杉磯 |
 | Ucloud | 1C1G | 中國香港   |
 
-## ZeroTier部分
+## *ZeroTier* 部分
 
 ---
 
-### 加入ZeroTier組網
+### 加入*ZeroTier* 組網
 
 #### 安裝軟體
 
@@ -54,7 +54,7 @@ tags:
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/machinesNetworks.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png)
 
-#### 寫入靜態IP和hostname
+#### 寫入靜態*IP* 和*hostname*
 
 ```bash
 # cat >> /etc/hosts << EOF
@@ -65,20 +65,20 @@ EOF
 # hostnamectl set-hostname xxx.m4d3bug.com
 ```
 
-## K8S部分
+## *K8S* 部分
 
 ---
 
 ### 系統預設定
 
-#### 確保selinux為寬容模式
+#### 確保*selinux* 為寬容模式
 
 ```bash
 # setenforce 0
 setenforce: SELinux is disabled
 ```
 
-#### 關閉firewalld
+#### 關閉*firewalld*
 
 云供應商們基本都關掉了，所以沒什麽回顯。
 
@@ -87,9 +87,9 @@ setenforce: SELinux is disabled
 # systemctl stop firewalld
 ```
 
-#### 选择性關閉swap
+#### 选择性關閉*swap*
 
-在master節點以外操作
+在*master* 節點以外操作。
 
 ```bash
 # swapoff -a
@@ -113,12 +113,15 @@ EOF
 
 ### 開始安裝
 
-#### 安裝Docker軟體
+#### 安裝*Docker* 軟體
 
 ```bash
-# yum -y install docker
+# yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+# yum install docker-ce docker-ce-cli containerd.io
 # docker -v 
-Docker version 1.13.1, build 64e9980/1.13.1
+Docker version 19.03.12, build 48a66213fe
 # systemctl start docker
 # systemctl enable docker
 Created symlink from /etc/systemd/system/multi-user.target.wants/docker.service to /usr/lib/systemd/system/docker.service.
@@ -126,7 +129,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/docker.service 
 
 #### 加入代理設定到Docker中
 
-順便説一嘴，可以在ZeroTier組網裏起一個代理。
+順便説一嘴，可以在*ZeroTier* 組網裏起一個代理。
 
 ```bash
 # mkdir /usr/lib/systemd/system/docker.service.d
@@ -142,7 +145,7 @@ EOF
 
 #### 加入谷歌倉庫
 
-同樣加入ZeroTier中的代理地址。
+同樣加入*ZeroTier* 中的代理地址。
 
 ```bash
 # cat <<'EOF' > /etc/yum.repos.d/kubernetes.repo
@@ -161,42 +164,213 @@ EOF
 
 ```bash
 # yum -y install kubeadm kubelet kubectl
-# rpm -qa |grep kube*
-kubeadm-1.18.4-0.x86_64
-kubectl-1.18.4-0.x86_64
-kubelet-1.18.4-0.x86_64
+#  rpm -qa |grep kube*
+kubectl-1.18.8-0.x86_64
+kubernetes-cni-0.8.6-0.x86_64
+kubeadm-1.18.8-0.x86_64
+kubelet-1.18.8-0.x86_64
 # systemctl enable kubelet
 # kubeadm config images pull
 ```
 
-master節點只是一隻小鷄鷄，所以就不關它的swap了。
+*master* 節點只是一隻小鷄鷄，所以就不關它的*swap* 了。
 
 ```nohighlight
 # vim /etc/sysconfig/kubelet
 KUBELET_EXTRA_ARGS=--fail-swap-on=false
 ```
 
-#### 附加設置
-
-鑒於這是node為最小單位的部署方法，爲了dns可控，每個機器加裝dnsmasq并且指定本機解析。
-
-```bash
-# yum install -y dnsmasq
-# vim /etc/dnsmasq.conf
-strict-order    #在解析域名地址时严格按照 DNS 服务器列表的从上到下的顺序去解析
-# vim /etc/resolv.conf
-search local
-....
-# systemctl enable dnsmasq.service 
-# systemctl start dnsmasq.service
-```
-
 #### 安裝集群
 
-注意master節點的ZeroTier IP
+在v1.8.0之後的版本，kubeadm提供了一種[分階段的構建方式](https://kubernetes.io/zh/docs/reference/setup-tools/kubeadm/kubeadm-init/)，構建*etcd* 是其中的一個*phase* ，在啓動前我們需要對其中的參數進行修改。
+
+- 定制該版本的*kubeadm-config.yml*
+
+  ```bash
+  # kubeadm config print init-defaults  > kubeadm-config.yaml
+  # vim kubeadm-config.yaml
+  apiVersion: kubeadm.k8s.io/v1beta2
+  bootstrapTokens:
+  - groups:
+    - system:bootstrappers:kubeadm:default-node-token
+    token: abcdef.0123456789abcdef
+    ttl: 24h0m0s
+    usages:
+    - signing
+    - authentication
+  kind: InitConfiguration
+  localAPIEndpoint:
+    advertiseAddress: 10.9.8.118             <---網卡ip
+    bindPort: 6443
+  nodeRegistration:
+    criSocket: /var/run/dockershim.sock
+    name: master.m4d3bug.com
+    taints:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+  ---
+  apiServer:
+    timeoutForControlPlane: 4m0s
+  apiVersion: kubeadm.k8s.io/v1beta2
+  certificatesDir: /etc/kubernetes/pki
+  clusterName: kubernetes
+  controllerManager: {}
+  dns:
+    type: CoreDNS
+  etcd:
+    local:
+      dataDir: /var/lib/etcd
+  imageRepository: k8s.gcr.io
+  kind: ClusterConfiguration
+  kubernetesVersion: v1.18.0
+  networking:
+    dnsDomain: cluster.local
+    serviceSubnet: 10.96.0.0/12
+    podSubnet: 10.244.0.0/16                 <---pod子網範圍
+  scheduler: {}
+  ```
+
+-  *preflight* 階段
+
+  ```bash
+  # kubeadm init phase preflight --config kubeadm-config.yaml --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Swap
+  ```
+
+-  *kubelet-start*  階段
+
+  ```bash
+  # kubeadm init phase kubelet-start --config kubeadm-config.yaml
+  ```
+
+-  *kubeconfig*  階段
+
+  ```bash
+  # kubeadm init phase kubeconfig all --config kubeadm-config.yaml
+  ```
+
+-  *control-plane*  階段
+
+  ```bash
+  # kubeadm init phase control-plane all --config kubeadm-config.yaml
+  ```
+
+-  etcd 階段 
+
+  ```bash
+  # kubeadm init phase etcd local --config kubeadm-config.yaml
+  # vim /etc/kubernetes/manifests/etcd.yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubeadm.kubernetes.io/etcd.advertise-client-urls: https://10.9.8.118:2379
+    creationTimestamp: null
+    labels:
+      component: etcd
+      tier: control-plane
+    name: etcd
+    namespace: kube-system
+  spec:
+    containers:
+    - command:
+      - etcd
+      - --advertise-client-urls=https://10.9.8.118:2379
+      - --cert-file=/etc/kubernetes/pki/etcd/server.crt
+      - --client-cert-auth=true
+      - --data-dir=/var/lib/etcd
+      - --initial-advertise-peer-urls=https://10.9.8.118:2380
+      - --initial-cluster=master.m4d3bug.com=https://10.9.8.118:2380
+      - --key-file=/etc/kubernetes/pki/etcd/server.key
+      - --listen-client-urls=https://0.0.0.0:2379        <--- 改爲0.0.0.0
+      - --listen-metrics-urls=http://127.0.0.1:2381
+      - --listen-peer-urls=https://0.0.0.0:2380          <--- 改爲0.0.0.0
+      - --name=master.m4d3bug.com
+      - --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt
+      - --peer-client-cert-auth=true
+      - --peer-key-file=/etc/kubernetes/pki/etcd/peer.key
+      - --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+      - --snapshot-count=10000
+      - --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+      image: k8s.gcr.io/etcd:3.4.3-0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 8
+        httpGet:
+          host: 127.0.0.1
+          path: /health
+          port: 2381
+          scheme: HTTP
+        initialDelaySeconds: 15
+        timeoutSeconds: 15
+      name: etcd
+      resources: {}
+      volumeMounts:
+      - mountPath: /var/lib/etcd
+        name: etcd-data
+      - mountPath: /etc/kubernetes/pki/etcd
+        name: etcd-certs
+    hostNetwork: true
+    priorityClassName: system-cluster-critical
+    volumes:
+    - hostPath:
+        path: /etc/kubernetes/pki/etcd
+        type: DirectoryOrCreate
+      name: etcd-certs
+    - hostPath:
+        path: /var/lib/etcd
+        type: DirectoryOrCreate
+      name: etcd-data
+  status: {}
+  
+  # kubectl apply -f /etc/kubernetes/manifests/etcd.yaml
+  # kubeadm init --skip-phases=preflight,certs,kubeconfig,kubelet-start,control-plane,etcd --config kubeadm-config.yaml
+  ```
+
+- 之後就如下：
+
+  ```bash
+  Your Kubernetes control-plane has initialized successfully!
+  
+  To start using your cluster, you need to run the following as a regular user:
+  
+    mkdir -p $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  
+  You should now deploy a pod network to the cluster.
+  Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+    https://kubernetes.io/docs/concepts/cluster-administration/addons/
+  
+  Then you can join any number of worker nodes by running the following on each as root:
+  
+  kubeadm join 10.9.8.118:6443 --token abcdef.0123456789abcdef \
+      --discovery-token-ca-cert-hash sha256:f14e90eda52b285b41ddb5d34a4dcf21f55ed66831015c4ca1a996cf17754143 
+  ```
+
+- 部署*flannel* 
+
+  ```bash
+  # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  ```
+
+### 排障
 
 ```bash
-# kubeadm init --apiserver-advertise-address=10.9.8.118 --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Swap 
+查看pod日志
+# kubectl --namespace kube-system logs kube-controller-manager-master.m4d3bug.com
+查看pod的過程
+# kubectl describe pod kube-controller-manager-master.m4d3bug.com --namespace=kube-system
+打印加入的命令
+# kubeadm token create --print-join-command
+重置集群
+# kubeadm reset
+# ifconfig cni0 down
+# ip link delete cni0
+# ifconfig flannel.1 down
+# ip link delete flannel.1
+# rm -rf /var/lib/cni/
+# rm -rf /var/lib/etcd
+# rm -rf /etc/cni/net.d
 ```
 
 ## 結語
