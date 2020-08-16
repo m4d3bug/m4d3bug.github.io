@@ -119,7 +119,7 @@ EOF
 # yum-config-manager \
     --add-repo \
     https://download.docker.com/linux/centos/docker-ce.repo
-# yum install docker-ce docker-ce-cli containerd.io
+# yum install -y docker-ce docker-ce-cli containerd.io
 # docker -v 
 Docker version 19.03.12, build 48a66213fe
 # systemctl start docker
@@ -127,7 +127,7 @@ Docker version 19.03.12, build 48a66213fe
 Created symlink from /etc/systemd/system/multi-user.target.wants/docker.service to /usr/lib/systemd/system/docker.service.
 ```
 
-#### 加入代理設定到Docker中
+#### 加入代理設定到*Docker* 中
 
 順便説一嘴，可以在*ZeroTier* 組網裏起一個代理。
 
