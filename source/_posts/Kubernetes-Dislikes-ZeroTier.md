@@ -252,6 +252,12 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
   # kubeadm init phase kubelet-start --config kubeadm-config.yaml
   ```
 
+- *cert* 階段
+
+  ```bash
+  # kubeadm init phase certs all --config kubeadm-config.yaml
+  ```
+
 -  *kubeconfig*  階段
 
   ```bash
