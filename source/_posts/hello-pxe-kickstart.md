@@ -23,6 +23,8 @@ tags:
 
 ## 環境準備
 
+---
+
 ### 關閉*selinux, firewalld* 和 *iptables*
 
 排除不在本文涉及範圍内的内容影響。~<font color=#808080>會考慮單獨開坑記錄selinux的相關。 </font>~
@@ -56,6 +58,8 @@ Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/PXEnetwork.png)
 
 ## 配置*PXE* 服務器
+
+---
 
 ### 安裝必需包和調試工具
 
@@ -133,6 +137,8 @@ EOF
 
 ## 配置*TFTP* 服務器
 
+---
+
 ``` nohighlight
 ~]# sed -i '/disable/s/yes/no/g' /etc/xinetd.d/tftp
 ~]# cat /etc/xinetd.d/tftp |grep disable
@@ -143,6 +149,8 @@ Created symlink from /etc/systemd/system/sockets.target.wants/tftp.socket to /us
 ```
 
 ## 配置*DHCP* 服務器
+
+---
 
 ### 寫入*dhcp* 設置
 
@@ -209,6 +217,8 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dhcpd.service t
 
 ## 配置網絡安裝源
 
+---
+
 ### 使用*HTTP* 來提供*repo* 源
 
 ``` nohighlight
@@ -249,6 +259,8 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 ```
 
 ## 設定*Kickstart* 配置
+
+---
 
 ### 創建目錄
 
@@ -435,9 +447,13 @@ EOF
 
 ## 結語
 
+---
+
 簡單嘗試了基於*PXE*搭配*Kickstart*的無人值守安裝搭建。
 
 ## 鳴謝
+
+---
 
 - https://www.cnblogs.com/boowii/p/6475921.html
 - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/installation_guide/index#chap-installation-server-setup

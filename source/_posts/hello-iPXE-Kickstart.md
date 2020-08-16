@@ -30,6 +30,8 @@ tags:
 
 ## 環境準備
 
+---
+
 如果是物理服務器，請事先確認其[支持*iPXE*](https://ipxe.org/appnote/hardware_drivers) 。
 
 重複的東西不再贅述，谷歌商店安裝Link to Text Fragment直接跳轉~<font color=#808080>騙點擊率</font>~即可。
@@ -43,6 +45,8 @@ tags:
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png)
 
 ## 配置*iPXE* 服務器
+
+---
 
 ### 安裝必需包
 
@@ -116,6 +120,8 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dnsmasq.service
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png)
 
 ## 配置網絡安裝源
+
+---
 
 ### 使用*HTTP* 來提供*repo* 源
 
@@ -208,6 +214,8 @@ exit
 
 ## 結語
 
+---
+
 本文簡單搭建了iPXE的環境，除了本文的方法之外，還有以下有趣实现~<font color=#808080>水貼方向</font>~：
 
 - [基於*iSCSI* 的無盤工作站環境搭建](https://www.codenong.com/cs105547860/)
@@ -219,6 +227,8 @@ exit
 >    为什么在有的云厂商裸金属云服务介绍上，能看到分钟级的裸金属服务器交付，就是使用了iPXE的技术，服务器启动，通过iPXE引导已经制作好的iSCSI系统镜像，这样就免去了安装操作系统的过程，并且服务器也不需要系统硬盘，节省了成本。并且这样更为灵活，通过这样的技术，可以实现用户根据需要制定自己的系统镜像，而且方便镜像虚实转换，镜像机可以用于启动云主机，也可以启动物理机！
 
 ## 鸣谢
+
+---
 
 - [https://yangfeiffei.github.io/public/2019/08/12/net-install-centos7-with-ipxe.html](https://yangfeiffei.github.io/public/2019/08/12/net-install-centos7-with-ipxe.html)
 - [https://blog.hcl.moe/archives/2177](https://blog.hcl.moe/archives/2177)

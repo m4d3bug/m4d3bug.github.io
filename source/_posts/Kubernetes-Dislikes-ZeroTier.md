@@ -409,4 +409,13 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8scurl.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8scurl.png)
 
+## 鳴謝
 
+---
+
+- [跨VPC或者跨云供应商搭建K8S集群正确姿势](https://zhangguanzhang.github.io/2018/09/24/k8s-some-vpc-cluster/)
+- [跨VPC或者跨云供应商搭建K8S集群正确姿势-番外篇](跨VPC或者跨云供应商搭建K8S集群正确姿势-番外篇)
+- [Kubernetes——部署基于公网的k8s集群](https://zhuanlan.zhihu.com/p/74134318)
+- [使用 kubeadm 快速部署 K8S V1.18](https://developer.aliyun.com/article/763983)
+- [iptables详解（1）：iptables概念](http://www.zsythink.net/archives/1199/)
+- [10 分钟部署一个 Kubernetes 集群](https://mp.weixin.qq.com/s/PD1CCkKZgtZD7pAZEqF-rw)
