@@ -139,6 +139,16 @@ Environment="HTTP_PROXY=http://10.9.8.10:1081/"
 Environment="HTTPS_PROXY=http://10.9.8.10:1081/"
 Environment="NO_PROXY=localhost,localhost.localdomain,localhost4,localhost4.localdomain4,10.0.0.0/8"
 EOF
+# cat > /etc/docker/daemon.json <<EOF
+{
+    "exec-opts": ["native.cgroupdriver=systemd"],
+    "log-driver": "json-file",
+    "log-opts": {
+    "max-size": "100m"
+    },
+    "storage-driver": "overlay2"
+}
+EOF
 # systemctl daemon-reload
 # systemctl restart docker
 ```
