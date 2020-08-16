@@ -270,7 +270,7 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
   # kubeadm init phase control-plane all --config kubeadm-config.yaml
   ```
 
--  etcd 階段 
+- etcd 階段 
 
   ```bash
   # kubeadm init phase etcd local --config kubeadm-config.yaml
@@ -338,6 +338,8 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
       name: etcd-data
   status: {}
   
+  # echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> ~/.bash_profile
+  # source ~/.bash_profile
   # kubectl apply -f /etc/kubernetes/manifests/etcd.yaml
   # kubeadm init --skip-phases=preflight,certs,kubeconfig,kubelet-start,control-plane,etcd --config kubeadm-config.yaml
   ```
