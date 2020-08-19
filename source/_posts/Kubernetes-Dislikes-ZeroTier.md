@@ -368,7 +368,8 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
 - 部署*flannel* 
 
   ```bash
-  # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  # wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  # kubectl apply -f kube-flannel.yml
   ```
 
 ### 排障
@@ -414,7 +415,7 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
 ---
 
 - [跨VPC或者跨云供应商搭建K8S集群正确姿势](https://zhangguanzhang.github.io/2018/09/24/k8s-some-vpc-cluster/)
-- [跨VPC或者跨云供应商搭建K8S集群正确姿势-番外篇](跨VPC或者跨云供应商搭建K8S集群正确姿势-番外篇)
+- [跨VPC或者跨云供应商搭建K8S集群正确姿势-番外篇](https://zhuanlan.zhihu.com/p/106793809)
 - [Kubernetes——部署基于公网的k8s集群](https://zhuanlan.zhihu.com/p/74134318)
 - [使用 kubeadm 快速部署 K8S V1.18](https://developer.aliyun.com/article/763983)
 - [iptables详解（1）：iptables概念](http://www.zsythink.net/archives/1199/)
