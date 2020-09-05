@@ -22,7 +22,7 @@ tags:
 
 ---
 
-### ELF的第一種類型—-可重定位文件*(Relocatable File)*
+### ELF的第一種類型---可重定位文件(Relocatable File)
 
 環境準備，安裝軟體。
 
@@ -75,7 +75,7 @@ int main ()
 EOF
 ```
 
-進行編譯，**獲得ELF的第一種類型—-可重定位文件(*Relocatable File*)。**
+進行編譯，**獲得ELF的第一種類型—-可重定位文件(Relocatable File)。**
 
 ```bash
 [root@learn ~]# gcc -c -fPIC process.c
@@ -126,7 +126,7 @@ Key to Flags:
   l (large), p (processor specific)
 ```
 
-### ELF的第二種類型—-可執行文件(*Executable file*)
+### ELF的第二種類型---可執行文件(Executable file)
 
 先通過ar，將.o文件歸檔為.a文件，可作爲靜態鏈接庫。
 
@@ -182,7 +182,7 @@ Key to Flags:
   l (large), p (processor specific)
 ```
 
-后將.a文件鏈入目標文件**(*Relocatable File*)**中去編譯即可得到**ELF的第二種形態，可執行文件(*Executable file*)**。
+后將.a文件鏈入目標文件**(Relocatable File)**中去編譯即可得到**ELF的第二種形態，可執行文件(Executable file)**。
 
 ```bash
                                           目標文件  -L 查找當前目錄     
@@ -285,7 +285,7 @@ total 228
 -rw-r--r--. 1 root root 231449 Jun 22 05:36 redhat.repo
 ```
 
-### ELF的第三種類型—-共享對象文件*(Shared Object)*
+### ELF的第三種類型---共享對象文件(Shared Object)
 
 先通過gcc，由.o文件編譯為.so文件，可得到**動態鏈接庫，亦就是ELF第三種類型**。
 
