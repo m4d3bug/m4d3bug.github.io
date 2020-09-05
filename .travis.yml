@@ -8,6 +8,7 @@ before_install:
 
 install:
   - npm install hexo-cli -g
+  - npm install cheerio@0.22.0 hexo-renderer-pug hexo-renderer-stylus
   - npm install
 
 #before_script:
