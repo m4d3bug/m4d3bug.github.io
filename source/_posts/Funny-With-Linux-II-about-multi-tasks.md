@@ -17,7 +17,7 @@ tags:
 
 <!-- more -->
 
-## 什麽是綫程*(what and why?)*
+## 什麽是綫程(what and why?)
 
 ---
 
@@ -27,7 +27,7 @@ tags:
 
 因此，當開發任務間無先後次序時，拆分出支綫來并發，可顯著提升效率（而科學的分工，符合[**宇宙法則**](https://zh.wikipedia.org/zh-tw/%E5%B8%95%E7%B4%AF%E6%89%98%E6%B3%95%E5%88%99)）。
 
-## 如何創建綫程*(how?)*
+## 如何創建綫程(how?)
 
 ---
 
@@ -145,7 +145,7 @@ Thread 4 downloads the file file4.wmv in 15 minutes.
 Thread 5 downloads the file file5.flv in 77 minutes.
 ```
 
-## 綫程的數據*(when and where?)*
+## 綫程的數據(when and where?)
 
 ---
 
@@ -187,7 +187,7 @@ ulimit -s 16384
 
 ### 進程中共享的全局數據
 
-綫程在讀取進程中共享的全局數據時，引入互斥鎖***Mutex(Mutual Exclusion)***來避免數據不一，需要**等待互斥鎖[*(pthread_mutex_lock()]*** 或**嘗試互斥鎖*[pthread_mutex_trylock()]*** 來保證獨占。 前者需要一直等待，後者則可以根據沒搶到的提示佛系搶佔。
+綫程在讀取進程中共享的全局數據時，引入互斥鎖**Mutex(Mutual Exclusion)**來避免數據不一，需要**等待互斥鎖[(pthread_mutex_lock()]** 或**嘗試互斥鎖[pthread_mutex_trylock()]** 來保證獨占。 前者需要一直等待，後者則可以根據沒搶到的提示佛系搶佔。
 
 - 無條件變量的等待互斥鎖
 
@@ -195,7 +195,7 @@ ulimit -s 16384
 
     **有無鎖的情況對比，可幫助明白鎖的重要性。**
 
-    **無互斥鎖**，受多綫程影響的全局變量***(money_of_tom + money_of_jerry)***：
+    **無互斥鎖**，受多綫程影響的全局變量**(money_of_tom + money_of_jerry)**：
 
     ```bash
     [root@learn ~]# cat mutex.c 
@@ -320,7 +320,7 @@ ulimit -s 16384
     money_of_tom + money_of_jerry = 200
     ```
 
-    **有互斥鎖**，受多綫程影響的全局變量***(money_of_tom + money_of_jerry)***：
+    **有互斥鎖**，受多綫程影響的全局變量**(money_of_tom + money_of_jerry)**：
 
     ```bash
     [root@learn ~]# cat mutex.c 
