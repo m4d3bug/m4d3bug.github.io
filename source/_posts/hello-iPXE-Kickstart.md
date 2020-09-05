@@ -22,41 +22,41 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
 
-本文將簡單搭建一個基於*[iPXE](https://ipxe.org/)*網絡使用*Kickstart*自動化安裝*BIOS*或*UEFI*架構的自動化安裝環境。其中*TFTP, DHCP & httpd* 將運行在同一個機器底下。
+本文將簡單搭建一個基於PXE網絡分發[iPXE](https://ipxe.org/)使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中TFTP, DHCP & httpd 將運行在同一個機器底下。
 
 <!-- more -->
 
-沒仔細看是不是以爲我一篇博客寫~<font color=#808080>水</font>~兩次。其實不然，*iPXE* 作爲*PXE* 的擴展版，在[*Satellite*](https://www.redhat.com/en/technologies/management/satellite), [*OpenStack*](https://www.redhat.com/en/technologies/linux-platforms/openstack-platform) 乃至於[*Openshift*](https://www.redhat.com/en/technologies/cloud-computing/openshift) 之中都有應用。因此來簡單學習一下。
+沒仔細看是不是以爲我一篇博客寫~<font color=#808080>水</font>~兩次。其實不然，iPXE作爲PXE的擴展版，在[Satellite](https://www.redhat.com/en/technologies/management/satellite), [OpenStack](https://www.redhat.com/en/technologies/linux-platforms/openstack-platform) 乃至於[Openshift](https://www.redhat.com/en/technologies/cloud-computing/openshift) 之中都有應用。因此來簡單學習一下。
 
 ## 環境準備
 
 ---
 
-如果是物理服務器，請事先確認其[支持*iPXE*](https://ipxe.org/appnote/hardware_drivers) 。
+如果是物理服務器，請事先確認其[支持iPXE](https://ipxe.org/appnote/hardware_drivers) 。
 
 重複的東西不再贅述，谷歌商店安裝Link to Text Fragment直接跳轉~<font color=#808080>騙點擊率</font>~即可。
 
-### [關閉*selinux, firewalld* 和 *iptables*](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#關閉selinux-firewalld-和-iptables:~:text=%E9%97%9C%E9%96%89selinux%2C%20firewalld%20%E5%92%8C%20iptables,-%E6%8E%92%E9%99%A4%E4%B8%8D%E5%9C%A8%E6%9C%AC%E6%96%87%E6%B6%89%E5%8F%8A%E7%AF%84%E5%9C%8D%E5%86%85%E7%9A%84%E5%86%85%E5%AE%B9%E5%BD%B1%E9%9F%BF%E3%80%82)
+### [關閉selinux, firewalld 和 iptables](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#關閉selinux-firewalld-和-iptables:~:text=%E9%97%9C%E9%96%89selinux%2C%20firewalld%20%E5%92%8C%20iptables,-%E6%8E%92%E9%99%A4%E4%B8%8D%E5%9C%A8%E6%9C%AC%E6%96%87%E6%B6%89%E5%8F%8A%E7%AF%84%E5%9C%8D%E5%86%85%E7%9A%84%E5%86%85%E5%AE%B9%E5%BD%B1%E9%9F%BF%E3%80%82)
 
-### [確保局域網内無*DHCP* 服務器](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#確保局域網内無DHCP-服務器:~:text=%2DF-,%E7%A2%BA%E4%BF%9D%E5%B1%80%E5%9F%9F%E7%B6%B2%E5%86%85%E7%84%A1DHCP%20%E6%9C%8D%E5%8B%99%E5%99%A8)
+### [確保局域網内無DHCP 服務器](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#確保局域網内無DHCP-服務器:~:text=%2DF-,%E7%A2%BA%E4%BF%9D%E5%B1%80%E5%9F%9F%E7%B6%B2%E5%86%85%E7%84%A1DHCP%20%E6%9C%8D%E5%8B%99%E5%99%A8)
 
 ### 設置自定義IP
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png)
 
-## 配置*iPXE* 服務器
+## 配置iPXE 服務器
 
 ---
 
 ### 安裝必需包
 
-這次選用*dnsmasq* 來提供*ftp* 和*dhcp* 功能，借此學習一波。
+這次選用dnsmasq 來提供ftp 和dhcp 功能，借此學習一波。
 
 ```bash
 ~]# yum install -y ipxe-bootimgs dnsmasq tree tcpdump wireshark
 ```
 
-提取引導程序文件*undionly.kpxe* 和*ipxe.efi* ，并自建菜單*boot.ipxe* 。
+提取引導程序文件undionly.kpxe 和ipxe.efi ，并自建菜單boot.ipxe。
 
 ```bash
 ~]# mkdir /var/lib/tftpboot
@@ -109,9 +109,9 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dnsmasq.service
 ~]# systemctl start dnsmasq
 ```
 
-### 檢查*DHCP* 工作情況
+### 檢查DHCP工作情況
 
-在相同*LAN* 下啓動無盤*VM* 用於測試*DHCP*，測試期間檢查：開機提示、日志和抓包。
+在相同LAN下啓動無盤VM用於測試DHCP，測試期間檢查：開機提示、日志和抓包。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/Dnsmasqresult.png?raw=true](https://img.madebug.net/m4d3bug/images-of-website/master/blog/Dnsmasqresult.png?raw=true)
 
@@ -123,7 +123,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dnsmasq.service
 
 ---
 
-### 使用*HTTP* 來提供*repo* 源
+### 使用HTTP來提供repo源
 
 ```bash
 ~]# yum -y install httpd
@@ -185,7 +185,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 ~]# tcpdump -i ens38 port 80 and host 172.16.70.1 -vvv >> tcpdump.out
 ```
 
-### 菜單加入*HTTP* 鏈接
+### 菜單加入HTTP鏈接
 
 ```bash
 ~]# cat /var/lib/tftpboot/menu/boot.ipxe
@@ -216,11 +216,11 @@ exit
 
 ---
 
-本文簡單搭建了iPXE的環境，除了本文的方法之外，還有以下有趣实现~<font color=#808080>水貼方向</font>~：
+本文簡單嘗試在PXE的環境下調用iPXE固件，除了本文的方法之外，還有以下有趣实现~<font color=#808080>水貼方向</font>~：
 
-- [基於*iSCSI* 的無盤工作站環境搭建](https://www.codenong.com/cs105547860/)
+- [基於iSCSI的無盤工作站環境搭建](https://www.codenong.com/cs105547860/)
 
-- [在支持*iPXE* 的*KVM* 上安裝你想要的系統](https://lala.im/4524.html)~<font color=#808080>例如*kali*</font>~，支持*iPXE* 的*[vps](https://zhuanlan.zhihu.com/p/111206825):*
+- [在支持iPXE的KVM上安裝你想要的系統](https://lala.im/4524.html)~<font color=#808080>例如*kali*</font>~，支持*iPXE* 的*[vps](https://zhuanlan.zhihu.com/p/111206825):*
 
 >    这里特别说明下一项关键技术iPXE，iPXE是预引导执行环境（PXE）客户端固件和引导程序的开源实现，可用于启用没有内置PXE支持的计算机从网络引导。虽然标准化PXE客户端使用TFTP传输数据，但非标准化iPXE客户端固件增加了通过其他协议检索数据的功能，包括HTTP，iSCSI，以太网ATA（AoE）和以太网光纤通道（FCoE）。
 
