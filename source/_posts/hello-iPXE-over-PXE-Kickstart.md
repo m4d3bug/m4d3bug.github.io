@@ -22,7 +22,7 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
 
-本文將簡單搭建一個基於PXE網卡分發[iPXE](https://ipxe.org/)使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中TFTP, DHCP & httpd 將運行在同一個機器底下。
+本文將簡單搭建一個基於PXE網卡分發[iPXE](https://ipxe.org/)使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中TFTP, DHCP&httpd將運行在同一個機器底下。
 
 <!-- more -->
 
