@@ -258,7 +258,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 ~]# tcpdump -i ens38 port 80 and host 172.16.7.1 -vvv >> tcpdump.out
 ```
 
-## 設定Kickstart配置
+## Kickstart文件編寫
 
 ---
 
@@ -433,7 +433,7 @@ pwpolicy luks --minlen=6 --minquality=1 --notstrict --nochanges --notempty
 EOF
 ```
 
-啓用之前的*VM*，并且確保其不包含*ISO*。
+啓用之前的VM，并且確保其不包含ISO。
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20191012215904.png?raw=true)
 
