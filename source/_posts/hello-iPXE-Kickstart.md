@@ -231,24 +231,24 @@ exit
 > * pxe是一个协议，跟mbr是一个性质的东西，它规定了CPU启动后通过什么方式获取引导代码并执行。
 > * pxe的实现有许多，不同的厂商有不同的实现。并且pxe的实现代码主要有两种存放位置，一种是存在主板上，一种是存在网卡里，现在新的网卡一般都自带了pxe的实现代码。（去mbr查找引导代码的实现是在主板上的。）
 > * 由于pxe协议比较“落后”，仅支持tftp传输数据，性能差，灵活性也差，于是有了gpxe这个项目。gpxe是一种兼容pxe的实现，并且在pxe之上增加了许多特性，例如通过http/ftp等协议传输数据。
-* gpxe原先使用的域名的拥有者突然收回了该域名的使用权，于是这些人fork出去做了ipxe，gpxe现在已经不再开发，ipxe开发非常活跃。
-* 一些较新的intel的网卡里都带了gpxe的实现代码，最新的可能会带ipxe代码。
-* pxelinux是syslinux项目的一个部分，syslinux主要有三个产出，syslinux、isolinux、pxelinux，分别用于硬盘、光盘、网络启动，它的角色与grub相同。
+> * gpxe原先使用的域名的拥有者突然收回了该域名的使用权，于是这些人fork出去做了ipxe，gpxe现在已经不再开发，ipxe开发非常活跃。
+> * 一些较新的intel的网卡里都带了gpxe的实现代码，最新的可能会带ipxe代码。
+> * pxelinux是syslinux项目的一个部分，syslinux主要有三个产出，syslinux、isolinux、pxelinux，分别用于硬盘、光盘、网络启动，它的角色与grub相同。
 
-* *.bin 和 *.0 文件一般是一样的，不过使用上有一些区别，下面解释
-* pxelinux.bin 是 pxelinux 编译后生成的文件
-​* 由于大多数网卡、主板都不自带gpxe/ipxe的代码，所以通常引导时需要这样的途径： pxe -> ipxe -> pxelinux.bin，后面这两步可以合并，于是大家就把ipxe与pxelinux.bin​的代码合体，做成了 ipxelinux.0 （gpxe+pxelinux.bin = gpxelinux.0）。一般习惯上裸的pxelinux镜像用.bin后缀，加上gpxe/ipxe之后用.0后缀。此外还会有.lkrn后缀，这是ipxe的东西，ipxe的代码默认只能通过pxe协议的方式加载，他们搞了另外一个代码入口，使得可以通过像linux kernel的方式一样加载（就是可以通过grub引导），这种镜像的后缀是lkrn.
-* 所以可行的引导过程可以有这些：
-  - pxe(网卡) -> ipxe -> pxelinux.bin -> menu.c32
-  - pxe      -> ipxelinux.0 -> menu.c32
-  - pxe -> syslinux.bin -> ipxe -> pxelinux.bin -> menu.c32
-  - pxe -> syslinux.bin -> ipxelinux.0 -> menu.c32
-  - grub -> ipxe.lkrn -> pxelinux.bin -> menu.c32
-  - grub -> ipxelinux.lkrn -> menu.c32
-  - ipxe(烧入网卡) -> pxelinux.bin
-  - ...
+> * *.bin 和 *.0 文件一般是一样的，不过使用上有一些区别，下面解释
+> * pxelinux.bin 是 pxelinux 编译后生成的文件
+> * 由于大多数网卡、主板都不自带gpxe/ipxe的代码，所以通常引导时需要这样的途径： pxe -> ipxe -> pxelinux.bin，后面这两步可以合并，于是大家就把ipxe与pxelinux.bin​的代码合体，做成了 ipxelinux.0 （gpxe+pxelinux.bin = gpxelinux.0）。一般习惯上裸的pxelinux镜像用.bin后缀，加上gpxe/ipxe之后用.0后缀。此外还会有.lkrn后缀，这是ipxe的东西，ipxe的代码默认只能通过pxe协议的方式加载，他们搞了另外一个代码入口，使得可以通过像linux kernel的方式一样加载（就是可以通过grub引导），这种镜像的后缀是lkrn.
+> * 所以可行的引导过程可以有这些：
+>  - pxe(网卡) -> ipxe -> pxelinux.bin -> menu.c32
+>  - pxe      -> ipxelinux.0 -> menu.c32
+>  - pxe -> syslinux.bin -> ipxe -> pxelinux.bin -> menu.c32
+>  - pxe -> syslinux.bin -> ipxelinux.0 -> menu.c32
+>  - grub -> ipxe.lkrn -> pxelinux.bin -> menu.c32
+>  - grub -> ipxelinux.lkrn -> menu.c32
+>  - ipxe(烧入网卡) -> pxelinux.bin
+>  - ...
 
-由于pxe代码是主板、网卡自带的，所以兼容性最好（至少本机的代码兼容本机的设备）。而ipxe兼容性略差（只是相对来说，因为我们编译时可能会漏掉一些网卡，或者一些特殊问题不好解决），曾经尝试过直接一步 pxe -> ipxelinux.0，但是发现有一些机器无法启动，加载ipxe之后就停住了。所以后来退而求其次，用两步加载，对于ipxe不支持的设备，可以在第一步pxe->pxelinux.bin之后手快一些按任意键中断，然后仍然可以使用pxe，不过之后我们一直没有维护通过tftp加载的pxelinux以及配置文件，所以那部分内容其实现在都已经严重过时了。
+> 由于pxe代码是主板、网卡自带的，所以兼容性最好（至少本机的代码兼容本机的设备）。而ipxe兼容性略差（只是相对来说，因为我们编译时可能会漏掉一些网卡，或者一些特殊问题不好解决），曾经尝试过直接一步 pxe -> ipxelinux.0，但是发现有一些机器无法启动，加载ipxe之后就停住了。所以后来退而求其次，用两步加载，对于ipxe不支持的设备，可以在第一步pxe->pxelinux.bin之后手快一些按任意键中断，然后仍然可以使用pxe，不过之后我们一直没有维护通过tftp加载的pxelinux以及配置文件，所以那部分内容其实现在都已经严重过时了。
 
 > 
 
