@@ -220,7 +220,7 @@ exit
 
 - [基於iSCSI的無盤工作站環境搭建](https://www.codenong.com/cs105547860/)
 
-- [在支持iPXE的KVM上安裝你想要的系統](https://lala.im/4524.html)~<font color=#808080>例如*kali*</font>~，支持*iPXE* 的*[vps](https://zhuanlan.zhihu.com/p/111206825):*
+- [在支持iPXE的KVM上安裝你想要的系統](https://lala.im/4524.html)~<font color=#808080>例如kali</font>~，支持iPXE 的[vps](https://zhuanlan.zhihu.com/p/111206825):
 
 >    这里特别说明下一项关键技术iPXE，iPXE是预引导执行环境（PXE）客户端固件和引导程序的开源实现，可用于启用没有内置PXE支持的计算机从网络引导。虽然标准化PXE客户端使用TFTP传输数据，但非标准化iPXE客户端固件增加了通过其他协议检索数据的功能，包括HTTP，iSCSI，以太网ATA（AoE）和以太网光纤通道（FCoE）。
 
