@@ -216,7 +216,7 @@ exit
 
 ---
 
-不再贅述
+[不再贅述](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#%E8%A8%AD%E5%AE%9AKickstart%E9%85%8D%E7%BD%AE)
 
 ## 結語
 
