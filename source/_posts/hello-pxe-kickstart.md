@@ -57,7 +57,7 @@ Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/PXEnetwork.png)
 
-## 配置PXE服務器
+## 開始
 
 ---
 
