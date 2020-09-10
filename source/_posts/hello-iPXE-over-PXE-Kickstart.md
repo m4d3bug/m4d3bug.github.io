@@ -206,11 +206,17 @@ set server_root http://172.16.70.1/media/rhel7/7.6
 # 指定启动镜像的网络地址        
 initrd ${server_root}/images/pxeboot/initrd.images
 # 指定相关kernel文件，源仓库根目录，kickstart的文件目录（按需加入，已略去新建存放该文件步骤）
-kernel ${server_root}/images/pxeboot/vmlinuz inst.repo=${server_root} inst.ks=http://172.16.70.1/ks/bios-ks.cfg ip=dhcp ipv6.disable initrd=initrd.img inst.geoloc=0 devfs=nomount
+kernel ${server_root}/images/pxeboot/vmlinuz inst.repo=${server_root} inst.ks=http://172.16.70.1/ks/bios-ks.cfg ip=dhcp ipv6.disable inst.geoloc=0 devfs=nomount
 boot
 :exit
 exit
 ```
+
+## Kickstart文件編寫
+
+---
+
+不再贅述
 
 ## 結語
 

@@ -17,7 +17,7 @@ tags:
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/PXE_diagram.png" width=50% /></center>
 
-本文將簡單搭建一個基於*PXE* 網絡使用*Kickstart* 自動化安裝*BIOS* 或*UEFI* 架構的自動化安裝環境。其中*TFTP, DHCP & httpd* 將運行在同一個機器底下。
+本文將簡單搭建一個基於PXE網絡使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中TFTP,DHCP&httpd將運行在同一個機器底下。
 
 <!-- more -->
 
@@ -25,7 +25,7 @@ tags:
 
 ---
 
-### 關閉*selinux, firewalld* 和 *iptables*
+### 關閉selinux,firewalld和iptables
 
 排除不在本文涉及範圍内的内容影響。~<font color=#808080>會考慮單獨開坑記錄selinux的相關。 </font>~
 
@@ -41,29 +41,29 @@ Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 ~]# iptables -F
 ```
 
-### 確保局域網内無*DHCP* 服務器
+### 確保處於無DHCP服務網段
 
-1. 停用*vmnet* 的*DHCP* 功能。
+1. 停用vmnet的DHCP功能。
 
    ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20191012215006.png?raw=true)
 
-2. 新建一個*LAN* 區段。(本文采用方法)
+2. 新建一個LAN區段。(本文采用方法)
 
    ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/setupLAN.png?raw=true)
 
 
 
-### 設置自定義*IP*
+### 設置自定義IP
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/PXEnetwork.png)
 
-## 配置*PXE* 服務器
+## 配置PXE服務器
 
 ---
 
 ### 安裝必需包和調試工具
 
-請在下面提取引導菜單程序文件步驟前，確認自己的*ISO* 挂載在*/dev/sr0* 下。
+請在下面提取引導菜單程序文件步驟前，確認自己的ISO挂載在/dev/sr0下。
 
 ```bash
 ~]# yum install -y syslinux tftp-server dhcp tree tcpdump
@@ -90,7 +90,7 @@ tftpboot]# ls
 pxelinux  usr
 ```
 
-###  *BIOS* 的準備工作
+###  BIOS的準備工作
 
 ```bash
 ~]# mkdir /var/lib/tftpboot/pxelinux/pxelinux.cfg
@@ -120,9 +120,9 @@ EOF
 ~]# cp /var/lib/tftpboot/usr/share/syslinux/{pxelinux.0,vesamenu.c32}  /var/lib/tftpboot/pxelinux/
 ```
 
-### *UEFI* 的準備工作
+### UEFI的準備工作
 
-在*UEFI* 中，我們用*grubx64.efi* 來代替*pxelinux* 作爲*UEFI* 的設定。
+在UEFI中，我們用grubx64.efi來代替pxelinux作爲UEFI的設定。
 
 ```bash
 ~]# cp /mnt/RHEL-7/7.8/EFI/BOOT/grubx64.efi /var/lib/tftpboot/
@@ -135,7 +135,7 @@ menuentry 'Install Red Hat Enterprise Linux 7.8' {
 EOF
 ```
 
-## 配置*TFTP* 服務器
+## 配置TFTP服務器
 
 ---
 
@@ -148,11 +148,11 @@ EOF
 Created symlink from /etc/systemd/system/sockets.target.wants/tftp.socket to /usr/lib/systemd/system/tftp.socket.
 ```
 
-## 配置*DHCP* 服務器
+## 配置DHCP服務器
 
 ---
 
-### 寫入*dhcp* 設置
+### 寫入dhcp設置
 
 ```nohighlight
 ~]# cat >> /etc/dhcp/dhcpd.conf << EOF
@@ -205,9 +205,9 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dhcpd.service t
 
 ```
 
-### 檢查*DHCP* 工作情況
+### 檢查DHCP工作情況
 
-在相同*LAN* 下啓動無盤*VM* 用於測試*DHCP*，測試期間檢查：開機提示、日志和抓包。
+在相同LAN下啓動無盤VM用於測試DHCP，測試期間檢查：開機提示、日志和抓包。
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/DHCPresult.png?raw=true)
 
@@ -219,7 +219,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dhcpd.service t
 
 ---
 
-### 使用*HTTP* 來提供*repo* 源
+### 使用HTTP來提供repo源
 
 ``` nohighlight
 ~]# yum -y install httpd
@@ -258,7 +258,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 ~]# tcpdump -i ens38 port 80 and host 172.16.7.1 -vvv >> tcpdump.out
 ```
 
-## 設定*Kickstart* 配置
+## 設定Kickstart配置
 
 ---
 
@@ -276,7 +276,7 @@ Confirm:
 $6$SXp9tsalYxyM41qQ$mG3TbO58L9m3.Hhlec.7aoAU2AeATpJ4p.5dmTXy1iKZkoqALFi9VOhFEWWJ7Tvk6bDYbTx4SRqHw14mVnbV2.
 ```
 
-### 創建*BIOS*自應答文件
+### 創建BIOS自應答文件
 
 ```nohighlight
 ~]# cat >> /var/www/html/ks/bios-ks.cfg << EOF
@@ -354,7 +354,7 @@ pwpolicy luks --minlen=6 --minquality=1 --notstrict --nochanges --notempty
 EOF
 ```
 
-### 創建*UEFI*自應答文件
+### 創建UEFI自應答文件
 
 ```nohighlight
 ~]# cat >> /var/www/html/ks/uefi-ks.cfg << EOF
@@ -449,13 +449,13 @@ EOF
 
 ---
 
-簡單嘗試了基於*PXE*搭配*Kickstart*的無人值守安裝搭建。
+簡單嘗試了基於PXE搭配Kickstart的無人值守安裝搭建。
 
 ## 鳴謝
 
 ---
 
-- https://www.cnblogs.com/boowii/p/6475921.html
-- https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/installation_guide/index#chap-installation-server-setup
-- https://www.server-world.info/en/note?os=CentOS_7&p=pxe&f=1
+- [搭建UEFI PXE 基于linux相关资料 - boowii - 博客园](https://www.cnblogs.com/boowii/p/6475921.html)
+- [Chapter 24. Preparing for a Network Installation](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/installation_guide/index#chap-installation-server-setup)
+- [PXE Boot : Configure PXE Server](https://www.server-world.info/en/note?os=CentOS_7&p=pxe&f=1&)
 
