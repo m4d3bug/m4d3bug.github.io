@@ -44,7 +44,7 @@ tags:
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png)
 
-## 配置iPXE 服務器
+## 配置iPXE服務器
 
 ---
 
