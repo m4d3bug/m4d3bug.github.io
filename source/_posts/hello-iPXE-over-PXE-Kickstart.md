@@ -1,5 +1,5 @@
 ---
-title: iPXE+Kickstart搭建無人值守自動化安裝環境
+title: 于PXE下的iPXE+Kickstart搭建無人值守自動化安裝環境
 mathjax: true
 copyright: true
 comment: true
