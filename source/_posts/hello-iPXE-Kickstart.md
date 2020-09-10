@@ -226,11 +226,38 @@ exit
 
 >    为什么在有的云厂商裸金属云服务介绍上，能看到分钟级的裸金属服务器交付，就是使用了iPXE的技术，服务器启动，通过iPXE引导已经制作好的iSCSI系统镜像，这样就免去了安装操作系统的过程，并且服务器也不需要系统硬盘，节省了成本。并且这样更为灵活，通过这样的技术，可以实现用户根据需要制定自己的系统镜像，而且方便镜像虚实转换，镜像机可以用于启动云主机，也可以启动物理机！
 
+另外以下是關於iPXE與PXE較爲[準確的解釋](https://groups.google.com/g/ustc_lug/c/P2jOQ5F4EKY?pli=1#c39:~:text=%E9%A6%96%E5%85%88%E9%9C%80%E8%A6%81%E7%90%86%E6%B8%85%E6%A5%9A%E5%87%A0%E4%B8%AA%E6%A6%82%E5%BF%B5%EF%BC%9Apxe%2C%20ipxe%2C%20pxelinux%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%87%A0%E4%B8%AA%E5%90%8D%E8%AF%8D%EF%BC%9Apxelinux.0%2C%20ipxelinux.0,%E7%94%B1%E4%BA%8Epxe%E4%BB%A3%E7%A0%81%E6%98%AF%E4%B8%BB%E6%9D%BF%E3%80%81%E7%BD%91%E5%8D%A1%E8%87%AA%E5%B8%A6%E7%9A%84%EF%BC%8C%E6%89%80%E4%BB%A5%E5%85%BC%E5%AE%B9%E6%80%A7%E6%9C%80%E5%A5%BD%EF%BC%88%E8%87%B3%E5%B0%91%E6%9C%AC%E6%9C%BA%E7%9A%84%E4%BB%A3%E7%A0%81%E5%85%BC%E5%AE%B9%E6%9C%AC%E6%9C%BA%E7%9A%84%E8%AE%BE%E5%A4%87%EF%BC%89%E3%80%82%E8%80%8Cipxe%E5%85%BC%E5%AE%B9%E6%80%A7%E7%95%A5%E5%B7%AE%EF%BC%88%E5%8F%AA%E6%98%AF%E7%9B%B8%E5%AF%B9%E6%9D%A5%E8%AF%B4%EF%BC%8C%E5%9B%A0%E4%B8%BA%E6%88%91%E4%BB%AC%E7%BC%96%E8%AF%91%E6%97%B6%E5%8F%AF%E8%83%BD%E4%BC%9A%E6%BC%8F%E6%8E%89%E4%B8%80%E4%BA%9B%E7%BD%91%E5%8D%A1%EF%BC%8C%E6%88%96%E8%80%85%E4%B8%80%E4%BA%9B%E7%89%B9%E6%AE%8A%E9%97%AE%E9%A2%98%E4%B8%8D%E5%A5%BD%E8%A7%A3%E5%86%B3%EF%BC%89%EF%BC%8C%E6%9B%BE%E7%BB%8F%E5%B0%9D%E8%AF%95%E8%BF%87%E7%9B%B4%E6%8E%A5%E4%B8%80%E6%AD%A5%20pxe%20%2D%3E%20ipxelinux.0%EF%BC%8C%E4%BD%86%E6%98%AF%E5%8F%91%E7%8E%B0%E6%9C%89%E4%B8%80%E4%BA%9B%E6%9C%BA%E5%99%A8%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%EF%BC%8C%E5%8A%A0%E8%BD%BDipxe%E4%B9%8B%E5%90%8E%E5%B0%B1%E5%81%9C%E4%BD%8F%E4%BA%86%E3%80%82%E6%89%80%E4%BB%A5%E5%90%8E%E6%9D%A5%E9%80%80%E8%80%8C%E6%B1%82%E5%85%B6%E6%AC%A1%EF%BC%8C%E7%94%A8%E4%B8%A4%E6%AD%A5%E5%8A%A0%E8%BD%BD%EF%BC%8C%E5%AF%B9%E4%BA%8Eipxe%E4%B8%8D%E6%94%AF%E6%8C%81%E7%9A%84%E8%AE%BE%E5%A4%87%EF%BC%8C%E5%8F%AF%E4%BB%A5%E5%9C%A8%E7%AC%AC%E4%B8%80%E6%AD%A5pxe%2D%3Epxelinux.bin%E4%B9%8B%E5%90%8E%E6%89%8B%E5%BF%AB%E4%B8%80%E4%BA%9B%E6%8C%89%E4%BB%BB%E6%84%8F%E9%94%AE%E4%B8%AD%E6%96%AD%EF%BC%8C%E7%84%B6%E5%90%8E%E4%BB%8D%E7%84%B6%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8pxe%EF%BC%8C%E4%B8%8D%E8%BF%87%E4%B9%8B%E5%90%8E%E6%88%91%E4%BB%AC%E4%B8%80%E7%9B%B4%E6%B2%A1%E6%9C%89%E7%BB%B4%E6%8A%A4%E9%80%9A%E8%BF%87tftp%E5%8A%A0%E8%BD%BD%E7%9A%84pxelinux%E4%BB%A5%E5%8F%8A%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%EF%BC%8C%E6%89%80%E4%BB%A5%E9%82%A3%E9%83%A8%E5%88%86%E5%86%85%E5%AE%B9%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%9C%A8%E9%83%BD%E5%B7%B2%E7%BB%8F%E4%B8%A5%E9%87%8D%E8%BF%87%E6%97%B6%E4%BA%86%E3%80%82)：
+
+> * pxe是一个协议，跟mbr是一个性质的东西，它规定了CPU启动后通过什么方式获取引导代码并执行。
+* pxe的实现有许多，不同的厂商有不同的实现。并且pxe的实现代码主要有两种存放位置，一种是存在主板上，一种是存在网卡里，现在新的网卡一般都自带了pxe的实现代码。（去mbr查找引导代码的实现是在主板上的。）
+* 由于pxe协议比较“落后”，仅支持tftp传输数据，性能差，灵活性也差，于是有了gpxe这个项目。gpxe是一种兼容pxe的实现，并且在pxe之上增加了许多特性，例如通过http/ftp等协议传输数据。
+* gpxe原先使用的域名的拥有者突然收回了该域名的使用权，于是这些人fork出去做了ipxe，gpxe现在已经不再开发，ipxe开发非常活跃。
+* 一些较新的intel的网卡里都带了gpxe的实现代码，最新的可能会带ipxe代码。
+* pxelinux是syslinux项目的一个部分，syslinux主要有三个产出，syslinux、isolinux、pxelinux，分别用于硬盘、光盘、网络启动，它的角色与grub相同。
+
+* *.bin 和 *.0 文件一般是一样的，不过使用上有一些区别，下面解释
+* pxelinux.bin 是 pxelinux 编译后生成的文件
+​* 由于大多数网卡、主板都不自带gpxe/ipxe的代码，所以通常引导时需要这样的途径： pxe -> ipxe -> pxelinux.bin，后面这两步可以合并，于是大家就把ipxe与pxelinux.bin​的代码合体，做成了 ipxelinux.0 （gpxe+pxelinux.bin = gpxelinux.0）。一般习惯上裸的pxelinux镜像用.bin后缀，加上gpxe/ipxe之后用.0后缀。此外还会有.lkrn后缀，这是ipxe的东西，ipxe的代码默认只能通过pxe协议的方式加载，他们搞了另外一个代码入口，使得可以通过像linux kernel的方式一样加载（就是可以通过grub引导），这种镜像的后缀是lkrn.
+* 所以可行的引导过程可以有这些：
+  - pxe(网卡) -> ipxe -> pxelinux.bin -> menu.c32
+  - pxe      -> ipxelinux.0 -> menu.c32
+  - pxe -> syslinux.bin -> ipxe -> pxelinux.bin -> menu.c32
+  - pxe -> syslinux.bin -> ipxelinux.0 -> menu.c32
+  - grub -> ipxe.lkrn -> pxelinux.bin -> menu.c32
+  - grub -> ipxelinux.lkrn -> menu.c32
+  - ipxe(烧入网卡) -> pxelinux.bin
+  - ...
+
+由于pxe代码是主板、网卡自带的，所以兼容性最好（至少本机的代码兼容本机的设备）。而ipxe兼容性略差（只是相对来说，因为我们编译时可能会漏掉一些网卡，或者一些特殊问题不好解决），曾经尝试过直接一步 pxe -> ipxelinux.0，但是发现有一些机器无法启动，加载ipxe之后就停住了。所以后来退而求其次，用两步加载，对于ipxe不支持的设备，可以在第一步pxe->pxelinux.bin之后手快一些按任意键中断，然后仍然可以使用pxe，不过之后我们一直没有维护通过tftp加载的pxelinux以及配置文件，所以那部分内容其实现在都已经严重过时了。
+
+> 
+
 ## 鸣谢
 
 ---
 
-- [https://yangfeiffei.github.io/public/2019/08/12/net-install-centos7-with-ipxe.html](https://yangfeiffei.github.io/public/2019/08/12/net-install-centos7-with-ipxe.html)
-- [https://blog.hcl.moe/archives/2177](https://blog.hcl.moe/archives/2177)
-- [https://lala.im/4524.html](https://lala.im/4524.html)
-- [https://zhuanlan.zhihu.com/p/111206825](https://zhuanlan.zhihu.com/p/111206825)
+- [使用ipxe安装centos7](https://yangfeiffei.github.io/public/2019/08/12/net-install-centos7-with-ipxe.html)
+- [gPXE/iPXE 初探 – HydricAcid](https://blog.hcl.moe/archives/2177)
+- [CentOS7配置GRUB2+iPXE进行网络重装-荒岛](https://lala.im/4524.html)
+- [一文读懂裸金属云 - 知乎](https://zhuanlan.zhihu.com/p/111206825)
+- [原先的 PXE 引导中，两阶段的 PXELINUX 的区别，以及 iPXE 的用途？](https://groups.google.com/g/ustc_lug/c/P2jOQ5F4EKY?pli=1)
