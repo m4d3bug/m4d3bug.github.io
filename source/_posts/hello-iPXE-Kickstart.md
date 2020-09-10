@@ -22,7 +22,7 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
 
-本文將簡單搭建一個基於PXE網絡分發[iPXE](https://ipxe.org/)使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中TFTP, DHCP & httpd 將運行在同一個機器底下。
+本文將簡單搭建一個基於PXE網卡分發[iPXE](https://ipxe.org/)使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中TFTP, DHCP & httpd 將運行在同一個機器底下。
 
 <!-- more -->
 
@@ -50,7 +50,7 @@ tags:
 
 ### 安裝必需包
 
-這次選用dnsmasq 來提供ftp 和dhcp 功能，借此學習一波。
+這次選用dnsmasq來提供ftp和dhcp功能，借此學習一波。
 
 ```bash
 ~]# yum install -y ipxe-bootimgs dnsmasq tree tcpdump wireshark
@@ -216,7 +216,7 @@ exit
 
 ---
 
-本文簡單嘗試在PXE的環境下調用iPXE固件，除了本文的方法之外，還有以下有趣实现~<font color=#808080>水貼方向</font>~：
+本文簡單嘗試在PXE的網卡環境下調用iPXE固件，除了本文的方法之外，還有以下有趣实现~<font color=#808080>水貼方向</font>~：
 
 - [基於iSCSI的無盤工作站環境搭建](https://www.codenong.com/cs105547860/)
 
