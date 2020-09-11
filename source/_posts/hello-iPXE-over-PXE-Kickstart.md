@@ -38,7 +38,7 @@ tags:
 
 ### [關閉selinux, firewalld 和 iptables](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#關閉selinux-firewalld-和-iptables:~:text=%E9%97%9C%E9%96%89selinux%2C%20firewalld%20%E5%92%8C%20iptables,-%E6%8E%92%E9%99%A4%E4%B8%8D%E5%9C%A8%E6%9C%AC%E6%96%87%E6%B6%89%E5%8F%8A%E7%AF%84%E5%9C%8D%E5%86%85%E7%9A%84%E5%86%85%E5%AE%B9%E5%BD%B1%E9%9F%BF%E3%80%82)
 
-### [確保局域網内無DHCP 服務器](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#確保局域網内無DHCP-服務器:~:text=%2DF-,%E7%A2%BA%E4%BF%9D%E5%B1%80%E5%9F%9F%E7%B6%B2%E5%86%85%E7%84%A1DHCP%20%E6%9C%8D%E5%8B%99%E5%99%A8)
+### [確保處於無DHCP服務網段](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#確保局域網内無DHCP-服務器:~:text=%2DF-,%E7%A2%BA%E4%BF%9D%E5%B1%80%E5%9F%9F%E7%B6%B2%E5%86%85%E7%84%A1DHCP%20%E6%9C%8D%E5%8B%99%E5%99%A8)
 
 ### 設置自定義IP
 
