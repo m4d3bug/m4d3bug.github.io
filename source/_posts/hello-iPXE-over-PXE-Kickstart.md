@@ -22,7 +22,9 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
 
-本文將簡單搭建一個基於PXE網卡分發[iPXE](https://ipxe.org/)使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中TFTP, DHCP&httpd將運行在同一個機器底下。
+本文將簡單搭建一個基於PXE網卡分發[iPXE](https://ipxe.org/)使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中dnsmasq&httpd將運行在同一個機器底下。
+
+采用的方式是通过已有的PXE固件来分发ipxe引导程序进行安装。pxe -> ipxe.lkrn(ipxe.efi/undionly.kpxe) -> boot.ipxe)
 
 <!-- more -->
 
@@ -31,8 +33,6 @@ tags:
 ## 0x00 環境準備
 
 ---
-
-如果是物理服務器，請事先確認其[支持iPXE](https://ipxe.org/appnote/hardware_drivers) 。
 
 重複的東西不再贅述，谷歌商店安裝Link to Text Fragment直接跳轉~<font color=#808080>騙點擊率</font>~即可。
 
