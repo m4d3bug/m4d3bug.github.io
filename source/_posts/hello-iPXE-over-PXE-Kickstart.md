@@ -92,8 +92,8 @@ EOF
     111 listen-address=172.16.70.1                           <---本机用于监听的地址
     164 dhcp-range=172.16.70.200,172.16.70.254,255.255.255.0 <---设定相关的dhcp起始地址及掩码
     303 dhcp-vendorclass=BIOS,PXEClient:Arch:00000           <---Send extra options which are tagged as "BIOS" to any machine whose DHCP vendorclass string includes the substring "PXEClient"
-	341 dhcp-option=option:router,172.16.70.1                <---设置router选项为默认网关
-	351 dhcp-option=option:netmask,255.255.255.0             <---设置子网掩码
+    341 dhcp-option=option:router,172.16.70.1                <---设置router选项为默认网关
+    351 dhcp-option=option:netmask,255.255.255.0             <---设置子网掩码
     450 dhcp-match=set:ipxe,175                              <---iPXE sends a 175 option.
     451 dhcp-boot=tag:!ipxe,tag:BIOS,undionly.kpxe           <---BIOS标签的引导至undionly.kpxe 
     452 dhcp-boot=tag:!ipxe,tag:!BIOS,ipxe.efi               <---非BIOS标签的引导至ipxe.efi
