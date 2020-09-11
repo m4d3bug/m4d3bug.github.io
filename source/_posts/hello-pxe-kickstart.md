@@ -21,7 +21,7 @@ tags:
 
 <!-- more -->
 
-## 環境準備
+## 0x00 環境準備
 
 ---
 
@@ -57,7 +57,7 @@ Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/PXEnetwork.png)
 
-## 開始
+## 0x01 開始
 
 ---
 
@@ -90,7 +90,7 @@ tftpboot]# ls
 pxelinux  usr
 ```
 
-###  BIOS的準備工作
+### BIOS的準備工作
 
 ```bash
 ~]# mkdir /var/lib/tftpboot/pxelinux/pxelinux.cfg
@@ -135,7 +135,7 @@ menuentry 'Install Red Hat Enterprise Linux 7.8' {
 EOF
 ```
 
-## 配置TFTP服務器
+## 0x02 配置TFTP服務器
 
 ---
 
@@ -148,7 +148,7 @@ EOF
 Created symlink from /etc/systemd/system/sockets.target.wants/tftp.socket to /usr/lib/systemd/system/tftp.socket.
 ```
 
-## 配置DHCP服務器
+## 0x03 配置DHCP服務器
 
 ---
 
@@ -215,7 +215,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dhcpd.service t
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/tcpdumpDHCP.png)
 
-## 配置網絡安裝源
+## 0x04 配置網絡安裝源
 
 ---
 
@@ -445,13 +445,13 @@ EOF
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/UEFIVM.png?raw=true)
 
-## 結語
+## 0x05 結語
 
 ---
 
 簡單嘗試了基於PXE搭配Kickstart的無人值守安裝搭建。
 
-## 鳴謝
+## 0x06 鳴謝
 
 ---
 
