@@ -8,7 +8,6 @@ categories:
 - "Ops "
 tags:
 - "Kickstart "
-- "DHCP "
 - "TFTP "
 - "iPXE "
 - "Httpd "
