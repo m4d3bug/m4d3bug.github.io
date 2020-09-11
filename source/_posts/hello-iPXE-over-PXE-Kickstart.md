@@ -28,7 +28,7 @@ tags:
 
 沒仔細看是不是以爲我一篇博客寫~<font color=#808080>水</font>~兩次。其實不然，iPXE作爲PXE的擴展版，在[Satellite](https://www.redhat.com/en/technologies/management/satellite), [OpenStack](https://www.redhat.com/en/technologies/linux-platforms/openstack-platform) 乃至於[Openshift](https://www.redhat.com/en/technologies/cloud-computing/openshift) 之中都有應用。因此來簡單學習一下。
 
-## 環境準備
+## 0x00 環境準備
 
 ---
 
@@ -44,7 +44,7 @@ tags:
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png)
 
-## 開始
+## 0x01 開始
 
 ---
 
@@ -79,7 +79,7 @@ exit
 EOF   
 ```
 
-## 配置Dnsmasq服務器
+## 0x02 配置Dnsmasq服務器
 
 ### 修改配置
 
@@ -120,7 +120,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dnsmasq.service
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png)
 
-## 配置網絡安裝源
+## 0x03 配置網絡安裝源
 
 ---
 
@@ -213,13 +213,13 @@ boot
 exit
 ```
 
-## Kickstart文件編寫
+## 0x04 Kickstart文件編寫
 
 ---
 
 [不再贅述](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#%E8%A8%AD%E5%AE%9AKickstart%E9%85%8D%E7%BD%AE)
 
-## 結語
+## 0x05 結語
 
 ---
 
@@ -259,7 +259,7 @@ exit
 
 > 
 
-## 鸣谢
+## 0x06 鸣谢
 
 ---
 
