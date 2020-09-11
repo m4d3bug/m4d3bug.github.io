@@ -87,18 +87,19 @@ EOF
 
 ```bash
 ~]# vim /etc/dnsmasq.conf
-    10  port=0                                            <---禁用dns功能
-    106 interface=ens38                                   <---对应工作的网口
-    111 listen-address=172.16.70.1                        <---本机用于监听的地址
-    180 dhcp-range=172.16.70.200,static,255.255.255.0     <---设定相关的dhcp起始地址及掩码
-    229 dhcp-host=00:0c:29:77:62:49,172.16.70.200,test1   <---加入客户机的MAC地址及分配的地址，和标记
-    303 dhcp-vendorclass=BIOS,PXEClient:Arch:00000        <---Send extra options which are tagged as "BIOS" to any machine whose DHCP vendorclass string includes the substring "PXEClient"
-    450 dhcp-match=set:ipxe,175                           <---iPXE sends a 175 option.
-    451 dhcp-boot=tag:!ipxe,tag:BIOS,undionly.kpxe        <---BIOS标签的引导至undionly.kpxe 
-    452 dhcp-boot=tag:!ipxe,tag:!BIOS,ipxe.efi            <---非BIOS标签的引导至ipxe.efi
-    453 dhcp-boot=tag:ipxe,menu/boot.ipxe                 <---设置它们的菜单文件为boot.ipxe
-    499 enable-tftp                                       <---启用tftp
-    502 tftp-root=/var/lib/tftpboot                       <---设置tftp的目录
+    10  port=0                                               <---禁用dns功能
+    106 interface=ens38                                      <---对应工作的网口
+    111 listen-address=172.16.70.1                           <---本机用于监听的地址
+    164 dhcp-range=172.16.70.200,172.16.70.254,255.255.255.0 <---设定相关的dhcp起始地址及掩码
+    303 dhcp-vendorclass=BIOS,PXEClient:Arch:00000           <---Send extra options which are tagged as "BIOS" to any machine whose DHCP vendorclass string includes the substring "PXEClient"
+	341 dhcp-option=option:router,172.16.70.1                <---设置router选项为默认网关
+	351 dhcp-option=option:netmask,255.255.255.0             <---设置子网掩码
+    450 dhcp-match=set:ipxe,175                              <---iPXE sends a 175 option.
+    451 dhcp-boot=tag:!ipxe,tag:BIOS,undionly.kpxe           <---BIOS标签的引导至undionly.kpxe 
+    452 dhcp-boot=tag:!ipxe,tag:!BIOS,ipxe.efi               <---非BIOS标签的引导至ipxe.efi
+    453 dhcp-boot=tag:ipxe,menu/boot.ipxe                    <---设置它们的菜单文件为boot.ipxe
+    499 enable-tftp                                          <---启用tftp
+    502 tftp-root=/var/lib/tftpboot                          <---设置tftp的目录
 ```
 
 ### 啓動服務
