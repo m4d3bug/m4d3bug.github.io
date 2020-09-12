@@ -22,6 +22,7 @@ tags:
 
 本文將實踐通過燒錄iPXE到相應的VMware虛擬機中，來模擬一個無PXE的自動化安裝環境。
 
+<!-- more -->
 在閲讀本文前，請確保您有足夠瞭解[iPXE和PXE的~~情情愛愛~~恩恩怨怨。](https://groups.google.com/g/ustc_lug/c/P2jOQ5F4EKY?pli=1)
 
 ## 0x00 相關背景
