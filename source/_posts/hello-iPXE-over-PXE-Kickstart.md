@@ -23,9 +23,11 @@ tags:
 
 本文將簡單搭建一個基於PXE網卡分發[iPXE](https://ipxe.org/)使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中dnsmasq&httpd將運行在同一個機器底下。
 
-采用的方式是通过已有的PXE固件来分发ipxe引导程序进行安装。pxe -> ipxe.lkrn(ipxe.efi/undionly.kpxe) -> boot.ipxe)
-
 <!-- more -->
+
+采用的方式是通过已有的PXE固件来分发ipxe引导程序进行安装。
+pxe -> ipxe.lkrn(ipxe.efi/undionly.kpxe) -> boot.ipxe)
+
 
 沒仔細看是不是以爲我一篇博客寫~<font color=#808080>水</font>~兩次。其實不然，iPXE作爲PXE的擴展版，在[Satellite](https://www.redhat.com/en/technologies/management/satellite), [OpenStack](https://www.redhat.com/en/technologies/linux-platforms/openstack-platform) 乃至於[Openshift](https://www.redhat.com/en/technologies/cloud-computing/openshift) 之中都有應用。因此來簡單學習一下。
 
