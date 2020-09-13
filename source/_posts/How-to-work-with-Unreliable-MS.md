@@ -28,9 +28,9 @@ tags:
 <!-- more -->
 ## 0x00 初衷
 
-    出於種種原因，需要在Win10中的terminal中使用一個“完整版”的Linux。衆所周知，WSL并無過多Linux内核特性的實現，而WSL2還沒有被巨硬推送。（三綫師弟的易升升級已經完美翻車）於是有了本文。
+出於種種原因，需要在Win10中的terminal中使用一個“完整版”的Linux。衆所周知，WSL并無過多Linux内核特性的實現，而WSL2還沒有被巨硬推送。（三綫師弟的易升升級已經完美翻車）於是有了本文。
 
-    本文采用的方案則是：Windows Terminal  + Terminal settings + wsl + VMware VM + VMware自啓脚本，實現開機自啓no gui的ubuntu 18.04，其後運行terminal的時候無感知對該vm發起ssh。
+本文采用的方案則是：Windows Terminal  + Terminal settings + wsl + VMware VM + VMware自啓脚本，實現開機自啓no gui的ubuntu 18.04，其後運行terminal的時候無感知對該vm發起ssh。
 
 ## 0x01 設置VMware虛擬機
 
@@ -42,16 +42,16 @@ tags:
 
 ## 0x02 設置WSL
 
-       其實這一步不是必須，但是經過測試，powershell或者cmd在結束連接后，會在下一次連接時出現令人費解的[?1;0c符號，因~~强迫症~~而改爲用wsl.exe進行跳板連接。
+其實這一步不是必須，但是經過測試，powershell或者cmd在結束連接后，會在下一次連接時出現令人費解的[?1;0c符號，因~~强迫症~~而改爲用wsl.exe進行跳板連接。
 
-```
+```nohighlight
 Win10安装Ubuntu子系统教程（附安装图形化界面） - Windows10.Pro
 https://windows10.pro/bash-on-ubuntu-on-windows/
 ```
 
-      之後在wsl中生成wsl環公密鑰並傳送給VMware.
+之後在wsl中生成wsl環公密鑰並傳送給VMware.
 
-```
+```bash
 # ssh-keygen -t rsa -b 2048 -C "m4d3bug@wsl"
 # ssh-copy-id m4d3bug@192.168.99.96
 ```
@@ -161,7 +161,7 @@ https://windows10.pro/bash-on-ubuntu-on-windows/
 
 - 創建脚本，注意替換自己的路徑以及雙引號
 
-    ```
+    ```nohighlight
     "D:\Program Files (x86)\VMware\VMware Workstation\vmrun.exe" start "G:\Virtual Machines\ubuntu18.madebug.net\ubuntu18.madebug.net.vmx" nogui
     ```
 
@@ -301,15 +301,13 @@ https://windows10.pro/bash-on-ubuntu-on-windows/
     $ byobu-enable
     ```
 
-- [设置虚拟机共享宿主机目录](https://zhuanlan.zhihu.com/p/43920548)
-
-      能share爲什麽要copy呢？傻不傻
+- [设置虚拟机共享宿主机目录](https://zhuanlan.zhihu.com/p/43920548),能share爲什麽要copy呢？傻不傻
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/sharewithVM.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/sharewithVM.png)
 
 ## 0x06 結語
 
-    實在受不了WSL的半成品了，WSL2就讓它先飛一會吧。
+實在受不了WSL這半成品了，WSL2就讓它先飛一會吧。
 
 ## 0x07 鳴謝
 
