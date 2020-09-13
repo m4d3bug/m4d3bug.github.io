@@ -17,6 +17,7 @@ tags:
 - "UEFI "
 - "Anaconda "
 - "Dnsmasq "
+- "VMware "
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
 
