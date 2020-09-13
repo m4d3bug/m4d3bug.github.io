@@ -14,17 +14,17 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
-本文旨在從三個方面（被執行的主體，執行程序的主體，執行函數的主體）闡述系統調用的全過程。
+本文旨在從三個方面（被執行的主體[Executable and Linkable Format]，執行程序的主體，執行函數的主體）闡述系統調用的全過程。
 
 <!-- more -->
 
-## 被執行的主體-ELF(Executable and Linkable Format)
+## 0x00 被執行的主體：ELF
 
 ---
 
-### ELF的第一種類型---可重定位文件(Relocatable File)
+### ELF的第一種類型：可重定位文件
 
-環境準備，安裝軟體。
+可重定位文件全程：Relocatable File，環境準備，安裝軟體。
 
 ```bash
 [root@learn ~]# yum -y groupinstall "Development Tools"
@@ -53,7 +53,7 @@ int create_process (char* program, char** arg_list)
         }
 }
 EOF
-# cat >> createprocess.c << EOF
+[root@learn ~]# cat >> createprocess.c << EOF
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -75,7 +75,7 @@ int main ()
 EOF
 ```
 
-進行編譯，**獲得ELF的第一種類型—-可重定位文件(Relocatable File)。**
+進行編譯，**獲得ELF的第一種類型: 可重定位文件(Relocatable File)。**
 
 ```bash
 [root@learn ~]# gcc -c -fPIC process.c
@@ -126,9 +126,9 @@ Key to Flags:
   l (large), p (processor specific)
 ```
 
-### ELF的第二種類型---可執行文件(Executable file)
+### ELF的第二種類型：可執行文件
 
-先通過ar，將.o文件歸檔為.a文件，可作爲靜態鏈接庫。
+可执行文件全稱：Executable file，先通過ar，將.o文件歸檔為.a文件，可作爲靜態鏈接庫。
 
 ```bash
 [root@learn ~]# man ar
@@ -285,9 +285,9 @@ total 228
 -rw-r--r--. 1 root root 231449 Jun 22 05:36 redhat.repo
 ```
 
-### ELF的第三種類型---共享對象文件(Shared Object)
+### ELF的第三種類型：共享對象文件
 
-先通過gcc，由.o文件編譯為.so文件，可得到**動態鏈接庫，亦就是ELF第三種類型**。
+共享對象文件全稱：Shared Object，先通過gcc，由.o文件編譯為.so文件，可得到**動態鏈接庫，亦就是ELF第三種類型**。
 
 ```bash
 [root@learn ~]# gcc -shared -fPIC -o libdynamicprocess.so process.o
@@ -372,7 +372,7 @@ Key to Flags:
 [root@learn ~]# gcc -o dynamiccreateprocess createprocess.o -L. -l dynamicprocess
 ```
 
-運行結果，運行時需要手動指定*load*的路徑。
+運行結果，運行時需要手動指定load的路徑。
 
 ```bash
 [root@learn ~]# export LD_LIBRARY_PATH=.
@@ -460,7 +460,7 @@ dynamiccreateprocess→ PLT⇋GOT→ld-linux.so→libdynamicprocess.so(create_pr
 
 >它们是怎么工作的，使得程序运行的时候，可以将 so 文件动态链接到进程空间的呢？dynamiccreateprocess 这个程序要调用 libdynamicprocess.so 里的 create_process 函数。由于是运行时才去找，编译的时候，压根不知道这个函数在哪里，所以就在 PLT 里面建立一项 PLT[x]。这一项也是一些代码，有点像一个本地的代理，在二进制程序里面，不直接调用 create_process 函数，而是调用 PLT[x]里面的代理代码，这个代理代码会在运行的时候找真正的 create_process 函数。去哪里找代理代码呢？这就用到了 GOT，这里面也会为 create_process 函数创建一项 GOT[y]。这一项是运行时 create_process 函数在内存中真正的地址。如果这个地址在 dynamiccreateprocess 调用 PLT[x]里面的代理代码，代理代码调用 GOT 表中对应项 GOT[y]，调用的就是加载到内存中的 libdynamicprocess.so 里面的 create_process 函数了。但是 GOT 怎么知道的呢？对于 create_process 函数，GOT 一开始就会创建一项 GOT[y]，但是这里面没有真正的地址，因为它也不知道，但是它有办法，它又回调 PLT，告诉它，你里面的代理代码来找我要 create_process 函数的真实地址，我不知道，你想想办法吧。PLT 这个时候会转而调用 PLT[0]，也即第一项，PLT[0]转而调用 GOT[2]，这里面是 ld-linux.so 的入口函数，这个函数会找到加载到内存中的 libdynamicprocess.so 里面的 create_process 函数的地址，然后把这个地址放在 GOT[y]里面。下次，PLT[x]的代理函数就能够直接调用了。
 
-## 執行程序的主體-*load_elf_binary*等函數
+## 0x01 執行程序的主體：load_elf_binary等函數
 
 ---
 
@@ -480,7 +480,7 @@ sys_execve->do_execve->do_execveat_common->exec_binprm->search_binary_handler。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/execnamerule.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/execnamerule.jpg)
 
-## 而執行函數的主體—-進程！
+## 0x02 執行函數的主體：進程
 
 ---
 
@@ -512,7 +512,7 @@ root     32794 32792  0 Jan10 pts/0    00:00:00 -bash
 root     32901 32794  0 00:01 pts/0    00:00:00 ps -ef
 ```
 
-## 結語
+## 0x03 結語
 
 ---
 
