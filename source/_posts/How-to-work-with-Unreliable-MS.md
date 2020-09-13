@@ -6,7 +6,6 @@ comment: true
 date: 2020-09-13 20:32:05
 categories:
 - "Dev "
-- "Ops "
 tags:
 - "Ubuntu "
 - "fish "
