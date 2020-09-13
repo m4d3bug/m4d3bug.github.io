@@ -194,7 +194,7 @@ https://windows10.pro/bash-on-ubuntu-on-windows/
 - 安裝omf
 
     ```bash
-    $ curl -x http://192.168.99.99:1081 -L https://get.oh-my.fish | fish
+	$ curl -x http://192.168.99.99:1081 -L https://get.oh-my.fish | fish
 	$ chsh -s /usr/bin/fish
     ```
 
