@@ -28,9 +28,9 @@ tags:
 <!-- more -->
 ## 0x00 初衷
 
-      出於種種原因，需要在Win10中的terminal中使用一個“完整版”的Linux。衆所周知，WSL并無過多Linux内核特性的實現，而WSL2還沒有被巨硬推送。（三綫師弟的易升升級已經完美翻車）於是有了本文。
+    出於種種原因，需要在Win10中的terminal中使用一個“完整版”的Linux。衆所周知，WSL并無過多Linux内核特性的實現，而WSL2還沒有被巨硬推送。（三綫師弟的易升升級已經完美翻車）於是有了本文。
 
-      本文采用的方案則是：Windows Terminal  + Terminal settings + wsl + VMware VM + VMware自啓脚本，實現開機自啓no gui的ubuntu 18.04，其後運行terminal的時候無感知對該vm發起ssh。
+    本文采用的方案則是：Windows Terminal  + Terminal settings + wsl + VMware VM + VMware自啓脚本，實現開機自啓no gui的ubuntu 18.04，其後運行terminal的時候無感知對該vm發起ssh。
 
 ## 0x01 設置VMware虛擬機
 
