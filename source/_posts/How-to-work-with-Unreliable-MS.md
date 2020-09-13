@@ -300,7 +300,7 @@ https://windows10.pro/bash-on-ubuntu-on-windows/
     $ byobu-enable
     ```
 
-- [设置虚拟机共享宿主机目录](https://zhuanlan.zhihu.com/p/43920548),能share爲什麽要copy呢？傻不傻
+- [设置虚拟机共享宿主机目录](https://zhuanlan.zhihu.com/p/43920548)，能share自然無須copy。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/sharewithVM.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/sharewithVM.png)
 
