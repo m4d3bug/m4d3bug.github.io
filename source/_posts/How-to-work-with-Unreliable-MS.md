@@ -275,7 +275,7 @@ https://windows10.pro/bash-on-ubuntu-on-windows/
                     export PS1='\[\e[01;31m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ '
             else
     #               export PROMPT='%F{10}%n@%m%f:%F{12}%~%f\$ '
-                    export PROMPT="%F{135}%n%f@%F{166}%m%f %F{118}%~%f %# "
+                    export PROMPT="%F{135}%n%f@%F{166}%m%f %F{118}%~%f %$ "
                     export PS1='\[\e[01;32m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ '
             fi
     }
@@ -293,8 +293,8 @@ https://windows10.pro/bash-on-ubuntu-on-windows/
     function prompt_color_on (){
             if [ $(id -u) -eq 0 ]; then
     #                export PROMPT='%F{10}%n@%m%f:%F{12}%~%f%# '
-    #                export PROMPT="%F{135}%n%f@%F{166}%m%f %F{118}%~%f \$ "
-                    export PS1='[\[\e[01;31m\]\u@\h\[\e[01;31m\] \[\e[01;31m\]\w\[\e[00m\]]\$ '
+    #                export PROMPT="%F{135}%n%f@%F{166}%m%f %F{118}%~%f \# "
+                    export PS1='[\[\e[01;31m\]\u@\h\[\e[01;31m\] \[\e[01;31m\]\w\[\e[00m\]]\# '
             else
     #                export PROMPT='%F{10}%n@%m%f:%F{12}%~%f\$ '
     #                export PROMPT="%F{135}%n%f@%F{166}%m%f %F{118}%~%f %$ "
