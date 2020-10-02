@@ -20,7 +20,7 @@ tags:
 - "apt "
 - "bash "
 ---
-<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/terminalworkstation.png" width=50% /></center>
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/terminalworkstation.png" width=50% /></center>
 
 本文簡單介紹我的環境setup，隨緣更新。
 
