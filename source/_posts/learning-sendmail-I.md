@@ -5,10 +5,10 @@ copyright: true
 comment: true
 date: 2020-10-01 21:21:06
 categories:
-"Ops "
+- "Ops "
 tags:
-"Linux "
-"sendmail "
+- "Linux "
+- "sendmail "
 ---
  <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/%20LinuxAdministrationHandbook.jpg" width=50% /></center>
 
