@@ -25,7 +25,7 @@ script:
 
 after_script:
   - cd ./public
-  - echo "blog.madebug.net" > CNAME
+#  - echo "blog.madebug.net" > CNAME
   - git init
   - git config user.name "m4d3bug"
   - git config user.email "m4d3bug@gmail.com"
