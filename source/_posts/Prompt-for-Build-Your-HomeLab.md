@@ -69,7 +69,7 @@ i9散熱不講武德~~<font color=#808080>(拍這個照片的時候我還發著�
 - 給系統啓用官方訂閲和epel第三方倉庫。
 
     ```bash
-    [root@rhel7 ~]# subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"  --enable "rhel-ha-for-rhel-*-server-rpms"
+    [root@rhel7 ~]# subscription-manager repos --enable "rhel-*-server-rpms" --enable "rhel-*-server-extras-rpms" "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"  --enable "rhel-ha-for-rhel-*-server-rpms"
     [root@rhel7 ~]# yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     ```
 
@@ -213,10 +213,9 @@ i9散熱不講武德~~<font color=#808080>(拍這個照片的時候我還發著�
       swap rhel -wi-a-----   4.00g
     ```
 
-- 安裝cockpit全家桶web協管。其中kvm管理cockpit-machines-ovirt來自第三方社區。
+- 安裝cockpit全家桶web協管。
 
     ```bash
-    [root@rhel7 ~]# yum install http://mirror.centos.org/centos/7/extras/x86_64/Packages/cockpit-machines-195.6-1.el7.centos.noarch.rpm
     [root@rhel7 ~]# yum install cockpit* -x cockpit-machines-ovirt
     [root@rhel7 ~]# systemctl enable cockpit --now
     [root@rhel7 ~]# firewall-cmd --add-services cockpit
