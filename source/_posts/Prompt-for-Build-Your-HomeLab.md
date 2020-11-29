@@ -36,24 +36,17 @@ tags:
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/HomeLabHardware.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/HomeLabHardware.png)
 
 芯片：i9十代測試版QTB1，10C20T，定位是家用靜音低功耗，
-
 主板：選擇了自帶wifi6的主板，搭配房間華爲wif6+ 使用，大小符合MATX大小。 
-
 散熱：i9 不講武德，不加散熱直接97℃，標配散熱。
-
 内存：馬甲條子，容量和頻率+京東自營，要啥自行車。
-
 固態：500GiB起步，本人機械硬盤絕緣體。
-
 電源：500W夠用，600W合適，700W富裕。600W保留以後顯卡升級的功耗。
-
 機箱：最便宜的就夠。
-
-風扇：最便宜的就夠。
+風扇：最便宜的就夠+1。
 
 ## 0x02 上手安装
 
-i9散熱不講武德個~~<font color=#808080>(拍這個照片的時候我還發著不塗硅脂免得不好退貨這種白日夢，甚至塗了還不上散熱被熱熔了差點漏到芯片針脚。)</font>~~
+i9散熱不講武德~~<font color=#808080>(拍這個照片的時候我還發著不塗硅脂免得不好退貨這種白日夢，甚至塗了還不上散熱被熱熔了差點漏到芯片針脚。)</font>~~
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/hothothot.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/hothothot.jpg)
 
@@ -76,7 +69,6 @@ i9散熱不講武德個~~<font color=#808080>(拍這個照片的時候我還發�
 - 給系統啓用官方訂閲和epel第三方倉庫。
 
     ```bash
-
     [root@rhel7 ~]# subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"  --enable "rhel-ha-for-rhel-*-server-rpms"
     [root@rhel7 ~]# yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     ```
