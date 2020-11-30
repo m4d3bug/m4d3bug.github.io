@@ -26,7 +26,7 @@ b is bit, B is Byte
 150 Mbps = 18.75 MB/s = 153600 kb/s = 19200 KB/s
 ```
 
-爲什麽需要特別提及網速，因爲KVM的XML使用的是KB/s，測速軟件一般是 MB/s
+爲什麽需要特別提及網速，因爲KVM的XML使用的是KB/s，測速軟件一般是 MB/s。
 
 ```
 The units for average and peak attributes are kilobytes per second
@@ -117,4 +117,4 @@ To the KVM host
 
 ## 0x03 結語
 
-KVM直接virsh reboot是不生效的。
+XML修改后使用virsh reboot是不生效的。
