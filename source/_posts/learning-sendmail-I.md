@@ -10,7 +10,7 @@ tags:
 - "Linux "
 - "sendmail "
 ---
- <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/%20LinuxAdministrationHandbook.jpg" width=50% /></center>
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/%20LinuxAdministrationHandbook.jpg" width=50% /></center>
 
 本文簡單記錄sendmail的工作模式模型閱讀筆記。
 

@@ -1,5 +1,5 @@
 ---
-title: Network Qos for KVM
+title: 如何為KVM限速
 mathjax: true
 copyright: true
 comment: true
@@ -11,10 +11,11 @@ tags:
 - "KVM "
 - "Network "
 ---
-
-# 如何為KVM限速
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-kvm-1280x720.png" width=50% /></center>
 
 本文簡單實踐KVM的限速設置並檢驗。
+
+<!--more -->
 
 ## 0x00 前言
 
