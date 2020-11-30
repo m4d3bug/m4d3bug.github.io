@@ -66,9 +66,9 @@ tags:
 
 ## 0x03 系統安裝
 
-### 簡單講一下遇到的坑和解決的方法。
+### 簡單講一下遇到的坑和解決的方法
 
-#### 官方訂閲與epel第三方倉庫。
+#### 官方訂閲與epel第三方倉庫
 
     ```bash
     [root@rhel7 ~]# subscription-manager repos --enable "rhel-*-server-rpms" --enable "rhel-*-server-extras-rpms" "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"  --enable "rhel-ha-for-rhel-*-server-rpms"
