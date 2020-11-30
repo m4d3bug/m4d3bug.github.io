@@ -46,7 +46,9 @@ tags:
 
 ## 0x02 上手安装
 
-### i9散熱不講武德~~<font color=#808080>(拍這個照片的時候我還發著不塗硅脂免得不好退貨這種白日夢，甚至塗了還不上散熱被熱熔了差點漏到芯片針脚。)</font>~~
+### i9散熱不講武德
+
+~~<font color=#808080>(拍這個照片的時候我還發著不塗硅脂免得不好退貨這種白日夢，甚至塗了還不上散熱被熱熔了差點漏到芯片針脚。)</font>~~
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/hothothot.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/hothothot.jpg)
 
@@ -66,14 +68,16 @@ tags:
 
 ### 簡單講一下遇到的坑和解決的方法。
 
-#### 給系統啓用官方訂閲和epel第三方倉庫。
+#### 官方訂閲與epel第三方倉庫。
 
     ```bash
     [root@rhel7 ~]# subscription-manager repos --enable "rhel-*-server-rpms" --enable "rhel-*-server-extras-rpms" "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"  --enable "rhel-ha-for-rhel-*-server-rpms"
     [root@rhel7 ~]# yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     ```
 
-#### 主板網卡驅動，需要手動配置靜態IP。
+#### 主板網卡驅動
+
+需手動配置靜態IP。
 
     ```bash
     [root@rhel7 ~]# yum install https://mirror.rackspace.com/elrepo/elrepo/el7/x86_64/RPMS/kmod-r8125-9.003.05-1.el7_8.elrepo.x86_64.rpm
@@ -90,13 +94,17 @@ tags:
     supports-priv-flags: no
     ```
 
-#### 安裝byobu，右下角時間不顯示，更換老舊版本解決。
+#### 安裝byobu
+
+右下角時間不顯示，更換老舊版本解決。
 
     ```bash
     [root@rhel7 ~]# yum install https://rpmfind.net/linux/openmandriva/4.0/repository/x86_64/unsupported/release/byobu-5.43-2-omv4000.noarch.rpm
     ```
 
-#### RHEL7識別硬盤系統有固定順序而不像RHEL8，而加裝的B/M key m.2只能在特定槽位被識別。硬盤擴容流程如下：
+#### 硬盤識別順序
+
+RHEL7識別硬盤系統有固定順序而不像RHEL8，而加裝的B/M key m.2只能在特定槽位被識別。硬盤擴容流程如下：
 
     ```bash
     #直接用之前試裝RHEL8的操作步驟進行記錄，懶
@@ -213,7 +221,7 @@ tags:
       swap rhel -wi-a-----   4.00g
     ```
 
-#### 安裝cockpit全家桶web協管。
+#### cockpit全家桶
 
     ```bash
     [root@rhel7 ~]# yum install cockpit* -x cockpit-machines-ovirt
@@ -222,14 +230,14 @@ tags:
     [root@rhel7 ~]# firewall-cmd --reload
     ```
 
-#### v2ray客戶端安裝。
+#### v2ray客戶端
 
     ```bash
     v2fly/fhs-install-v2ray: Bash script for installing V2Ray in operating systems such as Debian / CentOS / Fedora / openSUSE that support systemd
     https://github.com/v2fly/fhs-install-v2ray
     ```
 
-#### zerotier安裝。
+#### zerotier
 
     ```bash
     [root@rhel7 ~]# curl -s https://install.zerotier.com/ | sudo bash
