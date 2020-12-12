@@ -258,7 +258,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service t
 ~]# tcpdump -i ens38 port 80 and host 172.16.7.1 -vvv >> tcpdump.out
 ```
 
-## Kickstart文件編寫
+## 0x05 Kickstart文件編寫
 
 ---
 
@@ -445,7 +445,7 @@ EOF
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/UEFIVM.png?raw=true)
 
-## 0x05 結語
+## 0x06 結語
 
 ---
 
