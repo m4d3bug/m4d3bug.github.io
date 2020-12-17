@@ -11,7 +11,7 @@ tags:
 - "IMAP "
 - "POP "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/%20LinuxAdministrationHandbook.jpg" width=50% /></center>
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook" width=50% /></center>
 
 本文記錄關於郵件服務器的相關。
 
