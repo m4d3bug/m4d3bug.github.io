@@ -9,7 +9,7 @@ categories:
 tags:
 - "sendmail"
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook" width=50% /></center>
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
 
 本文簡單記錄郵件別名。
 
