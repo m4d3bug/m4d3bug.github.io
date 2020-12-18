@@ -171,7 +171,7 @@ option architecture-type code 93 = unsigned integer 16;
 
 subnet 172.16.7.0 netmask 255.255.255.0 {
   option routers 172.16.7.1;
-  range 172.16.7.200 192.168.188.253;
+  range 172.16.7.200 172.16.7.253;
 
   class "pxeclients" {
       match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
