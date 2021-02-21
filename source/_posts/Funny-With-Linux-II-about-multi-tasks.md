@@ -17,7 +17,7 @@ tags:
 
 <!-- more -->
 
-## 什麽是綫程(what and why?)
+## 0x00 什麽是綫程(what and why?)
 
 ---
 
@@ -27,7 +27,7 @@ tags:
 
 因此，當開發任務間無先後次序時，拆分出支綫來并發，可顯著提升效率（而科學的分工，符合[**宇宙法則**](https://zh.wikipedia.org/zh-tw/%E5%B8%95%E7%B4%AF%E6%89%98%E6%B3%95%E5%88%99)）。
 
-## 如何創建綫程(how?)
+## 0x01 如何創建綫程(how?)
 
 ---
 
@@ -145,7 +145,7 @@ Thread 4 downloads the file file4.wmv in 15 minutes.
 Thread 5 downloads the file file5.flv in 77 minutes.
 ```
 
-## 綫程的數據(when and where?)
+## 0x02 綫程的數據(when and where?)
 
 ---
 
@@ -589,7 +589,7 @@ int pthread_setspecific(pthread_key_t key, const void *value)
 void *pthread_getspecific(pthread_key_t key)
 ```
 
-## 結語
+## 0x03 結語
 
 ---
 
