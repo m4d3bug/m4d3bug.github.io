@@ -18,13 +18,13 @@ tags:
 
 <!-- more -->
 
-## 什麽是性能問題
+## 0x00 什麽是性能問題
 
 性能問題的本質，就是系統資源已經達到瓶頸，但請求的處理卻還不夠快，無法支撐更多的請求。
 
 性能分析，其實就是找出應用或系統的瓶頸，并設法去避免或者緩解它們。
 
-## 不同側分析問題的次序
+## 0x01 不同側分析問題的次序
 
 <center><font size="5"><B>↓從應用側（吞吐量，延遲……）↓</B></font></center>
 
@@ -32,15 +32,15 @@ tags:
 
 <center><font size="5"><B>↑從系統側（CPU, 内存……）↑</B></font></center>
 
-## Linux各方面相關的工具
+## 0x02 Linux各方面相關的工具
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411112954.png" width=50% /></center>
 
-## Linux調優的腦圖
+## 0x03 Linux調優的腦圖
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411113050.png" width=50% /></center>
 
-## 結語
+## 0x04 結語
 
 *High concurrency means a big throughput, and fast response means a small delay.*
 
