@@ -23,7 +23,7 @@ tags:
 
 <!-- more -->
 
-## 什麽是平均負載 (*Load Averages*)
+## 0x00 什麽是平均負載 (*Load Averages*)
 
 平均負載依賴於有多少空閑核心，運行態，不可中斷態。我們可以從uptime的manual中查看到以下訊息：
 
@@ -64,7 +64,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
 **注意：** 平均負載應該小於CPU數的70%。
 
-## 案例模擬
+## 0x01 案例模擬
 
 ### 測試説明
 
@@ -276,7 +276,7 @@ stress: info: [15703] dispatching hogs: 0 cpu, 1 io, 0 vm, 0 hdd
 
   *Now we can clearly see Load Average up because of waiting CPU(%wait).* 
 
-## 結語
+## 0x02 結語
 
 ### Load Averages = running(運行態) + uninterruptable(不可中斷態)
 
