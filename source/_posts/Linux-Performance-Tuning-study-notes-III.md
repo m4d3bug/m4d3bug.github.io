@@ -50,7 +50,7 @@ tags:
 ### 綫程の上下文切換
 
 - [綫程是調度的基本單位](https://blog.madebug.net/ops/2020-06-29-funny-with-linux-ii-about-multi-tasks)，不再贅述。（who）
-- 誘發綫程“被”切換/釋放CPU上下文：（when）
+- 誘發綫程“被”切換/釋放CPU上下文：（when, where）
     - 前後綫程分屬**不同進程切換≈進程間上下文切換**
     - 前後綫程均屬**同一進程切換=一次CPU上下文切换**
 - 多綫程消耗＜<多進程消耗
