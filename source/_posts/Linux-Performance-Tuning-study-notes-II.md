@@ -167,6 +167,8 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
 - **Windows 2**
 
+  Load Average一分鐘内數值飆升至1.06
+
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
   Every 2.0s: uptime                                                          Tue Sep  3 21:34:11 2019
@@ -174,9 +176,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
    21:34:11 up 6 min,  4 users,  load average: 1.05, 0.62, 0.27
   ```
 
-  *Load Average of 1 min will close to 1.06.*
-
 - **Windows 3**
+
+  只有一個CPU的%iowait上升。
 
   ```nohighlight
   [root@localhost ~]# mpstat -P ALL 5 3
@@ -196,9 +198,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   09:36:20 PM    1 0.20  0.00  43.75 33.87  0.00   0.00    0.00    0.00    0.00  22.18
   ```
 
-  *Only one cpu's %iowait is rising.*
-
 - **Windows 4**
+
+  Load Average上升是因爲等待I/O
 
   ``` nohighlight
   [root@localhost ~]# pidstat -u 5 1
@@ -209,8 +211,6 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   10:37:34 PM     0     16458    0.00    0.20    0.00    0.00    0.20     0  pidstat
   10:37:34 PM     0     17460    0.00   85.20    0.00    0.40   85.20     1  stress
   ```
-  
-  *Now we can clearly see Load Average up because of waiting I/O.*
 
 ### CPU等待
 
@@ -223,6 +223,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
 - **Windows 2**
 
+  平均負載在一分鐘内逼近10.00
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
   Every 2.0s: uptime                                                          Tue Sep  3 22:08:46 2019
@@ -230,9 +231,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
    22:08:46 up 41 min,  4 users,  load average: 9.34, 8.13, 4.66
   ```
 
-  *Load Average of 1 min will close to 10.00.*
-
 - **Windows 3**
+
+  全體CPU的%usr都在上升。
 
   ``` nohighlight
   [root@localhost ~]# mpstat -P ALL 5 3
@@ -252,9 +253,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   10:00:07 PM    1 99.60  0.00  0.40  0.00   0.00  0.00    0.00    0.00    0.00    0.00
   ```
 
-  *All cpu's %usr is rising.*
-
 - **Windows 4**
+
+  Load Average上升時因爲等待CPU，也即是%wait
 
   ```nohighlight
   [root@localhost ~]# pidstat -u 5 1
@@ -271,8 +272,6 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   10:33:49 PM     0     16494   24.35    0.00    0.00   75.05   24.35     0  stress
   10:33:49 PM     0     16495   24.75    0.00    0.00   75.65   24.75     1  stress
   ```
-
-  *Now we can clearly see Load Average up because of waiting CPU(%wait).* 
 
 ## 0x02 結語
 
