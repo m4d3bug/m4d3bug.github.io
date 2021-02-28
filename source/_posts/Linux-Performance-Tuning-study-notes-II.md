@@ -110,7 +110,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 -  **Windows 2**
 
   每兩秒輸出*uptime*命令的結果。
-  
+
   ```nohighlight
   [root@localhost ~]# watch -d uptime
   Every 2.0s: uptime                                            Mon Sep  2 23:39:47 2019
@@ -162,12 +162,10 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   
   ``` nohighlight
   [root@localhost ~]# stress -i 1 --timeout 600
-stress: info: [15703] dispatching hogs: 0 cpu, 1 io, 0 vm, 0 hdd
+  stress: info: [15703] dispatching hogs: 0 cpu, 1 io, 0 vm, 0 hdd
   ```
 
 - **Windows 2**
-
-  
 
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
