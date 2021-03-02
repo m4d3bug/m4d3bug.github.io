@@ -665,6 +665,7 @@ gitalk:
   labels: Gitalk
   sitemap:
     path: sitemap.xml
+  proxy: 'https://netnr-proxy.cloudno.de/https://github.com/login/oauth/access_token'
 
 
 # ---------------------------------------------------------------
