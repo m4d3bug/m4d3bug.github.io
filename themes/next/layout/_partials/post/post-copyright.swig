@@ -7,6 +7,14 @@
     <strong>{{ __('post.copyright.author') + __('symbol.colon') }} </strong>
     {{- page.author or author }}
   </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    {{ page.date.format("YYYY/MM/DD - HH:MM") }}
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    {{ page.updated.format("YYYY/MM/DD - HH:MM") }}
+  </li>
   <li class="post-copyright-link">
     <strong>{{ __('post.copyright.link') + __('symbol.colon') }}</strong>
     {{ next_url(page.permalink, page.permalink, {title: page.title}) }}
