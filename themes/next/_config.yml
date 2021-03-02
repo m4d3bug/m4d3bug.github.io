@@ -623,6 +623,7 @@ changyan:
   enable: false
   appid:
   appkey:
+    <div id="gitalk-container"></div>
   #post_meta_order: 0
 
 # Valine
@@ -661,11 +662,11 @@ gitalk:
   # Gitalk's display language depends on user's browser or system environment
   # If you want everyone visiting your site to see a uniform language, you can set a force language value
   # Available values: en | es-ES | fr | ru | zh-CN | zh-TW
-  language: 
+  language: en 
   labels: Gitalk
+  proxy: https://shielded-brushlands-08810.herokuapp.com/https://github.com/login/oauth/access_token
   sitemap:
     path: sitemap.xml
-    proxy: https://shielded-brushlands-08810.herokuapp.com/https://github.com/login/oauth/access_token
 
 
 # ---------------------------------------------------------------
