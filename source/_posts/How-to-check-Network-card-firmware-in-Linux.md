@@ -76,7 +76,8 @@ Please send this file to your support representative.
 從PCI總綫上去檢查設備型號。
 
 ```bash
-# grep -EH 'Ethernet|Network' sosreport-*/lspci                                                                               sosreport-rhel7-2020-12-16-teqlkzl/lspci:03:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 15)
+# grep -EH 'Ethernet|Network' sosreport-*/lspci                                                                               
+sosreport-rhel7-2020-12-16-teqlkzl/lspci:03:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 15)
 sosreport-rhel7-2020-12-16-teqlkzl/lspci:04:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 15)
 sosreport-rhel7-2020-12-16-teqlkzl/lspci:05:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 15)
 sosreport-rhel7-2020-12-16-teqlkzl/lspci:06:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 15)
