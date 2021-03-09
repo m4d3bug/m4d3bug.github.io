@@ -62,7 +62,8 @@ https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/vi
 
 ```
 From the KVM host
-[root@rhel7 ~]# iperf3 -i 5 -t 60 -c 192.168.122.224                                                                                                         ------------------------------------------------------------
+[root@rhel7 ~]# iperf3 -i 5 -t 60 -c 192.168.122.224                                                                                                         
+------------------------------------------------------------
 Client connecting to 192.168.122.224, TCP port 5001
 TCP window size:  204 KByte (default)
 ------------------------------------------------------------
@@ -83,7 +84,8 @@ TCP window size:  204 KByte (default)
 [  3]  0.0-60.0 sec  1.03 GBytes   147 Mbits/sec
 
 To the KVM guest
-[root@rhel76 ~]# iperf3 -i 5 -s                                                                                                                              ------------------------------------------------------------
+[root@rhel76 ~]# iperf3 -i 5 -s                                                                                                                              
+------------------------------------------------------------
 Server listening on TCP port 5001
 TCP window size: 85.3 KByte (default)
 ------------------------------------------------------------
