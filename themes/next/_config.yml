@@ -438,13 +438,13 @@ font:
   # Global font settings used for all elements inside <body>.
   global:
     external: true
-    family: Lato
+    family: EB Garamond
     size:
 
   # Font settings for site title (.site-title).
   title:
     external: true
-    family:
+    family: Roboto Slab
     size:
 
   # Font settings for headlines (<h1> to <h6>).
@@ -461,8 +461,8 @@ font:
   # Font settings for <code> and code blocks.
   codes:
     external: true
-    family: 
-    size: 12
+    family: Roboto Mono 
+    size: 9
 
 
 # ---------------------------------------------------------------
