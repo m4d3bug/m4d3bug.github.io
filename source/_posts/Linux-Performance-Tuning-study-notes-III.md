@@ -12,13 +12,15 @@ tags:
 - "CPU Content Switch "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>       
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
 本文旨在剖析CPU上下文切換的五個W。
 
 <!-- more -->
 
 ## 0x00 概念(what and why?)
+
+---
 
 - Linux在支持遠超CPU數的任務時，背後在**頻繁為任務輪流切換CPU**。
 - 每次切換均需Linux為CPU（**保存/預設**）**CPU寄存器和程序計數器**
@@ -27,6 +29,8 @@ tags:
 - 誘發場景：**[進程](https://blog.madebug.net/ops/2020-06-25-funny-with-linux-i-about-progress#0x02-%E5%9F%B7%E8%A1%8C%E5%87%BD%E6%95%B8%E7%9A%84%E4%B8%BB%E9%AB%94%EF%BC%9A%E9%80%B2%E7%A8%8B)の上下文切換、[綫程](https://blog.madebug.net/ops/2020-06-29-funny-with-linux-ii-about-multi-tasks)の上下文切換以及中斷の上下文切換。**
 
 ## 0x01 類型(who, when and where?)
+
+---
 
 ### 進程の上下文切換
 
@@ -61,6 +65,8 @@ tags:
 - 中斷，先保存前面進程，后中斷目的進程。（一次保存，一次CPU上下文切換）
 
 ## 0x02 小結
+
+---
 
 - 基本都是概念性東西。
 - 切換過多往往是性能下降的元凶之一，也是負載升高的元凶。
