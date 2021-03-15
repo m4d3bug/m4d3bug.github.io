@@ -109,12 +109,12 @@ deploy:
   repo: https://github.com/m4d3bug/m4d3bug.github.io.git
   branch: master
 
-toc:
-  maxdepth: 3
-  class: toc
-  slugify: transliteration
-  decodeEntities: false
-  anchor:
-    position: after
-    symbol: '#'
-    style: header-anchor''
+#toc:
+#  maxdepth: 3
+#  class: toc
+#  slugify: transliteration
+#  decodeEntities: false
+#  anchor:
+#    position: after
+#    symbol: '#'
+#    style: header-anchor''
