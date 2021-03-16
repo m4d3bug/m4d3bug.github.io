@@ -22,12 +22,11 @@ tags:
 
 ---
 
-- 分析：
-    - vmstat、pidstat、watch
+- 分析：vmstat、pidstat、watch
 
-        ```bash
-        # yum install procps-ng sysstat -y
-        ```
+    ```bash
+    # yum install procps-ng sysstat -y
+    ```
 
 - 压测：sysbench
 
@@ -45,7 +44,7 @@ tags:
 
 ### 事前介紹
 
-- vmstat（系统总体の上下文切换情况）
+- **vmstat**（系统总体の上下文切换情况）
 
     ```bash
     # vmstat -wSm 1 6
@@ -64,7 +63,7 @@ tags:
     - in列：每秒中断次数。
     - cs列：每秒content switch次数变化。
     - us列、sy列：user及system层面的系统CPU使用率。
-- pidstat（进程の上下文切换情况）
+- **pidstat**（进程の上下文切换情况）
 
     ```bash
     # pidstat -w -u 5
@@ -103,8 +102,8 @@ tags:
 
     - cswch/s：每秒自愿上下文切换，进程（资源耗尽）自愿进而上下文切换。
     - nvcswch/s：每秒非自愿上下文切换，进程因（优先级、时间片）因素被强制调度进而上下文切换。
-- watch（监控interrupts详情）
-- sysbench（以10个线程运行5分钟的基准测试，模拟多线程切换的问题）
+- **watch**（监控interrupts详情）
+- **sysbench**（以10个线程运行5分钟的基准测试，模拟多线程切换的问题）
 
     ```bash
     # sysbench --threads=10 --max-time=300 threads run
