@@ -19,57 +19,61 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>       
 
-本文旨在闡述，關於平均負載的知識點。
+本文旨在阐述，关于平均负载的知识点
 
 <!-- more -->
 
-## 0x00 什麽是平均負載 (*Load Averages*)
+## 0x00 什么是平均负载(Load Averages)
 
-平均負載依賴於有多少空閑核心，運行態，不可中斷態。我們可以從uptime的manual中查看到以下訊息：
+---
+
+平均负载依赖于有多少空闲核心，运行态，不可中断态。我们可以从uptime的manual中查看到以下讯息：
 
 >man uptime
 >...
->System load averages is the average number of processes that are either in a runnable or uninterruptable state. (平均負載：單位時間內，系統處於運行態和不可中斷態的進程數。)
->A process in a runnable state is either using the CPU or waiting to use the CPU.(運行態指正使用CPU或等待CPU。)
->A process in uninterruptable state is waiting for some I/O access, eg waiting for disk.(不可中斷態指正處於內核態關鍵流程，萬不可打斷，諸如等待磁盤I/O響應。“不可中斷態指系統對進程和硬件設備的保護機制。”)
->The averages are taken over the three time intervals.(參數取自三個時間間隔：1min、5min、15min)
+>System load averages is the average number of processes that are either in a runnable or uninterruptable state. (平均负载：单位时间内，系统处于运行态和不可中断态的进程数。)
+>A process in a runnable state is either using the CPU or waiting to use the CPU.(运行态指正使用CPU或等待CPU。)
+>A process in uninterruptable state is waiting for some I/O access, eg waiting for disk.(不可中断态指正处于内核态关键流程，万不可打断，诸如等待磁盘I/O响应。“不可中断态指系统对进程和硬件设备的保护机制。”)
+>The averages are taken over the three time intervals.(参数取自三个时间间隔：1min、5min、15min)
 >Load averages are not normalized for the number of CPUs in a system, so a load average of 1 means a single CPU system is loaded all the time while on a 4 CPU system it means it was idle 75% of the time.
->##一直穩定：1min≈5min≈15min
->##過去高負：1min  <<  15min  
->##目前高負：1min  >>  15min
+>##一直稳定：1min≈5min≈15min
+>##过去高负：1min  <<  15min  
+>##目前高负：1min  >>  15min
 
-### 平均負載(*Load Averages*)=運行態(*runnable*)+不可中斷態(*uninterruptable*)
+- **运行态(runnable)+不可中断态(uninterruptable)**
 
-以下算式直觀描述影響平均負載的可能因素(CPU占用，CPU等待，，IO等待)：
+  以下算式直观描述影响平均负载的可能因素(CPU占用，CPU等待，IO等待)：
 
-- *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
-- *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
-- *System Load Averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
+  - *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
+  - *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
+  - *System Load Averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
 
-### *R+ = running↓ D+ = Disk Sleep(uninterruptable sleep)↓*
+- **R+ = running↓ D+ = Disk Sleep(uninterruptable sleep)↓**
 
-```nohighlight
-[root@localhost ~]# ps -aux
-USER        PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
-root      22417  0.0  0.3  39008  3628 pts/0    R+   21:40   0:00 ps -aux
-root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
-```
+  ```nohighlight
+  [root@localhost ~]# ps -aux
+  USER        PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+  root      22417  0.0  0.3  39008  3628 pts/0    R+   21:40   0:00 ps -aux
+  root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
+  ```
 
-### 當平均負載 = 1時：
+- **当平均负载 = 1时：**
 
-這需要結合CPU數來進行判斷*CPU NUM = grep 'model name' /proc/cpuinfo | wc -l*
+  这需要结合CPU数来进行判断CPU NUM = grep 'model name' /proc/cpuinfo | wc -l
 
-- 1個CPU系統：滿載
-- 4個CPU系統：1/4滿載
+  - 1个CPU系统：满载
+  - 4个CPU系统：1/4满载
 
-**注意：** 平均負載應該小於CPU數的70%。
+- **注意：平均负载应该小于CPU数的70%。** 
 
-## 0x01 案例模擬
+## 0x01 案例模拟
 
-### 測試説明
+---
 
-- 測試工具：[*stress*](https://linux.die.net/man/1/stress)
-- 分析工具：[*sysstat*](https://man7.org/linux/man-pages/man5/sysstat.5.html) (僅使用 mpstat[CPU] 和 pidstat[pid])
+### 测试説明
+
+- 测试工具：[*stress*](https://linux.die.net/man/1/stress)
+- 分析工具：[*sysstat*](https://man7.org/linux/man-pages/man5/sysstat.5.html) (仅使用 mpstat[CPU] 和 pidstat[pid])
 
 ```nohighlight
 [root@localhost ~]# screenfetch 
@@ -98,18 +102,18 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
 ### CPU占用
 
--  **Windows 1**
+#### Windows 1
 
-  施加一個持續10分鐘的CPU占用。
+  施加一个持续**10分钟的CPU占用**。
   
   ```nohighlight
   [root@localhost ~]# stress --cpu 1 --timeout 600
   stress: info: [19751] dispatching hogs: 1 cpu, 0 io, 0 vm, 0 hd
   ```
 
--  **Windows 2**
+#### Windows 2
 
-  每兩秒輸出*uptime*命令的結果。
+  每两秒**输出uptime**命令的结果。
 
   ```nohighlight
   [root@localhost ~]# watch -d uptime
@@ -118,9 +122,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   23:39:47 up  1:09,  4 users,  load average: 0.85, 0.68, 0.36
   ```
 
--  **Windows 3**
+#### Windows 3
 
-  使用mpstat來每5秒輸出，可以看到*%usr*顯著升高。
+  使用mpstat来每5秒输出，可以看到**%usr显着升高。**
   
   ```nohighlight
   [root@localhost ~]# mpstat -P ALL 5
@@ -140,7 +144,7 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   11:41:33 PM    1  1.80  0.00  0.40  0.20   0.00   0.00    0.00    0.00    0.00  97.60
   ```
 
--  **Windows 4**
+#### Windows 4
 
   ```nohighlight
   [root@localhost ~]# pidstat -u 5
@@ -152,22 +156,22 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   10:40:14 PM     0     18043  100.00    0.00    0.00    0.00  100.00     1  stress
   ```
 
-現在我們可以看見平均負載的升高是因爲CPU占用。
+  现在我们可以看见平均负载的**升高是因为CPU占用**。
 
 ### IO等待
 
-- **Windows 1**
+#### Windows 1
 
-  施加一個持續10分鐘的io寫入。
+  施加一个持续**10分钟的io写入。**
   
   ``` nohighlight
   [root@localhost ~]# stress -i 1 --timeout 600
   stress: info: [15703] dispatching hogs: 0 cpu, 1 io, 0 vm, 0 hdd
   ```
 
-- **Windows 2**
+#### Windows 2
 
-  Load Average一分鐘内數值飆升至1.06
+  Load Average**一分钟内数值飙升至1.06。**
 
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
@@ -176,9 +180,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
    21:34:11 up 6 min,  4 users,  load average: 1.05, 0.62, 0.27
   ```
 
-- **Windows 3**
+#### Windows 3
 
-  只有一個CPU的%iowait上升。
+  **只有一个CPU的%iowait上升。**
 
   ```nohighlight
   [root@localhost ~]# mpstat -P ALL 5 3
@@ -198,9 +202,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   09:36:20 PM    1 0.20  0.00  43.75 33.87  0.00   0.00    0.00    0.00    0.00  22.18
   ```
 
-- **Windows 4**
+#### Windows 4
 
-  Load Average上升是因爲等待I/O
+  Load Average**上升是因爲等待I/O。**
 
   ``` nohighlight
   [root@localhost ~]# pidstat -u 5 1
@@ -214,16 +218,16 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
 
 ### CPU等待
 
-- **Windows 1**
+#### Windows 1
 
   ``` nohighlight
   [root@localhost ~]# stress --cpu 8 --timeout 600
   stress: info: [9168] dispatching hogs: 8 cpu, 0 io, 0 vm, 0 hdd
   ```
 
-- **Windows 2**
+#### Windows 2
 
-  平均負載在一分鐘内逼近10.00
+  Load Average在**一分钟内逼近10.00。**
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
   Every 2.0s: uptime                                                          Tue Sep  3 22:08:46 2019
@@ -231,9 +235,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
    22:08:46 up 41 min,  4 users,  load average: 9.34, 8.13, 4.66
   ```
 
-- **Windows 3**
+#### Windows 3
 
-  全體CPU的%usr都在上升。
+  全体CPU的%usr都在上升。
 
   ``` nohighlight
   [root@localhost ~]# mpstat -P ALL 5 3
@@ -253,9 +257,9 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   10:00:07 PM    1 99.60  0.00  0.40  0.00   0.00  0.00    0.00    0.00    0.00    0.00
   ```
 
-- **Windows 4**
+#### Windows 4
 
-  Load Average上升時因爲等待CPU，也即是%wait
+  Load Average上升时因为等待CPU，也即是%wait。
 
   ```nohighlight
   [root@localhost ~]# pidstat -u 5 1
@@ -273,18 +277,20 @@ root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   10:33:49 PM     0     16495   24.75    0.00    0.00   75.65   24.75     1  stress
   ```
 
-## 0x02 結語
+## 0x02 结语
 
-### Load Averages = running(運行態) + uninterruptable(不可中斷態)
+---
+
+### Load Averages = running(运行态) + uninterruptable(不可中断态)
 
 - *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
 - *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
 - *System Load Averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
 
-### 平均負載可以通過以下公式進行計算。
+### 平均负载可以通过以下公式进行计算。
 
 >load(t) = n+((load(t-1)-n)/e^(interval/(min*60)))
->load(t): 平均負載的時間.
->n: 運行態和不可中斷態的綫程數
->interval: 計算間隔，RHEL是5秒
->min: 負載的時長(分鐘數)
+>load(t): 平均负载的时间.
+>n: 运行态和不可中断态的綫程数
+>interval: 计算间隔，RHEL是5秒
+>min: 负载的时长(分钟数)

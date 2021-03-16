@@ -26,27 +26,21 @@ tags:
 
 性能分析的本质，就是找出应用或系统的瓶颈，并设法去避免或者缓解它们。
 
----
-
 ## 0x01 不同侧分析问题的次序
 
 ---
 
 <center><font size="5"><B>↓从应用侧（吞吐量，延迟……）↓</B></font></center>
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411112804.png" width=50% /></center>
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411112804.png" width=60% /></center>
 
 <center><font size="5"><B>↑从系统侧（CPU, 内存……）↑</B></font></center>
-
----
 
 ## 0x02 Linux各方面相关的工具
 
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411112954.png" width=100% /></center>
-
----
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411112954.png" width=120% /></center>
 
 ## 0x03 Linux调优的脑图
 
@@ -54,13 +48,10 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411113050.png" width=100% /></center>
 
----
-
 ## 0x04 结语
 
 ---
 
 - *High concurrency means a big throughput, and fast response means a small delay.* 高并發就是吞吐大，响应快就是延时小。
 
----
 
