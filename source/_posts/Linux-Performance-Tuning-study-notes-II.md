@@ -72,8 +72,8 @@ tags:
 
 ### 测试説明
 
-- 测试工具：[*stress*](https://linux.die.net/man/1/stress)
-- 分析工具：[*sysstat*](https://man7.org/linux/man-pages/man5/sysstat.5.html) (仅使用 mpstat[CPU] 和 pidstat[pid])
+- 测试工具：[**stress**](https://linux.die.net/man/1/stress)
+- 分析工具：[**sysstat**](https://man7.org/linux/man-pages/man5/sysstat.5.html) (仅使用 mpstat[CPU] 和 pidstat[pid])
 
 ```nohighlight
 [root@localhost ~]# screenfetch 
@@ -104,7 +104,7 @@ tags:
 
 #### Windows 1
 
-  施加一个持续**10分钟的CPU占用**。
+  施加一个持续**10min的一个CPU占用**。
   
   ```nohighlight
   [root@localhost ~]# stress --cpu 1 --timeout 600
@@ -117,46 +117,46 @@ tags:
 
   ```nohighlight
   [root@localhost ~]# watch -d uptime
-  Every 2.0s: uptime                                            Mon Sep  2 23:39:47 2019
+  Every 2.0s: uptime                                      Mon Sep  2 23:39:47 2019
   
   23:39:47 up  1:09,  4 users,  load average: 0.85, 0.68, 0.36
   ```
 
 #### Windows 3
 
-  使用mpstat来每5秒输出，可以看到**%usr显着升高。**
+  使用mpstat来每5s输出，可以看到**%usr列显着升高。**
   
   ```nohighlight
-  [root@localhost ~]# mpstat -P ALL 5
-  11:41:18 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
-  11:41:23 PM  all 50.15  0.00  0.20  0.10   0.00   0.10    0.00    0.00    0.00  49.45
-  11:41:23 PM    0 100.00 0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00   0.00
-  11:41:23 PM    1  0.20  0.00  0.40  0.00   0.00   0.00    0.00    0.00    0.00  99.40
-  
-  11:41:23 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
-  11:41:28 PM  all 50.25  0.00  0.30  0.00   0.00   0.00    0.00    0.00    0.00  49.45
-  11:41:28 PM    0 94.81  0.00  0.20  0.00   0.00   0.00    0.00    0.00    0.00   4.99
-  11:41:28 PM    1  5.61  0.00  0.40  0.00   0.00   0.00    0.00    0.00    0.00  93.99
-  
-  11:41:28 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
-  11:41:33 PM  all 50.25  0.00  0.20  0.10   0.00   0.00    0.00    0.00    0.00  49.45
-  11:41:33 PM    0 98.60  0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00   1.40
-  11:41:33 PM    1  1.80  0.00  0.40  0.20   0.00   0.00    0.00    0.00    0.00  97.60
+    [root@localhost ~]# mpstat -P ALL 5
+    11:41:18 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
+    11:41:23 PM  all 50.15  0.00  0.20  0.10   0.00   0.10    0.00    0.00    0.00  49.45
+  >>11:41:23 PM    0 100.00 0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00   0.00
+    11:41:23 PM    1  0.20  0.00  0.40  0.00   0.00   0.00    0.00    0.00    0.00  99.40
+    
+    11:41:23 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
+    11:41:28 PM  all 50.25  0.00  0.30  0.00   0.00   0.00    0.00    0.00    0.00  49.45
+  >>11:41:28 PM    0 94.81  0.00  0.20  0.00   0.00   0.00    0.00    0.00    0.00   4.99
+    11:41:28 PM    1  5.61  0.00  0.40  0.00   0.00   0.00    0.00    0.00    0.00  93.99
+    
+    11:41:28 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
+    11:41:33 PM  all 50.25  0.00  0.20  0.10   0.00   0.00    0.00    0.00    0.00  49.45
+  >>11:41:33 PM    0 98.60  0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00   1.40
+    11:41:33 PM    1  1.80  0.00  0.40  0.20   0.00   0.00    0.00    0.00    0.00  97.60             
   ```
 
 #### Windows 4
 
-  ```nohighlight
-  [root@localhost ~]# pidstat -u 5
-  10:40:09 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
-  10:40:14 PM     0      2853    0.20    0.20    0.00    0.40    0.40     0  YDService
-  10:40:14 PM     0      3303    0.00    0.20    0.00    0.00    0.20     0  sshd
-  10:40:14 PM     0      3750    0.40    0.40    0.00    0.00    0.80     0  barad_agent
-  10:40:14 PM     0      4179    0.20    0.00    0.00    0.00    0.20     0  watch
-  10:40:14 PM     0     18043  100.00    0.00    0.00    0.00  100.00     1  stress
-  ```
-
   现在我们可以看见平均负载的**升高是因为CPU占用**。
+
+  ```nohighlight
+    [root@localhost ~]# pidstat -u 5
+    10:40:09 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+    10:40:14 PM     0      2853    0.20    0.20    0.00    0.40    0.40     0  YDService
+    10:40:14 PM     0      3303    0.00    0.20    0.00    0.00    0.20     0  sshd
+    10:40:14 PM     0      3750    0.40    0.40    0.00    0.00    0.80     0  barad_agent
+    10:40:14 PM     0      4179    0.20    0.00    0.00    0.00    0.20     0  watch
+  >>10:40:14 PM     0     18043  100.00    0.00    0.00    0.00  100.00     1  stress
+  ```
 
 ### IO等待
 
@@ -175,45 +175,45 @@ tags:
 
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
-  Every 2.0s: uptime                                                          Tue Sep  3 21:34:11 2019
+  Every 2.0s: uptime                                       Tue Sep  3 21:34:11 2019
   
    21:34:11 up 6 min,  4 users,  load average: 1.05, 0.62, 0.27
   ```
 
 #### Windows 3
 
-  **只有一个CPU的%iowait上升。**
+  只有一个CPU的**%iowait上升。**
 
   ```nohighlight
-  [root@localhost ~]# mpstat -P ALL 5 3
-  09:36:05 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
-  09:36:10 PM  all 0.50  0.00 29.03  21.27  0.00   0.00    0.00    0.00    0.00  49.19
-  09:36:10 PM    0 0.81  0.00 25.15  17.44  0.00   0.00    0.00    0.00    0.00  56.59
-  09:36:10 PM    1 0.20  0.00 32.73  25.10  0.00   0.00    0.00    0.00    0.00  41.97
-  
-  09:36:10 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
-  09:36:15 PM  all 0.30  0.00 29.43  21.42  0.00   0.00    0.00    0.00    0.00  48.85
-  09:36:15 PM    0 0.40  0.00 20.61  15.15  0.00   0.00    0.00    0.00    0.00  63.84
-  09:36:15 PM    1 0.00  0.00 38.29  27.58  0.00   0.00    0.00    0.00    0.00  34.13
-  
-  09:36:15 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
-  09:36:20 PM  all 0.30  0.00  28.61 21.54  0.00   0.00    0.00    0.00    0.00  49.54
-  09:36:20 PM    0 0.41  0.00  13.18  9.13  0.00   0.00    0.00    0.00    0.00  77.28
-  09:36:20 PM    1 0.20  0.00  43.75 33.87  0.00   0.00    0.00    0.00    0.00  22.18
+    [root@localhost ~]# mpstat -P ALL 5 3
+    09:36:05 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
+    09:36:10 PM  all 0.50  0.00 29.03  21.27  0.00   0.00    0.00    0.00    0.00  49.19
+    09:36:10 PM    0 0.81  0.00 25.15  17.44  0.00   0.00    0.00    0.00    0.00  56.59
+  >>09:36:10 PM    1 0.20  0.00 32.73  25.10  0.00   0.00    0.00    0.00    0.00  41.97
+    
+    09:36:10 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
+  >>09:36:15 PM  all 0.30  0.00 29.43  21.42  0.00   0.00    0.00    0.00    0.00  48.85
+    09:36:15 PM    0 0.40  0.00 20.61  15.15  0.00   0.00    0.00    0.00    0.00  63.84
+    09:36:15 PM    1 0.00  0.00 38.29  27.58  0.00   0.00    0.00    0.00    0.00  34.13
+    
+    09:36:15 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
+    09:36:20 PM  all 0.30  0.00  28.61 21.54  0.00   0.00    0.00    0.00    0.00  49.54
+    09:36:20 PM    0 0.41  0.00  13.18  9.13  0.00   0.00    0.00    0.00    0.00  77.28
+  >>09:36:20 PM    1 0.20  0.00  43.75 33.87  0.00   0.00    0.00    0.00    0.00  22.18
   ```
 
 #### Windows 4
 
-  Load Average**上升是因爲等待I/O。**
+  Load Average**上升是因为等待I/O。**
 
   ``` nohighlight
-  [root@localhost ~]# pidstat -u 5 1
-  10:37:29 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
-  10:37:34 PM     0      1232    0.00    0.40    0.00    0.00    0.40     0 kworker/0:1H
-  10:37:34 PM     0      2853    0.40    0.40    0.00    0.60    0.80     1  YDService
-  10:37:34 PM     0      3750    0.20    0.00    0.00    0.00    0.20     0  barad_agent
-  10:37:34 PM     0     16458    0.00    0.20    0.00    0.00    0.20     0  pidstat
-  10:37:34 PM     0     17460    0.00   85.20    0.00    0.40   85.20     1  stress
+    [root@localhost ~]# pidstat -u 5 1
+    10:37:29 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+    10:37:34 PM     0      1232    0.00    0.40    0.00    0.00    0.40     0 kworker/0:1H
+    10:37:34 PM     0      2853    0.40    0.40    0.00    0.60    0.80     1  YDService
+    10:37:34 PM     0      3750    0.20    0.00    0.00    0.00    0.20     0  barad_agent
+    10:37:34 PM     0     16458    0.00    0.20    0.00    0.00    0.20     0  pidstat
+  >>10:37:34 PM     0     17460    0.00   85.20    0.00    0.40   85.20     1  stress 
   ```
 
 ### CPU等待
@@ -230,7 +230,7 @@ tags:
   Load Average在**一分钟内逼近10.00。**
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
-  Every 2.0s: uptime                                                          Tue Sep  3 22:08:46 2019
+  Every 2.0s: uptime                                        Tue Sep  3 22:08:46 2019
   
    22:08:46 up 41 min,  4 users,  load average: 9.34, 8.13, 4.66
   ```
@@ -241,6 +241,7 @@ tags:
 
   ``` nohighlight
   [root@localhost ~]# mpstat -P ALL 5 3
+                      v
   09:59:51 PM CPU   %usr %nice  %sys %iowait %irq %soft  %steal  %guest  %gnice  %idle
   09:59:57 PM  all 99.70  0.00  0.20  0.10   0.00  0.10    0.00    0.00    0.00   0.00
   09:59:57 PM    0 99.80  0.00  0.20  0.00   0.00  0.00    0.00    0.00    0.00   0.00
@@ -263,6 +264,7 @@ tags:
 
   ```nohighlight
   [root@localhost ~]# pidstat -u 5 1
+                                                          v
   10:33:44 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
   10:33:49 PM     0      2774    0.00    0.20    0.00    0.00    0.20     1  auditd
   10:33:49 PM     0      2853    0.20    0.20    0.00   74.45    0.40     1  YDService
@@ -291,6 +293,6 @@ tags:
 
 >load(t) = n+((load(t-1)-n)/e^(interval/(min*60)))
 >load(t): 平均负载的时间.
->n: 运行态和不可中断态的綫程数
+>n: 运行态和不可中断态的线程数
 >interval: 计算间隔，RHEL是5秒
 >min: 负载的时长(分钟数)
