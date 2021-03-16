@@ -117,7 +117,7 @@ tags:
 
   ```nohighlight
   [root@localhost ~]# watch -d uptime
-  Every 2.0s: uptime                                      Mon Sep  2 23:39:47 2019
+  Every 2.0s: uptime                          Mon Sep  2 23:39:47 2019
   
   23:39:47 up  1:09,  4 users,  load average: 0.85, 0.68, 0.36
   ```
@@ -143,7 +143,7 @@ tags:
     11:41:33 PM  all 50.25  0.00  0.20  0.10   0.00   0.00    0.00    0.00    0.00  49.45
   >>11:41:33 PM    0 98.60  0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00   1.40
     11:41:33 PM    1  1.80  0.00  0.40  0.20   0.00   0.00    0.00    0.00    0.00  97.60 
-                
+
   ```
 
 #### Windows 4
@@ -179,7 +179,7 @@ tags:
 
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
-  Every 2.0s: uptime                                       Tue Sep  3 21:34:11 2019
+  Every 2.0s: uptime                           Tue Sep  3 21:34:11 2019
   
    21:34:11 up 6 min,  4 users,  load average: 1.05, 0.62, 0.27
   ```
@@ -238,7 +238,7 @@ tags:
   Load Average在**一分钟内逼近10.00。**
   ``` nohighlight
   [root@localhost ~]# watch -d uptime
-  Every 2.0s: uptime                                        Tue Sep  3 22:08:46 2019
+  Every 2.0s: uptime                            Tue Sep  3 22:08:46 2019
   
    22:08:46 up 41 min,  4 users,  load average: 9.34, 8.13, 4.66
   ```
