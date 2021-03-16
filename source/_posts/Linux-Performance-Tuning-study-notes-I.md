@@ -24,7 +24,7 @@ tags:
 
 性能问题的本质，就是系统资源已经达到瓶颈，但请求的处理却还不够快，无法支撑更多的请求。
 
-性能分析，其实就是找出应用或系统的瓶颈，并设法去避免或者缓解它们。
+性能分析的本质，就是找出应用或系统的瓶颈，并设法去避免或者缓解它们。
 
 ---
 
@@ -44,7 +44,7 @@ tags:
 
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411112954.png" width=50% /></center>
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411112954.png" width=100% /></center>
 
 ---
 
@@ -52,7 +52,7 @@ tags:
 
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411113050.png" width=80% /></center>
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411113050.png" width=100% /></center>
 
 ---
 
