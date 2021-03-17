@@ -27,7 +27,7 @@ tags:
 
 ---
 
-平均负载依赖于有多少空闲核心，运行态，不可中断态。我们可以从uptime的manual中查看到以下讯息：
+我们可以从uptime的manual中查看到以下讯息：
 
 >man uptime
 >...
@@ -35,20 +35,27 @@ tags:
 >A process in a runnable state is either using the CPU or waiting to use the CPU.(运行态指正使用CPU或等待CPU。)
 >A process in uninterruptable state is waiting for some I/O access, eg waiting for disk.(不可中断态指正处于内核态关键流程，万不可打断，诸如等待磁盘I/O响应。“不可中断态指系统对进程和硬件设备的保护机制。”)
 >The averages are taken over the three time intervals.(参数取自三个时间间隔：1min、5min、15min)
+>**一直稳定：1min≈5min≈15min**
+>**过去高负：1min  <<  15min**  
+>**目前高负：1min  >>  15min**
 >Load averages are not normalized for the number of CPUs in a system, so a load average of 1 means a single CPU system is loaded all the time while on a 4 CPU system it means it was idle 75% of the time.
->##一直稳定：1min≈5min≈15min
->##过去高负：1min  <<  15min  
->##目前高负：1min  >>  15min
+>**(平均负载未针对CPU个数调整，因为数值1在1个CPU和4个CPU的系统有不同的意味。)**
+>**当平均负载 = 1时：**
+>**这需要结合CPU数(CPU NUM = grep 'model name' /proc/cpuinfo | wc -l)来进行判断**
+>**- 1个CPU系统：满载**
+>**- 4个CPU系统：1/4满载**
 
 - **运行态(runnable)+不可中断态(uninterruptable)**
 
   以下算式直观描述影响平均负载的可能因素(CPU占用，CPU等待，IO等待)：
+  平均负载升高不一定CPU升高，例如等待I/O
 
   - *System Load Averages ↑ = Using CPU ↑ + Waiting CPU + Waiting I/O*
   - *System Load Averages ↑ = Using CPU + Waiting CPU  ↑ + Waiting I/O*
   - *System Load Averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
 
-- **R+ = running↓ D+ = Disk Sleep(uninterruptable sleep)↓**
+- **可运行态的进程R：Running Runnable,不可中断态的进程D：Disk Sleep(uninterruptable sleep)**
+R+ = running↓ D+ = Disk Sleep(uninterruptable sleep)↓**
 
   ```nohighlight
   [root@localhost ~]# ps -aux
@@ -57,12 +64,6 @@ tags:
   root      22418  0.0  0.1  22016  1624 pts/0    D+   21:40   0:00 -bash
   ```
 
-- **当平均负载 = 1时：**
-
-  这需要结合CPU数来进行判断CPU NUM = grep 'model name' /proc/cpuinfo | wc -l
-
-  - 1个CPU系统：满载
-  - 4个CPU系统：1/4满载
 
 - **注意：平均负载应该小于CPU数的70%。** 
 
@@ -100,7 +101,7 @@ tags:
 [root@localhost ~]# yum install -y stress sysstat-11.7.3-3.fc30.x86_64.rpm
 ```
 
-### CPU占用
+### CPU占用（CPU密集型进程）
 
 #### Windows 1
 
@@ -124,11 +125,11 @@ tags:
 
 #### Windows 3
 
-  使用mpstat来每5s输出，可以看到**%usr列显着升高。**
+  使用mpstat来每5s输出，可以看到**单个CPU使用率%usr列显着升高。**
   
   ```nohighlight
     [root@localhost ~]# mpstat -P ALL 5
-
+                      v
     11:41:18 PM  CPU %usr  %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
     11:41:23 PM  all 50.15  0.00  0.20  0.10   0.00   0.10    0.00    0.00    0.00  49.45
   >>11:41:23 PM    0 100.00 0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00   0.00
@@ -143,12 +144,12 @@ tags:
     11:41:33 PM  all 50.25  0.00  0.20  0.10   0.00   0.00    0.00    0.00    0.00  49.45
   >>11:41:33 PM    0 98.60  0.00  0.00  0.00   0.00   0.00    0.00    0.00    0.00   1.40
     11:41:33 PM    1  1.80  0.00  0.40  0.20   0.00   0.00    0.00    0.00    0.00  97.60 
-
+                      ^
   ```
 
 #### Windows 4
 
-  现在我们可以看见平均负载的**升高是因为CPU占用**。
+  现在我们可以看见平均负载的**升高是因为CPU被占用**。
 
   ```nohighlight
     [root@localhost ~]# pidstat -u 5
@@ -162,7 +163,7 @@ tags:
 
   ```
 
-### IO等待
+### IO等待（I/O密集型进程）
 
 #### Windows 1
 
@@ -186,26 +187,26 @@ tags:
 
 #### Windows 3
 
-  只有一个CPU的**%iowait上升。**
+  仅一个CPU的**%iowait上升。**
 
   ```nohighlight
     [root@localhost ~]# mpstat -P ALL 5 3
-
+                                         v
     09:36:05 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
     09:36:10 PM  all 0.50  0.00 29.03  21.27  0.00   0.00    0.00    0.00    0.00  49.19
     09:36:10 PM    0 0.81  0.00 25.15  17.44  0.00   0.00    0.00    0.00    0.00  56.59
   >>09:36:10 PM    1 0.20  0.00 32.73  25.10  0.00   0.00    0.00    0.00    0.00  41.97
     
     09:36:10 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
-  >>09:36:15 PM  all 0.30  0.00 29.43  21.42  0.00   0.00    0.00    0.00    0.00  48.85
+    09:36:15 PM  all 0.30  0.00 29.43  21.42  0.00   0.00    0.00    0.00    0.00  48.85
     09:36:15 PM    0 0.40  0.00 20.61  15.15  0.00   0.00    0.00    0.00    0.00  63.84
-    09:36:15 PM    1 0.00  0.00 38.29  27.58  0.00   0.00    0.00    0.00    0.00  34.13
+  >>09:36:15 PM    1 0.00  0.00 38.29  27.58  0.00   0.00    0.00    0.00    0.00  34.13
     
     09:36:15 PM  CPU %usr %nice  %sys %iowait %irq  %soft  %steal  %guest  %gnice  %idle
     09:36:20 PM  all 0.30  0.00  28.61 21.54  0.00   0.00    0.00    0.00    0.00  49.54
     09:36:20 PM    0 0.41  0.00  13.18  9.13  0.00   0.00    0.00    0.00    0.00  77.28
   >>09:36:20 PM    1 0.20  0.00  43.75 33.87  0.00   0.00    0.00    0.00    0.00  22.18
-
+                                         ^
   ```
 
 #### Windows 4
@@ -214,7 +215,7 @@ tags:
 
   ``` nohighlight
     [root@localhost ~]# pidstat -u 5 1
-
+                                            V 
     10:37:29 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
     10:37:34 PM     0      1232    0.00    0.40    0.00    0.00    0.40     0  kworker/0:1H
     10:37:34 PM     0      2853    0.40    0.40    0.00    0.60    0.80     1  YDService
@@ -224,7 +225,7 @@ tags:
 
   ```
 
-### CPU等待
+### CPU等待（大量进程）
 
 #### Windows 1
 
@@ -245,7 +246,7 @@ tags:
 
 #### Windows 3
 
-  全体CPU的%usr都在上升。
+  使用mpstat来每5s输出，可以看到**全体CPU使用率%usr列显着升高。**
 
   ``` nohighlight
   [root@localhost ~]# mpstat -P ALL 5 3
@@ -269,24 +270,24 @@ tags:
 
 #### Windows 4
 
-  Load Average上升时因为等待CPU，也即是%wait。
+  pidstat来追踪进程，可以发现大量stress进程在抢占CPU。
 
   ```nohighlight
-  [root@localhost ~]# pidstat -u 5 1
-                                                          v
-  10:33:44 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
-  10:33:49 PM     0      2774    0.00    0.20    0.00    0.00    0.20     1  auditd
-  10:33:49 PM     0      2853    0.20    0.20    0.00   74.45    0.40     1  YDService
-  10:33:49 PM     0     16458    0.00    0.20    0.00    0.20    0.20     0  pidstat
-  10:33:49 PM     0     16488   24.55    0.00    0.00   75.65   24.55     0  stress
-  10:33:49 PM     0     16489   24.55    0.00    0.00   75.05   24.55     0  stress
-  10:33:49 PM     0     16490   24.75    0.00    0.00   75.45   24.75     0  stress
-  10:33:49 PM     0     16491   24.75    0.00    0.00   74.65   24.75     1  stress
-  10:33:49 PM     0     16492   24.95    0.00    0.00   75.45   24.95     1  stress
-  10:33:49 PM     0     16493   24.95    0.00    0.00   75.05   24.95     1  stress
-  10:33:49 PM     0     16494   24.35    0.00    0.00   75.05   24.35     0  stress
-  10:33:49 PM     0     16495   24.75    0.00    0.00   75.65   24.75     1  stress
-                                                          ^
+    [root@localhost ~]# pidstat -u 5 1   
+                                                        
+    10:33:44 PM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+    10:33:49 PM     0      2774    0.00    0.20    0.00    0.00    0.20     1  auditd
+    10:33:49 PM     0      2853    0.20    0.20    0.00   74.45    0.40     1  YDService
+    10:33:49 PM     0     16458    0.00    0.20    0.00    0.20    0.20     0  pidstat
+  >>10:33:49 PM     0     16488   24.55    0.00    0.00   75.65   24.55     0  stress
+  >>10:33:49 PM     0     16489   24.55    0.00    0.00   75.05   24.55     0  stress
+  >>10:33:49 PM     0     16490   24.75    0.00    0.00   75.45   24.75     0  stress
+  >>10:33:49 PM     0     16491   24.75    0.00    0.00   74.65   24.75     1  stress
+  >>10:33:49 PM     0     16492   24.95    0.00    0.00   75.45   24.95     1  stress
+  >>10:33:49 PM     0     16493   24.95    0.00    0.00   75.05   24.95     1  stress
+  >>10:33:49 PM     0     16494   24.35    0.00    0.00   75.05   24.35     0  stress
+  >>10:33:49 PM     0     16495   24.75    0.00    0.00   75.65   24.75     1  stress
+                                                        
   ```
 
 ## 0x02 结语
