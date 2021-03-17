@@ -55,7 +55,7 @@ tags:
   - *System Load Averages ↑ = Using CPU + Waiting CPU  + Waiting I/O ↑*
 
 - **可运行态的进程R：Running Runnable,不可中断态的进程D：Disk Sleep(uninterruptable sleep)**
-R+ = running↓ D+ = Disk Sleep(uninterruptable sleep)↓**
+  **R+ = running↓ D+ = Disk Sleep(uninterruptable sleep)↓**
 
   ```nohighlight
   [root@localhost ~]# ps -aux
