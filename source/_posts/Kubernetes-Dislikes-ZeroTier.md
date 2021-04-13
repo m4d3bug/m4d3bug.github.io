@@ -22,7 +22,7 @@ tags:
 
 <!-- more -->
 
-## 機器情況
+## 0x00 機器情況
 
 ---
 
@@ -32,11 +32,11 @@ tags:
 | 搬瓦工 | 2C2G | 美國洛杉磯 |
 | Ucloud | 1C1G | 中國香港   |
 
-## *ZeroTier* 部分
+## 0x01 ZeroTier部分
 
 ---
 
-### 加入*ZeroTier* 組網
+### 加入ZeroTier組網
 
 #### 安裝軟體
 
@@ -52,9 +52,9 @@ tags:
 
 #### 機器網絡狀況
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/machinesNetworks.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png)
+![https://img.madebug.net/m4d3bug/images-of-website/master/blog/machinesNetworks.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/machinesNetworks.png)
 
-#### 寫入靜態*IP* 和*hostname*
+#### 寫入靜態IP 和hostname
 
 ```bash
 # cat >> /etc/hosts << EOF
@@ -65,20 +65,20 @@ EOF
 # hostnamectl set-hostname xxx.m4d3bug.com
 ```
 
-## *K8S* 部分
+## 0x02 K8S 部分
 
 ---
 
 ### 系統預設定
 
-#### 確保*selinux* 為寬容模式
+#### 確保selinux為寬容模式
 
 ```bash
 # setenforce 0
 setenforce: SELinux is disabled
 ```
 
-#### 關閉*firewalld*
+#### 關閉firewalld
 
 云供應商們基本都關掉了，所以沒什麽回顯。
 
@@ -87,9 +87,9 @@ setenforce: SELinux is disabled
 # systemctl stop firewalld
 ```
 
-#### 选择性關閉*swap*
+#### 选择性關閉swap
 
-在*master* 節點以外操作。
+在master節點以外操作。
 
 ```bash
 # swapoff -a
@@ -113,7 +113,7 @@ EOF
 
 ### 開始安裝
 
-#### 安裝*Docker* 軟體
+#### 安裝Docker軟體
 
 ```bash
 # yum-config-manager \
@@ -127,9 +127,9 @@ Docker version 19.03.12, build 48a66213fe
 Created symlink from /etc/systemd/system/multi-user.target.wants/docker.service to /usr/lib/systemd/system/docker.service.
 ```
 
-#### 加入代理設定到*Docker* 中
+#### 加入代理設定到Docker中
 
-順便説一嘴，可以在*ZeroTier* 組網裏起一個代理。
+順便説一嘴，可以在ZeroTier組網裏起一個代理。
 
 ```bash
 # mkdir /usr/lib/systemd/system/docker.service.d
@@ -155,7 +155,7 @@ EOF
 
 #### 加入谷歌倉庫
 
-同樣加入*ZeroTier* 中的代理地址。
+同樣加入ZeroTier中的代理地址。
 
 ```bash
 # cat <<'EOF' > /etc/yum.repos.d/kubernetes.repo
@@ -183,7 +183,7 @@ kubelet-1.18.8-0.x86_64
 # kubeadm config images pull
 ```
 
-*master* 節點只是一隻小鷄鷄，所以就不關它的*swap* 了。
+master節點只是一隻小鷄鷄，所以就不關它的swap了。
 
 ```nohighlight
 # vim /etc/sysconfig/kubelet
@@ -192,9 +192,9 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
 
 #### 安裝集群
 
-在v1.8.0之後的版本，kubeadm提供了一種[分階段的構建方式](https://kubernetes.io/zh/docs/reference/setup-tools/kubeadm/kubeadm-init/)，構建*etcd* 是其中的一個*phase* ，在啓動前我們需要對其中的參數進行修改。
+在v1.8.0之後的版本，kubeadm提供了一種[分階段的構建方式](https://kubernetes.io/zh/docs/reference/setup-tools/kubeadm/kubeadm-init/)，構建etcd是其中的一個phase，在啓動前我們需要對其中的參數進行修改。
 
-- 定制該版本的*kubeadm-config.yml*
+- 定制該版本的kubeadm-config.yml
 
   ```bash
   # kubeadm config print init-defaults  > kubeadm-config.yaml
@@ -240,31 +240,31 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
   scheduler: {}
   ```
 
--  *preflight* 階段
+- preflight階段
 
   ```bash
   # kubeadm init phase preflight --config kubeadm-config.yaml --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Swap
   ```
 
--  *kubelet-start*  階段
+- kubelet-start階段
 
   ```bash
   # kubeadm init phase kubelet-start --config kubeadm-config.yaml
   ```
 
-- *cert* 階段
+- cert階段
 
   ```bash
   # kubeadm init phase certs all --config kubeadm-config.yaml
   ```
 
--  *kubeconfig*  階段
+- kubeconfig階段
 
   ```bash
   # kubeadm init phase kubeconfig all --config kubeadm-config.yaml
   ```
 
--  *control-plane*  階段
+- control-plane階段
 
   ```bash
   # kubeadm init phase control-plane all --config kubeadm-config.yaml
@@ -365,7 +365,7 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
       --discovery-token-ca-cert-hash sha256:f14e90eda52b285b41ddb5d34a4dcf21f55ed66831015c4ca1a996cf17754143 
   ```
 
-- 部署*flannel* 
+- 部署flannel 
 
   ```bash
   # wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
@@ -396,17 +396,17 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
 
 ---
 
-一套下來，*UDP* 的通信可靠性還是名不虛傳，除非等待*HTTP3.0/quic* 協議普及吧，這樣子運營商也許就不會對UDP那麽狠了，所以奉勸各位還是別折騰這條路了，後面或許會嘗試使用[*GRE* 方式](https://feisky.xyz/posts/2015-03-02-setting-up-gre-for-kubernetes/)來再嘗試一次。以下是部署后情況：
+一套下來，UDP的通信可靠性還是名不虛傳，除非等待HTTP3.0/quic協議普及吧，這樣子運營商也許就不會對UDP那麽狠了，所以奉勸各位還是別折騰這條路了，後面或許會嘗試使用[GRE方式](https://feisky.xyz/posts/2015-03-02-setting-up-gre-for-kubernetes/)來再嘗試一次。以下是部署后情況：
 
-可以見到，即使加入成功也都是充斥著大量因爲*timeout* 造成的*failed* 的信息在其中。
+可以見到，即使加入成功也都是充斥著大量因爲timeout造成的failed的信息在其中。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/failedzerotier.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/failedzerotier.png)
 
-其後，通過睡了一覺，白天時分，*QOS* 緩和的時候，順利將剩下搬瓦工節點加入。
+其後，通過睡了一覺，白天時分，QOS緩和的時候，順利將剩下搬瓦工節點加入。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png)
 
-但也證明，*SDN* 跨運營商，以*node* 為最小單位組建K8S集群是可行的，但是需要💰。因此不難理解爲什麽現在混合雲架構都是傾向于以一個帶*master* 節點集群為最小單位組建集群。~<font color=#808080>或許可以試試每個節點都是單master的去污點化部署。</font>~
+但也證明，SDN跨運營商，以node為最小單位組建K8S集群是可行的，但是需要💰。因此不難理解爲什麽現在混合雲架構都是傾向于以一個帶master節點集群為最小單位組建集群。~<font color=#808080>或許可以試試每個節點都是單master的去污點化部署。</font>~
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8scurl.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8scurl.png)
 
