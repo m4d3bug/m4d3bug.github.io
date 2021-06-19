@@ -106,7 +106,7 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: 'git'
-  repo: https://github_token@github.com/m4d3bug/m4d3bug.github.io.git
+  repo: https://github.com/m4d3bug/m4d3bug.github.io.git
   branch: master
 
 #toc:
