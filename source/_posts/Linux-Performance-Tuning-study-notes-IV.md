@@ -338,7 +338,7 @@ KiB Swap:  4194300 total,  4194300 free,        0 used. 12585044+avail Mem
 
 - 分析
 
-初步分析：
+1. 初步分析：
 
 ```bash
 可以见到由于依赖路径不一，只能看到十六进制内容。
@@ -367,7 +367,7 @@ Samples: 111K of event 'cycles', 4000 Hz, Event count (approx.): 55131826469 los
 +    1.01%     1.01%  php-fpm             [.] 0x00000000008cd720
 ```
 
-保存一个进程的记录，拷贝进入容器内分析：
+2. 保存一个进程的记录，拷贝进入容器内分析：
 
 ```bash
 [root@rhel7 ~]# perf record -g -p 6763
@@ -394,11 +394,11 @@ linux-tools is already the newest version (4.9+80+deb9u13).
 root@d5bdfeec83b1:/tmp# perf_4.9 report
 ```
 
-光标选中后回车进入，逐一检视← →
+3. 光标选中后回车进入，逐一检视← →
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/calltrace.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/calltrace.jpg)
 
-基本得出结果了，源码核实一下
+4. 基本得出结果了，源码核实一下
 
 ```bash
 [root@rhel7 ~]# docker cp phpfpm:/app .
@@ -415,7 +415,7 @@ for ($i = 0; $i <= 1000000; $i++) {
 echo "It works!"
 ```
 
-修复方式
+5. 修复
 
 ```bash
 [root@rhel7 ~/app]# cat index.php
@@ -424,7 +424,7 @@ echo "It works!"
 ?>
 ```
 
-测试一下修复结果
+6. 测试一下修复结果
 
 ```bash
 [root@rhel7 ~]# docker rm -f nginx phpfpm
