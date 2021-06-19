@@ -32,8 +32,8 @@ after_script:
 #  - cd ./public
 #  - echo "blog.madebug.net" > CNAME
 #  - git init
-#  - git config user.name "m4d3bug"
-#  - git config user.email "m4d3bug@gmail.com"
+  - git config user.name "m4d3bug"
+  - git config user.email "m4d3bug@gmail.com"
 #  - sed -i "s/github_token/${GH_TOKEN}/g" _config.yml || exit 1
   - git add .
   - git commit -m "Travis CI Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
