@@ -24,6 +24,10 @@ script:
   - hexo clean
   - hexo generate
 
+addons:
+  ssh_known_hosts:
+  - github.com
+
 after_script:
   - cd ./public
 #  - echo "blog.madebug.net" > CNAME
