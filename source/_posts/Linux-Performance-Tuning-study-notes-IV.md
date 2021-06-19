@@ -178,7 +178,8 @@ tags:
 - ps：进程的资源（区分用户态/内核态）使用情况。
 
     ```bash
-    [root@rhel7 ~]# pidstat 1  5                                                                                                                                                                           00:10:13Linux 4.4.0-19041-Microsoft (DESKTOP-L2O85CS)   06/20/2021      _x86_64_        (12 CPU)
+    [root@rhel7 ~]# pidstat 1  5                                                                                                                                                                           
+	Linux 3.10.0-1160.11.1.el7.x86_64   06/20/2021      _x86_64_        (20 CPU)
 
                                    用户态 内核态  虚拟机    等待    总使用率
                                                CPU使用率 CPU使用率
@@ -264,7 +265,8 @@ $ docker run --name phpfpm -itd --network container:nginx docker.io/feisky/php-f
 这里使用其他客户端配合
 $ curl http://192.168.99.79:10000/
 It works!
-$ ab -c 10 -n 10000 http://192.168.99.79:10000/                                                                                                                                                        01:11:09This is ApacheBench, Version 2.3 <$Revision: 1879490 $>
+$ ab -c 10 -n 10000 http://192.168.99.79:10000/
+This is ApacheBench, Version 2.3 <$Revision: 1879490 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
 
@@ -439,7 +441,8 @@ e82455fa5628: Pull complete
 Digest: sha256:a02d81e93c29d0196293556723cfbcb7fa94b9761b01f4fc9f1b2a6291295dd9
 Status: Downloaded newer image for feisky/nginx:cpu-fix
 9027bc69836a6764847b305e2e1a826711c5736fac720cd8b8b66a9e36684a8a
-[root@rhel7 ~]# docker run --name phpfpm -itd --network container:nginx docker.io/feisky/php-fpm:cpu-fix                                                                                                          Unable to find image 'feisky/php-fpm:cpu-fix' locally
+[root@rhel7 ~]# docker run --name phpfpm -itd --network container:nginx docker.io/feisky/php-fpm:cpu-fix 
+Unable to find image 'feisky/php-fpm:cpu-fix' locally
 cpu-fix: Pulling from feisky/php-fpm
 ad7b1e3e2409: Pull complete
 99184861b139: Pull complete
@@ -457,7 +460,8 @@ Status: Downloaded newer image for feisky/php-fpm:cpu-fix
 ```
 
 ```bash
-$ ab -c 10 -n 10000 http://192.168.99.79:10000/                                                                                                                                                        01:35:35This is ApacheBench, Version 2.3 <$Revision: 1879490 $>
+$ ab -c 10 -n 10000 http://192.168.99.79:10000/
+This is ApacheBench, Version 2.3 <$Revision: 1879490 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
 
