@@ -204,53 +204,53 @@ tags:
     Average:     1000     17722    0.00    0.20    0.00    0.00    0.20     -  pidstat
     ```
 
-    ## 0x03 CPU使用率过高怎么办？
+## 0x03 CPU使用率过高怎么办？
 
-    答：直接查找占用的函数进行优化。
+### 答：直接查找占用的函数进行优化。
 
-    - GDB（中断程序进行调试）
-    - perf（不中断程序进行调试）
+- GDB（中断程序进行调试）
+- perf（不中断程序进行调试）
 
-        ```bash
-        $ perf top
-        Samples: 2K of event 'cycles', 4000 Hz, Event count (approx.): 1591275795 lost: 0/0 drop: 0/0
-        共2k个CPU时钟事件 总事件数1591275795
-        采样率     函数共享对象/类型           函数名，符号名
-        Overhead  Shared Object              Symbol
-           5.45%  [kernel]                   [k] module_get_kallsym  
-           3.84%  [kernel]                   [k] page_fault
-           3.53%  libc-2.17.so               [.] __gconv_transform_utf8_internal
-           3.19%  libc-2.17.so               [.] __mbrtowc
-           2.55%  libc-2.17.so               [.] _int_malloc
-           2.06%  [kernel]                   [k] kallsyms_expand_symbol.constprop.1
-           2.01%  libc-2.17.so               [.] __GI_____strtoull_l_internal
-           1.74%  libc-2.17.so               [.] __strcmp_sse42
-           1.64%  [kernel]                   [k] format_decode
-           1.62%  libc-2.17.so               [.] _int_free
-           1.31%  [kernel]                   [k] __memcpy
-           1.23%  perf                       [.] __dso__load_kallsyms
-           1.21%  libc-2.17.so               [.] __strcpy_sse2_unaligned
-           1.20%  perf                       [.] rb_next
-           1.09%  [kernel]                   [k] vsnprintf
-           1.05%  libc-2.17.so               [.] __strlen_sse2_pminub
-           0.95%  libc-2.17.so               [.] malloc
-           0.90%  [kernel]                   [k] acpi_processor_ffh_cstate_enter
-           0.90%  [kernel]                   [k] delay_tsc
-           0.88%  perf                       [.] 0x00000000000d67a4
-           0.87%  libc-2.17.so               [.] __memcpy_sse2
-           0.86%  [kernel]                   [k] handle_mm_fault
-           0.83%  libc-2.17.so               [.] _IO_feof
-           0.82%  [kernel]                   [k] number.isra.2
-           0.72%  [kernel]                   [k] strnlen
-           0.70%  perf                       [.] rb_insert_color
-           0.63%  [kernel]                   [k] copy_page_rep
-           0.61%  libc-2.17.so               [.] __ctype_get_mb_cur_max
-           0.59%  libc-2.17.so               [.] _dl_addr
-           0.59%  [kernel]                   [k] string.isra.7
-           0.59%  [kernel]                   [k] strnlen_user
-        ```
+    ```bash
+    $ perf top
+    Samples: 2K of event 'cycles', 4000 Hz, Event count (approx.): 1591275795 lost: 0/0 drop: 0/0
+    共2k个CPU时钟事件 总事件数1591275795
+    采样率     函数共享对象/类型           函数名，符号名
+    Overhead  Shared Object              Symbol
+        5.45%  [kernel]                   [k] module_get_kallsym  
+        3.84%  [kernel]                   [k] page_fault
+        3.53%  libc-2.17.so               [.] __gconv_transform_utf8_internal
+        3.19%  libc-2.17.so               [.] __mbrtowc
+        2.55%  libc-2.17.so               [.] _int_malloc
+        2.06%  [kernel]                   [k] kallsyms_expand_symbol.constprop.1
+        2.01%  libc-2.17.so               [.] __GI_____strtoull_l_internal
+        1.74%  libc-2.17.so               [.] __strcmp_sse42
+        1.64%  [kernel]                   [k] format_decode
+        1.62%  libc-2.17.so               [.] _int_free
+        1.31%  [kernel]                   [k] __memcpy
+        1.23%  perf                       [.] __dso__load_kallsyms
+        1.21%  libc-2.17.so               [.] __strcpy_sse2_unaligned
+        1.20%  perf                       [.] rb_next
+        1.09%  [kernel]                   [k] vsnprintf
+        1.05%  libc-2.17.so               [.] __strlen_sse2_pminub
+        0.95%  libc-2.17.so               [.] malloc
+        0.90%  [kernel]                   [k] acpi_processor_ffh_cstate_enter
+        0.90%  [kernel]                   [k] delay_tsc
+        0.88%  perf                       [.] 0x00000000000d67a4
+        0.87%  libc-2.17.so               [.] __memcpy_sse2
+        0.86%  [kernel]                   [k] handle_mm_fault
+        0.83%  libc-2.17.so               [.] _IO_feof
+        0.82%  [kernel]                   [k] number.isra.2
+        0.72%  [kernel]                   [k] strnlen
+        0.70%  perf                       [.] rb_insert_color
+        0.63%  [kernel]                   [k] copy_page_rep
+        0.61%  libc-2.17.so               [.] __ctype_get_mb_cur_max
+        0.59%  libc-2.17.so               [.] _dl_addr
+        0.59%  [kernel]                   [k] string.isra.7
+        0.59%  [kernel]                   [k] strnlen_user
+    ```
 
-示范：
+### 第一组示范：
 
 - 环境准备：
 
@@ -336,7 +336,7 @@ KiB Swap:  4194300 total,  4194300 free,        0 used. 12585044+avail Mem
 6762 bin       20   0  336684   9360   1684 R  99.7  0.0   0:31.09 php-fpm
 ```
 
-- 分析
+### 第一组分析
 
 1. 初步分析：
 
@@ -515,6 +515,177 @@ Percentage of the requests served within a certain time (ms)
  100%     29 (longest request)
 ```
 
+### 第二组示范
+
+- 环境准备：
+
+```bash
+$ docker rm -f nginx phpfpm
+$ docker run --name nginx -p 10000:80 -itd feisky/nginx:sp
+$ docker run --name phpfpm -itd --network container:nginx feisky/php-fpm:sp
+```
+
+- 压测：
+
+```bash
+这里使用其他客户端配合
+$ curl http://192.168.99.40:10000/
+It works!
+$ ab -c 100 -n 1000 http://192.168.99.40:10000/        
+This is ApacheBench, Version 2.3 <$Revision: 1879490 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 192.168.99.40 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        nginx/1.15.4
+Server Hostname:        192.168.99.40
+Server Port:            10000
+
+Document Path:          /
+Document Length:        9 bytes
+
+Concurrency Level:      100
+Time taken for tests:   9.049 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      172000 bytes
+HTML transferred:       9000 bytes
+Requests per second:    110.51 [#/sec] (mean)             <----- 
+Time per request:       904.876 [ms] (mean)
+Time per request:       9.049 [ms] (mean, across all concurrent requests)
+Transfer rate:          18.56 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   0.8      0       8
+Processing:    30  858 132.0    889    1020
+Waiting:       27  858 132.0    889    1020
+Total:         32  859 131.6    889    1023
+WARNING: The median and mean for the initial connection time are not within a normal deviation
+        These results are probably not that reliable.
+
+Percentage of the requests served within a certain time (ms)
+  50%    889
+  66%    900
+  75%    905
+  80%    910
+  90%    923
+  95%    934
+  98%    954
+  99%    964
+ 100%   1023 (longest request)
+```
+
+换一个时间比较长的进行压测方便观察。
+```
+$ ab -c 5 -t 600 http://192.168.99.40:10000/
+This is ApacheBench, Version 2.3 <$Revision: 1879490 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 192.168.99.40 (be patient)
+```
+
+可以观察到处于R (Running) 的php-fpm 与 总running 数目有所出入, 而其他处于R的进程是stress
+```bash
+[root@rhel7 ~]# top
+top - 23:48:57 up  1:04,  3 users,  load average: 5.02, 2.00, 1.09
+Tasks: 313 total,   9 running, 303 sleeping,   0 stopped,   1 zombie
+%Cpu(s): 81.1 us, 13.8 sy,  0.0 ni,  2.2 id,  0.0 wa,  0.0 hi,  2.9 si,  0.0 st
+KiB Mem :  4026220 total,   738312 free,  1249376 used,  2038532 buff/cache
+KiB Swap:  2097148 total,  2097148 free,        0 used.  2461720 avail Mem
+
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+  3974 101       20   0   33092   2208    788 S   4.7  0.1   0:51.84 nginx
+101516 bin       20   0  336684   9608   1932 R   2.7  0.2   0:03.36 php-fpm
+101521 bin       20   0  336684   9624   1948 S   2.7  0.2   0:03.34 php-fpm
+101529 bin       20   0  336684   9604   1928 R   2.7  0.2   0:03.22 php-fpm
+101543 bin       20   0  336684   9600   1924 S   2.3  0.2   0:03.28 php-fpm
+101535 bin       20   0  336684   9600   1924 S   2.0  0.2   0:03.31 php-fpm
+  3628 root      20   0  677812  97988  31360 S   1.3  2.4   0:27.50 dockerd
+  3921 root      20   0  113364  12076   3676 S   1.0  0.3   0:13.47 containerd-shim
+     6 root      20   0       0      0      0 S   0.3  0.0   0:01.96 ksoftirqd/0
+     7 root      rt   0       0      0      0 S   0.3  0.0   0:00.29 migration/0
+     9 root      20   0       0      0      0 R   0.3  0.0   0:06.12 rcu_sched
+  3617 root      20   0  446044  44020  16136 S   0.3  1.1   0:14.64 containerd
+  4531 root      20   0  164236   2548   1612 R   0.3  0.1   0:00.08 top
+ 11479 bin       20   0    8176    864    104 R   0.3  0.0   0:00.01 stress
+ 11481 bin       20   0       0      0      0 R   0.3  0.0   0:00.01 stress            
+```
+
+pidstat不能抓到转瞬即逝的这些进程，我们转用pstree |grep stress
+```
+$ watch -d -n 1 "pstree |grep stress" 
+    |-docker-containe-+-php-fpm-+-php-fpm---sh---stress
+    | |-3*[php-fpm---sh---stress---stress]
+```
+
+### 第二组分析
+
+1. 查找源码
+```
+$ docker cp phpfpm:/app .
+$ grep stress -r app
+app/index.php:// fake I/O with stress (via write()/unlink()).
+app/index.php:$result = exec("/usr/local/bin/stress -t 1 -d 1 2>&1", $output, $status);
+$ cat app/index.php
+<?php
+// fake I/O with stress (via write()/unlink()).
+$result = exec("/usr/local/bin/stress -t 1 -d 1 2>&1", $output, $status);
+if (isset($_GET["verbose"]) && $_GET["verbose"]==1 && $status != 0) {
+  echo "Server internal error: ";
+  print_r($output);
+} else {
+  echo "It works!";
+}
+?>
+```
+
+2. 通过源码带的接口调试结果
+```
+看错误消息 mkstemp failed: Permission denied ，以及 failed run completed in 0s。原来 stress 命令并没有成功，它因为权限问题失败退出了
+$ curl "http://192.168.99.40:10000?verbose=1"                                                           
+Server internal error: Array
+(
+    [0] => stress: info: [74139] dispatching hogs: 0 cpu, 0 io, 0 vm, 1 hdd
+    [1] => stress: FAIL: [74140] (563) mkstemp failed: Permission denied
+    [2] => stress: FAIL: [74139] (394) <-- worker 74140 returned error 1
+    [3] => stress: WARN: [74139] (396) now reaping child worker processes
+    [4] => stress: FAIL: [74139] (400) kill error: No such process
+    [5] => stress: FAIL: [74139] (451) failed run completed in 0s
+)
+```
+
+3. perf分析
+```
+确保软连接开启
+# sudo sysctl -w kernel.kptr_restrict=1
+# perf record -g 
+# docker cp perf.data phpfpm:/tmp
+# docker exec -it phpfpm bash
+# cd /tmp
+# apt update && apt install linux-perf linux-tools procps -y
+# perf_4.9 report
+```
+
+4. 光标选中后回车进入，逐一检视← →
+
+![https://img.madebug.net/m4d3bug/images-of-website/master/blog/perfcalltrace.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/perfcalltrace.jpg)
+
+
 ## 0x04 总结
 
 - 涉及的指标较多。
@@ -524,3 +695,4 @@ Percentage of the requests served within a certain time (ms)
     - 软中断和硬中断升高，说明中断操作占用，排查内核中断服务程序。
 - pidstat和top各有所长。
 - perf可以在不中断进程的情况下收集证据。
+- 转瞬即逝的进程，不停地崩溃重启，也有可能影响性能表现。
