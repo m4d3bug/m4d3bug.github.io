@@ -688,7 +688,7 @@ Server internal error: Array
 
 ## 0x04 总结
 
-- 涉及的指标较多。
+- 从```/proc/stat```可以得知CPU使用率的类型，其排查思路如下：
     - CPU和Nice升高，排查用户态进程。
     - 系统CPU升高，排查内核线程或者系统调用。
     - I / O 等待CPU升高，排查系统存储。
