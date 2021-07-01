@@ -45,7 +45,7 @@ tags:
 >**- 1个CPU系统：满载**
 >**- 4个CPU系统：1/4满载**
 
-- **运行态(runnable)+不可中断态(uninterruptable)**
+- **运行态(runnable)+不可中断态(Disk sleep / uninterruptable)**
 
   以下算式直观描述影响平均负载的可能因素(CPU占用，CPU等待，IO等待)：
   平均负载升高不一定CPU升高，例如等待I/O
