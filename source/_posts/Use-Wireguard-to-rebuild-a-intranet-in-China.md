@@ -246,6 +246,8 @@ $ systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service
 
 ```
 
+当然，另外你还会需要为这个页面做一个密码防护[Nginx Basic Authentication]。
+
 ## 0x04 测速
 
 完成上述设定之后，顺手做了一个国内的测速。很有幸处在UDP表现良好的地域，并且突破了良心云限定的带宽墙。(你没看错，就是用tcp_bw测，或者你喜欢可以用udp_bw看看结果)
