@@ -216,7 +216,9 @@ $ systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
 # 查找wireguard-tools包含的解决脚本
 
 $ find / -name reresolve-dns.sh
+Ubuntu
 /usr/share/doc/wireguard-tools/examples/reresolve-dns/reresolve-dns.sh
+CentOS
 /usr/share/doc/wireguard-tools-1.0.20210424/contrib/reresolve-dns/reresolve-dns.sh
 
 # 设置三十秒的定时器
