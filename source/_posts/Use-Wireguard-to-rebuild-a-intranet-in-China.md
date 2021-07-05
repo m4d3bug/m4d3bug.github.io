@@ -248,7 +248,7 @@ ExecStart=/bin/sh -c 'for i in /etc/wireguard/*.conf; do /usr/share/wireguard-to
 
 $ systemctl daemon-reload
 $ systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
-
+$ systemctl reload wg-quick@wg0
 ```
 
 当然，另外你还会需要为这个页面做一个密码防护[Nginx Basic Authentication]。
