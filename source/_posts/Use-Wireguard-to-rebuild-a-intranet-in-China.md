@@ -167,7 +167,7 @@ ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 WantedBy=multi-user.target
 
 # 添加监听路径
-# /etc/systemd/system/wg-gen-web.path
+# nano /etc/systemd/system/wg-gen-web.path
 [Unit]
 Description=Watch /etc/wireguard for changes
 
