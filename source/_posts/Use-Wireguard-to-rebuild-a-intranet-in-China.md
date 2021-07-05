@@ -128,6 +128,9 @@ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j A
 自动加载配置文件、自动生成配置文件。
 
 ```bash
+# 启动wg0
+$ wg-quick up wg0
+
 # 加入ExecReload在不中断活跃连接的情况下重新加载配置文件
 $ nano /usr/lib/systemd/system/wg-quick@.service
 [Unit]
