@@ -185,12 +185,14 @@ $ systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture](https://img.madebug.net/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture)
 
+当然，另外你还会需要为这个页面做一个密码防护。[Nginx Basic Authentication]
+
 ## 0x02 客户端
 
 ### 软件安装
 
 ```bash
-# 同上，略
+$ apt install wireguard wireguard-tools -y
 ```
 
 ### 软件设置
@@ -248,8 +250,6 @@ $ systemctl daemon-reload
 $ systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
 $ systemctl reload wg-quick@wg0
 ```
-
-当然，另外你还会需要为这个页面做一个密码防护[Nginx Basic Authentication]。
 
 ## 0x04 测速
 
