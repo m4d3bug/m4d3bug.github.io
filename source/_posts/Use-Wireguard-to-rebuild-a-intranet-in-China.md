@@ -128,9 +128,6 @@ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j A
 自动加载配置文件、自动生成配置文件。
 
 ```bash
-# 启动wg0
-$ wg-quick up wg0
-
 # 加入ExecReload在不中断活跃连接的情况下重新加载配置文件
 $ nano /usr/lib/systemd/system/wg-quick@.service
 [Unit]
@@ -182,6 +179,7 @@ WantedBy=multi-user.target
 
 # 刷新上述配置
 $ systemctl daemon-reload
+$ systemctl start wg-quick@wg0
 $ systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
 ```
 
@@ -244,7 +242,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c 'for i in /etc/wireguard/*.conf; do /usr/share/wireguard-tools/examples/reresolve-dns/reresolve-dns.sh "$i"; done'
+ExecStart=/bin/sh -c 'for i in /etc/wireguard/*.conf; do /usr/share/doc/wireguard-tools/examples/reresolve-dns/reresolve-dns.sh "$i"; done'
 
 $ systemctl daemon-reload
 $ systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
