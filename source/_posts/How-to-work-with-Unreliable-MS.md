@@ -341,7 +341,7 @@ https://windows10.pro/bash-on-ubuntu-on-windows/
 	.host:/         /mnt/hgfs               fuse.vmhgfs-fuse allow_other,defaults,nonempty   0       0
 	```
 
-## 0x08 鸣谢
+## 0x09 鸣谢
 
 - [Ubuntu Server 18.04下sudo速度很慢原因及解决办法_Linux教程_云网牛站](https://ywnz.com/linuxjc/2024.html)
 - [Win10安装Ubuntu子系统教程（附安装图形化界面） - Windows10.Pro](https://windows10.pro/bash-on-ubuntu-on-windows/)
