@@ -55,23 +55,26 @@ $ apt install wireguard wireguard-tools  byobu docker.io docker-compose -y
 ### 系统设置
 
 ```bash
-# 内核转发
-$ echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/99-sysctl.conf
-$ echo "net.ipv4.conf.all.proxy_arp = 1" >> /etc/sysctl.d/99-sysctl.conf
-$ sysctl -p /etc/sysctl.d/99-sysctl.conf
+$ 内核转发
+# echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/99-sysctl.conf
+# echo "net.ipv4.conf.all.proxy_arp = 1" >> /etc/sysctl.d/99-sysctl.conf
+# sysctl -p /etc/sysctl.d/99-sysctl.conf
 
-# iptables配置端口转发自定义网段
-$ iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-$ iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-$ iptables -A FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
-$ iptables -t nat -A POSTROUTING -s 10.9.8.0/24 -o eth0 -j MASQUERADE
+$ iptables配置端口转发自定义网段
+# iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+# iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+# iptables -A FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
+# iptables -t nat -A POSTROUTING -s 10.9.8.0/24 -o eth0 -j MASQUERADE
+
+$ 初始化wireguard
+# systemctl start wg-quick@wg0
 ```
 
 ### 托管设置
 
 ```bash
-# 直接使用wg-gen-web管理, 容器运行填入docker0的IP
-$ nano docker-compose.yaml
+$ 直接使用wg-gen-web管理, 容器运行填入docker0的IP
+# nano docker-compose.yaml
 version: '3.6'
 services:
   wg-gen-web:
@@ -86,7 +89,7 @@ services:
       - WG_CONF_DIR=/data
       - WG_INTERFACE_NAME=wg0.conf
       - OAUTH2_PROVIDER_NAME=fake
-      - WG_STATS_API=http://<DOCKER_NIC_IP>:8182
+      - WG_STATS_API=http://172.17.0.1:8182
     volumes:
       - /etc/wireguard:/data
     network_mode: bridge
@@ -97,9 +100,9 @@ services:
     cap_add:
       - NET_ADMIN
     network_mode: "host"
-    command: wg-api --device wg0 --listen <DOCKER_NIC_IP>:8182
+    command: wg-api --device wg0 --listen 172.17.0.1:8182
 
-$ docker-compose up -d
+# docker-compose up -d
 ```
 
 ### 软件设置
@@ -128,8 +131,8 @@ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j A
 自动加载配置文件、自动生成配置文件。
 
 ```bash
-# 加入ExecReload在不中断活跃连接的情况下重新加载配置文件
-$ nano /usr/lib/systemd/system/wg-quick@.service
+$ 加入ExecReload在不中断活跃连接的情况下重新加载配置文件
+# nano /usr/lib/systemd/system/wg-quick@.service
 [Unit]
 Description=WireGuard via wg-quick(8) for %I
 After=network-online.target nss-lookup.target
@@ -153,8 +156,8 @@ Environment=WG_ENDPOINT_RESOLUTION_RETRIES=infinity
 [Install]
 WantedBy=multi-user.target
 
-# 添加自动Reload
-$ nano /etc/systemd/system/wg-gen-web.service
+$ 添加自动Reload
+# nano /etc/systemd/system/wg-gen-web.service
 [Unit]
 Description=Restart WireGuard
 After=network.target
@@ -166,7 +169,7 @@ ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 [Install]
 WantedBy=multi-user.target
 
-# 添加监听路径
+$ 添加监听路径
 # nano /etc/systemd/system/wg-gen-web.path
 [Unit]
 Description=Watch /etc/wireguard for changes
@@ -177,10 +180,10 @@ PathModified=/etc/wireguard
 [Install]
 WantedBy=multi-user.target
 
-# 刷新上述配置
-$ systemctl daemon-reload
-$ systemctl start wg-quick@wg0
-$ systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
+$ 刷新上述配置
+# systemctl daemon-reload
+# systemctl start wg-quick@wg0
+# systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
 ```
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture](https://img.madebug.net/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture)
@@ -192,7 +195,7 @@ $ systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
 ### 软件安装
 
 ```bash
-$ apt install wireguard wireguard-tools -y
+# apt install wireguard wireguard-tools -y
 ```
 
 ### 软件设置
@@ -200,7 +203,7 @@ $ apt install wireguard wireguard-tools -y
 从服务端直接下载配置文件到**/etc/wireguard/**，并命名为wg0.conf
 
 ```bash
-# 同上，略，可以自行选择是否添加对配置文件的监听
+$ 同上，略，可以自行选择是否添加对配置文件的监听
 ```
 
 ## 0x03 进阶
@@ -216,16 +219,16 @@ $ apt install wireguard wireguard-tools -y
 [wireguard的域名解析并不是每个请求都执行的](https://lists.zx2c4.com/pipermail/wireguard/2017-November/002028.html)。因此我们需要为客户端进程添加一个定时脚本，来帮助其定时重新解析，以便在问题发生时，我们只需要关注域名的解析情况，即可达到蓝绿切换的功能，**但需要提醒一点，这样子做的不可控点在于域名解析生效的时长，请预留足够的窗口操作期，并配合良好的监控机制**。以下例子仅包含CentOS7 和Ubuntu 20.04、[这里是Archlinux的出处](https://wiki.archlinux.org/title/WireGuard#:~:text=details-,endpoint%20with%20changing%20ip,-After)。
 
 ```bash
-# 查找wireguard-tools包含的解决脚本
+$ 查找wireguard-tools包含的解决脚本
 
-$ find / -name reresolve-dns.sh
+# find / -name reresolve-dns.sh
 Ubuntu
 /usr/share/doc/wireguard-tools/examples/reresolve-dns/reresolve-dns.sh
 CentOS
 /usr/share/doc/wireguard-tools-1.0.20210424/contrib/reresolve-dns/reresolve-dns.sh
 
-# 设置三十秒的定时器
-$ nano /etc/systemd/system/wireguard_reresolve-dns.timer
+$ 设置三十秒的定时器
+# nano /etc/systemd/system/wireguard_reresolve-dns.timer
 [Unit]
 Description=Periodically reresolve DNS of all WireGuard endpoints
 
@@ -235,8 +238,8 @@ OnCalendar=*:*:0/30
 [Install]
 WantedBy=timers.target
 
-# 设置相应的脚本执行服务
-$ nano /etc/systemd/system/wireguard_reresolve-dns.service
+$ 设置相应的脚本执行服务
+# nano /etc/systemd/system/wireguard_reresolve-dns.service
 [Unit]
 Description=Reresolve DNS of all WireGuard endpoints
 Wants=network-online.target
@@ -246,9 +249,9 @@ After=network-online.target
 Type=oneshot
 ExecStart=/bin/sh -c 'for i in /etc/wireguard/*.conf; do /usr/share/doc/wireguard-tools/examples/reresolve-dns/reresolve-dns.sh "$i"; done'
 
-$ systemctl daemon-reload
-$ systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
-$ systemctl reload wg-quick@wg0
+# systemctl daemon-reload
+# systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
+# systemctl reload wg-quick@wg0
 ```
 
 ## 0x04 测速
