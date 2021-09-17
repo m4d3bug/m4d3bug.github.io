@@ -112,13 +112,14 @@ web访问<web_ip:8888>进行配置
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/wireguardserver.png?raw=ture](https://img.madebug.net/m4d3bug/images-of-website/master/blog/wireguardserver.png?raw=ture)
 
 ```bash
-# 检查生成的配置文件
-$ nano /etc/wireguard/wg0.conf
+$ 检查生成的配置文件
+# nano /etc/wireguard/wg0.conf
+
 # Updated: 2021-06-14 09:51:23.220280864 +0000 UTC / Created: 2021-06-12 18:27:38.627308446 +0000 UTC
 [Interface]
 Address = 10.9.8.1/24
 ListenPort = 9999
-PrivateKey = <Auto-Genrate-Private-Key>
+PrivateKey = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 PreUp = echo WireGuard PreUp
 PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
