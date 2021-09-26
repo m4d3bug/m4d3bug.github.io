@@ -17,11 +17,11 @@ tags:
 
 ## 0x00 前言
 
-        许久没有更新博客，正在花时间将手上的几台homelab机器整合划分不同的域，写blog素材upup，而kvm的各项工具正在蓬勃发展，现已不再需要osp和rhev也能够获得比较良好的虚拟机管理体验了。
+许久没有更新博客，正在花时间将手上的几台HomeLab机器整合划分不同的域，写blog素材upup，而kvm的各项工具正在蓬勃发展，现已不再需要osp和rhev也能够获得比较良好的虚拟机管理体验了。
 
 ## 0x01 工具介绍
 
-        这次的主角是virt-sysprep，以下方法适用于制作Ubuntu1804，Ubuntu2004，CentOS7，Centos Stream 8的模板。
+这次的主角是virt-sysprep，以下方法适用于制作Ubuntu1804，Ubuntu2004，CentOS7，Centos Stream 8的模板。
 
 ## 0x02 制作过程
 
@@ -37,7 +37,7 @@ tags:
 
 ### 清除标记
 
-        安装完成后使用virt-sysprep清除以下
+安装完成后使用virt-sysprep清除以下
 
 - 默认的日志项
 - 重置ssh相关
@@ -51,11 +51,11 @@ tags:
 
 ## 0x03 不同发行版
 
-        最近有不少不同Linux发行版的各种新闻，CentOS Stream 8取代CentOS 8，国家机关强推统信、麒麟OS等各种关乎不同OS的新闻出现，趁这篇博文撰写的时候谈一下自己粗浅的见解。
+最近有不少不同Linux发行版的各种新闻，CentOS Stream 8取代CentOS 8，国家机关强推统信、麒麟OS等各种关乎不同OS的新闻出现，趁这篇博文撰写的时候谈一下自己粗浅的见解。
 
 1. 谁最好 
 
-        我认为没有最好的Linux发行版，只有最适合自己的发行版。每种发行版于我而言，它们所做的一些开箱即用的优化以及一些特性都让我爱不释手。
+我认为没有最好的Linux发行版，只有最适合自己的发行版。每种发行版于我而言，它们所做的一些开箱即用的优化以及一些特性都让我爱不释手。
 
     - Fedora：rpm系的最上游，是成熟的kvm管理工具cockpit-kvm的最优先适配。rpm系breack change的试验田。
     - CentOS Stream：Stream的出现，我认为顺应了云原生浪潮。小版本的取消，使得CentOS上的创新能够以最低、最快的门槛适配RHEL。CentOS过去的角色，Rocky, Almalinux、TencentOS这些发行版可以轻松填补，但是CentOS Stream的角色它们却不能填补。这对开源软件界进入企业流行无疑是一大利好。
