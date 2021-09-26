@@ -55,8 +55,8 @@ tags:
 
 1. 区别 
 
-  - CentOS Stream：Stream的出现，我认为顺应了云原生浪潮。小版本的取消，使得CentOS上的创新能够以最低、最快的门槛适配RHEL。CentOS过去的角色，Rocky, Almalinux、TencentOS这些发行版可以轻松填补，但是CentOS Stream的角色它们却不能填补。这对开源软件界进入企业流行无疑是一大利好。
-  - RHEL: 集最多硬件支持、最优开源软件编译参数实践、最优商业支持Linux于一身。
+  - CentOS Stream：Stream的出现，我认为顺应了云原生浪潮。小版本的取消，使得CentOS上的创新能够以最低、最快的门槛适配RHEL。CentOS过去的角色，Rocky、Almalinux、TencentOS这些发行版可以轻松填补，但是CentOS Stream的角色它们却不能填补。这对开源软件界进入企业流行无疑是一大利好。
+  - RHEL: 集最多硬件支持、最优开源软件编译参数实践、最优商业支持于一身的Linux发行版。
   - Rocky，Almalinux、统信UOS服务器版、TencentOS： 现今的CentOS角色，并且也推出了[便宜的支持策略](https://www.zdnet.com/article/centos-clone-rocky-linux-gets-technical-support/)，像Oracle linux一样，更低的商业成本享受rpm系。
   - Debian：apt系的最上游，拥有比RHEL更“自由”的发行版，提供了进入Linux流行的更低门槛。毫无疑问会被更多不旨在进入企业流行盈利的软件爱好者所喜爱，须知也不是所有的开源应用都热衷于进入到企业盈利。
   - Ubuntu：apt系的扛把子，漂亮优雅的桌面风格，更新的内核。现在也采取了和RHEL一样的“十年”支持。额外使用了cloud-init来实现更易分发的特性，但是这也带来了一定侵入性，可选的apt系商业支持。
