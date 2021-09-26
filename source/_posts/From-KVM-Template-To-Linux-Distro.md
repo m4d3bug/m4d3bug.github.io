@@ -33,7 +33,7 @@ tags:
 
 - 使用lvm，并且设置确保/home目录没有使用
 - 设置普通用户并赋予sudo权限
-- 选择live-server
+- Ubuntu选择live-server, CentOS选择minimal
 
 ### 清除标记
 
