@@ -7,7 +7,6 @@ date: 2021-09-26 21:38:05
 categories:
 - "Ops "
 tags:
-tags:
 - "Linux "
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/Linux-distro.png" width=50% /></center>
@@ -36,7 +35,7 @@ tags:
 
 ### 清除标记
 
-安装完成后使用virt-sysprep清除以下
+        安装完成后使用virt-sysprep清除以下
 
 - 默认的日志项
 - 重置ssh相关
@@ -54,7 +53,7 @@ tags:
 
 1. 谁最好 
 
-            我认为没有最好的Linux发行版，只有最适合自己的发行版。每种发行版于我而言，它们所做的一些开箱即用的优化以及一些特性都让我爱不释手。
+        我认为没有最好的Linux发行版，只有最适合自己的发行版。每种发行版于我而言，它们所做的一些开箱即用的优化以及一些特性都让我爱不释手。
 
     - Fedora：rpm系的最上游，是成熟的kvm管理工具cockpit-kvm的最优先适配。rpm系breack change的试验田。
     - CentOS Stream：Stream的出现，我认为顺应了云原生浪潮。小版本的取消，使得CentOS上的创新能够以最低、最快的门槛适配RHEL。CentOS过去的角色，Rocky, Almalinux、TencentOS这些发行版可以轻松填补，但是CentOS Stream的角色它们却不能填补。这对开源软件界进入企业流行无疑是一大利好。
