@@ -49,6 +49,15 @@ tags:
 # virt-sysprep -d centos7_server --timezone 'Asia/Shanghai' --operations machine-id --no-logfile -v -x
 ```
 
+### 打包
+
+我安装时直接通过qcow2本身的稀松性（sparse）来生成，qcow2是具有稀松性的存储格式，会预划分磁盘大小，所以ls -hl看的大小是预划分的大小，只有du和ls -hls看的才准确。单纯地scp它们，稀松性不会被很好地保留，可能会出现以原先大小存储的可能性。因此应该用tar预先处理稀松性。
+
+```bash
+# tar -cv --sparse -f ubuntu2004_server.tar ubuntu2004_server.qcow2
+# tar -cv --sparse -f centos7_server.tar centos7_server.qcow2
+```
+
 ## 0x03 不同发行版
 
 最近有不少不同Linux发行版的各种新闻，CentOS Stream 8取代CentOS 8，国家机关强推统信、麒麟OS等各种关乎不同OS的新闻出现，趁这篇博文撰写的时候谈一下自己粗浅的见解。我认为没有最好的Linux发行版，只有最适合自己的发行版。每种发行版于我而言，它们所做的一些开箱即用的优化以及一些特性都让我爱不释手。
@@ -57,7 +66,7 @@ tags:
 
   - CentOS Stream：Stream的出现，我认为顺应了云原生浪潮。小版本的取消，使得CentOS上的创新能够以最低、最快的门槛适配RHEL。CentOS过去的角色，Rocky、Almalinux、TencentOS这些发行版可以轻松填补，但是CentOS Stream的角色它们却不能填补。这对开源软件界进入企业流行无疑是一大利好。
   - RHEL: 集最多硬件支持、最优开源软件编译参数实践、最优商业支持于一身的Linux发行版。
-  - Rocky，Almalinux、统信UOS服务器版、TencentOS： 现今的CentOS角色，并且也推出了[便宜的支持策略](https://www.zdnet.com/article/centos-clone-rocky-linux-gets-technical-support/)，像Oracle linux一样，更低的商业成本享受rpm系。
+  - Rocky，Almalinux、统信UOS服务器版、TencentOS、OpenAlios： 现今的CentOS角色，并且也推出了[便宜的支持策略](https://www.zdnet.com/article/centos-clone-rocky-linux-gets-technical-support/)，像Oracle linux一样，更低的商业成本享受rpm系，Oracle linux做的只是对自己Oracle数据库的一些简单优化参数，而OpenAlios目前的信息看来是旨在针对国内的硬件适配兼容。
   - Debian：apt系的最上游，拥有比RHEL更“自由”的发行版，提供了进入Linux流行的更低门槛。毫无疑问会被更多不旨在进入企业流行盈利的软件爱好者所喜爱，须知也不是所有的开源应用都热衷于进入到企业盈利。
   - Ubuntu：apt系的扛把子，漂亮优雅的桌面风格，更新的内核。现在也采取了和RHEL一样的“十年”支持。额外使用了cloud-init来实现更易分发的特性，但是这也带来了一定侵入性，可选的apt系商业支持。
   - Kali、deepin、统信UOS桌面版: 拥有很多适合特定场景的软件集合，提供开箱即用的桌面大杂烩工具集。
@@ -84,5 +93,6 @@ tags:
 - virt-sysprep挺好用的，把我暂时地从cloud-init的苦海拯救了出来。
 - virt-sysprep制作模板时背后调用virt-customize启用临时kvm制作，足够优雅。
 - 各大发行版都有自己的使用场景，应结合使用场景，相互借鉴，大家好才是真的好。“无他，唯手熟尔”。
-- 有机会搞一个混杂各种发行版的K8S。
+- 有机会搞一个混杂各种发行版的K8S玩玩。
+- 更多的厂商参与，对于客户来说是好事，并且眼睛足够多，开源特性能使得它们变得更好，互相学习。
 - 能够在这么纷繁复杂的世界中诞生Linux，已经是很了不起的事情了。
