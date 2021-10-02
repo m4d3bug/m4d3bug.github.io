@@ -49,7 +49,7 @@ Wireguard，被Linus盛赞的艺术，前几年刚出的时候接触过，印象
 ### 软件安装
 
 ```bash
-$ apt install wireguard wireguard-tools  byobu docker.io docker-compose -y
+# apt install wireguard wireguard-tools  byobu docker.io docker-compose -y
 ```
 
 ### 系统设置
@@ -67,7 +67,8 @@ $ iptables配置端口转发自定义网段
 # iptables -t nat -A POSTROUTING -s 10.9.8.0/24 -o eth0 -j MASQUERADE
 
 $ 初始化wireguard
-# systemctl start wg-quick@wg0
+# wg-quick up wg0
+# wg-quick down wg0
 ```
 
 ### 托管设置
