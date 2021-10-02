@@ -184,6 +184,7 @@ WantedBy=multi-user.target
 
 $ 刷新上述配置
 # systemctl daemon-reload
+# wg-quick down wg0
 # systemctl start wg-quick@wg0
 # systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
 ```
