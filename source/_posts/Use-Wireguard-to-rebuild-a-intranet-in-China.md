@@ -158,7 +158,7 @@ Environment=WG_ENDPOINT_RESOLUTION_RETRIES=infinity
 [Install]
 WantedBy=multi-user.target
 
-$ 添加自动Reload
+$ 为wg-gen-web添加自动Reload
 # nano /etc/systemd/system/wg-gen-web.service
 [Unit]
 Description=Restart WireGuard
@@ -171,7 +171,7 @@ ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 [Install]
 WantedBy=multi-user.target
 
-$ 添加监听路径
+$ 添加wg-gen-web监听路径
 # nano /etc/systemd/system/wg-gen-web.path
 [Unit]
 Description=Watch /etc/wireguard for changes
@@ -202,10 +202,33 @@ $ 刷新上述配置
 
 ### 软件设置
 
-从服务端直接下载配置文件到**/etc/wireguard/**，并命名为wg0.conf
+从服务端直接下载客户端配置文件到**/etc/wireguard/**，并命名为**wg0.conf**
 
 ```bash
-$ 同上，略，可以自行选择是否添加对配置文件的监听
+$ 加入ExecReload在不中断活跃连接的情况下重新加载配置文件
+# nano /usr/lib/systemd/system/wg-quick@.service
+[Unit]
+Description=WireGuard via wg-quick(8) for %I
+After=network-online.target nss-lookup.target
+Wants=network-online.target nss-lookup.target
+PartOf=wg-quick.target
+Documentation=man:wg-quick(8)
+Documentation=man:wg(8)
+Documentation=https://www.wireguard.com/
+Documentation=https://www.wireguard.com/quickstart/
+Documentation=https://git.zx2c4.com/wireguard-tools/about/src/man/wg-quick.8
+Documentation=https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/wg-quick up %i
+ExecStop=/usr/bin/wg-quick down %i
+ExecReload=/bin/bash -c 'exec /usr/bin/wg syncconf %i <(exec /usr/bin/wg-quick strip %i)'
+Environment=WG_ENDPOINT_RESOLUTION_RETRIES=infinity
+
+[Install]
+WantedBy=multi-user.target
 ```
 
 ## 0x03 进阶
@@ -229,13 +252,14 @@ Ubuntu
 CentOS
 /usr/share/doc/wireguard-tools-1.0.20210424/contrib/reresolve-dns/reresolve-dns.sh
 
-$ 设置三十秒的定时器
+$ 设置启动后3秒执行，每9秒一次的定时器
 # nano /etc/systemd/system/wireguard_reresolve-dns.timer
 [Unit]
 Description=Periodically reresolve DNS of all WireGuard endpoints
 
 [Timer]
-OnCalendar=*:*:0/30
+OnActiveSec=3
+OnUnitActiveSec=9
 
 [Install]
 WantedBy=timers.target
