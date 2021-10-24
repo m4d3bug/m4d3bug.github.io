@@ -229,6 +229,8 @@ Environment=WG_ENDPOINT_RESOLUTION_RETRIES=infinity
 
 [Install]
 WantedBy=multi-user.target
+# systemctl daemon-reload 
+# systemctl enable wg-quick@wg0 --now
 ```
 
 ## 0x03 进阶
