@@ -267,7 +267,7 @@ OnUnitActiveSec=9
 [Install]
 WantedBy=timers.target
 
-$ 设置相应的脚本执行服务
+$ 设置相应的脚本执行重解析重reload，oneshot可以多个ExecStart
 # nano /etc/systemd/system/wireguard_reresolve-dns.service
 [Unit]
 Description=Reresolve DNS of all WireGuard endpoints
@@ -277,6 +277,7 @@ After=network-online.target
 [Service]
 Type=oneshot
 ExecStart=/bin/sh -c 'for i in /etc/wireguard/*.conf; do /usr/share/doc/wireguard-tools/examples/reresolve-dns/reresolve-dns.sh "$i"; done'
+ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 
 # systemctl daemon-reload
 # systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
