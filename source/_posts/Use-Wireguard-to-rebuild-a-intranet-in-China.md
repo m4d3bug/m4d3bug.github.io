@@ -279,6 +279,9 @@ Type=oneshot
 ExecStart=/bin/sh -c 'for i in /etc/wireguard/*.conf; do /usr/share/doc/wireguard-tools/examples/reresolve-dns/reresolve-dns.sh "$i"; done'
 ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 
+[Install]
+WantedBy=timers.target
+
 # systemctl daemon-reload
 # systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
 # systemctl start wg-quick@wg0 |systemctl reload wg-quick@wg0
