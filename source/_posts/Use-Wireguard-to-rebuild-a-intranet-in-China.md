@@ -276,7 +276,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c 'for i in /etc/wireguard/*.conf; do /usr/share/doc/wireguard-tools/examples/reresolve-dns/reresolve-dns.sh "$i"; done'
+ExecStart=/bin/sh -c 'for i in /etc/wireguard/*.conf; do `find / -name reresolve-dns.sh` "$i"; done'
 ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 
 [Install]
