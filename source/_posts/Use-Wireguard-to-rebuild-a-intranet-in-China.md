@@ -283,8 +283,8 @@ ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 WantedBy=timers.target
 
 # systemctl daemon-reload
-# systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
 # systemctl start wg-quick@wg0 |systemctl reload wg-quick@wg0
+# systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
 ```
 
 ## 0x04 测速
