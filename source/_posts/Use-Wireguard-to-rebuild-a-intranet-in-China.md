@@ -283,7 +283,7 @@ ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 WantedBy=timers.target
 
 # systemctl daemon-reload
-# systemctl start wg-quick@wg0 |systemctl reload wg-quick@wg0
+# systemctl enable wg-quick@wg0 --now |systemctl reload wg-quick@wg0
 # systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
 ```
 
