@@ -10,8 +10,12 @@ tags:
 - "Kubernetes "
 - "Pod "
 ---
+
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/pod.png" width=50% /></center>
+
 ## 0x00 前言
 Pod，是Kubernetes项目的原子调度单位。但为什么是呢？
+
 <!--more -->
 ## 0x01 Pod的第一层意义
 **容器其本质是特殊的进程**，而K8s身为一个Paas领军产物，设计之初就借鉴了OS。
