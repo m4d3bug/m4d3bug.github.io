@@ -13,29 +13,28 @@ tags:
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
-本文旨在剖析线程的五個W和一個H。
+本文旨在剖析线程的5个W和1个H。
 
 <!-- more -->
 
-## 0x00 什麽是綫程(what and why?)
+## 0x00 什么是线程(what and why?)
 
 ---
 
-綫程常常與進程一起談論，可以通過以下解釋它們之間關係：
+线程常常与进程一起谈及，可通过以下解释它们的关系：
 
-> **進程相當於一個項目，而綫程則是爲了完成項目需求，而建立的一個個開發任務。**
+> **进程相当于一个项目，而线程则是为了完成项目需求，而建立的一个个开发任务。**
 
-因此，當開發任務間無先後次序時，拆分出支綫來并發，可顯著提升效率（而科學的分工，符合[**宇宙法則**](https://zh.wikipedia.org/zh-tw/%E5%B8%95%E7%B4%AF%E6%89%98%E6%B3%95%E5%88%99)）。
+因此，当开发任务间无先后次序时，拆分出支线来方便并发，可以使效率up up（科学的分工，符合[**宇宙法則**](https://zh.wikipedia.org/zh-tw/%E5%B8%95%E7%B4%AF%E6%89%98%E6%B3%95%E5%88%99)）。
 
-## 0x01 如何創建綫程(how?)
+## 0x01 如何创建线程(how?)
 
 ---
-
-創建前，先瞭解調用綫程的必經步驟。
+创建前，先了解调用线程的必经步骤。
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howtaskwork.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howtaskwork.jpg)
 
-根據流程圖，構建與之對應的測試代碼。
+根据流程图，构建与之对应的测试代码。
 
 ```c
 #include <pthread.h>
@@ -44,38 +43,38 @@ tags:
 
 #define NUM_OF_TASKS 5
 
-//聲明綫程函數
+//声明函数
 void *downloadfile(void *filename) 
 {
    printf("I am downloading the file %s!\n", (char *)filename);
    sleep(10);
    long downloadtime = rand()%100;
    printf("I finish downloading the file within %d minutes!\n", downloadtime);
-   //次綫程結束並返回隨機生成的downloadtime
+   //次线程结束并返回随机生成的downloadtime
    pthread_exit((void *)downloadtime); 
 }
 
 int main(int argc, char *argv[])
-   //聲明數組
+   //声明数组
    char files[NUM_OF_TASKS][20]={"file1.avi","file2.rmvb","file3.mp4","file4.wmv","file5.flv"}; 
-   //聲明該數組為綫程對象
+   //声明该数组为线程对象
    pthread_t threads[NUM_OF_TASKS];                                    
    int rc;
    int t;
    int downloadtime;
 
    
-   //設置綫程屬性
+   //设置线程属性
    pthread_attr_t thread_attr;                                         
-   //初始化綫程
+   //初始化线程
    pthread_attr_init(&thread_attr);                                   
-   //設置其屬性為主綫程等待子綫程，並獲取其退出狀態方便調試
+   //设置其属性为主线程等待子线程，并获取其退出状态方便调试
    pthread_attr_setdetachstate(&thread_attr,PTHREAD_CREATE_JOINABLE);  
 
    for(t=0;t<NUM_OF_TASKS;t++){
      //打印
      printf("creating thread %d, please help me to download %s\n", t+1, files[t]);
-     //創建並開啓綫程&thread_attr，然後指定子綫程的函數downloadfile
+	 //创建并开启线程 &thread_attr, 然后指定子线程的函数 downloadfie
      rc = pthread_create(&threads[t], &thread_attr, downloadfile, (void *)files[t]); 
      if (rc){
        printf("ERROR; return code from pthread_create() is %d\n", rc);
@@ -83,22 +82,21 @@ int main(int argc, char *argv[])
      }
    }
 
-   //銷毀綫程屬性
+   //回收线程属性
    pthread_attr_destroy(&thread_attr);  
 
    for(t=0;t<NUM_OF_TASKS;t++){
-     //等待綫程結束，並取得返回的downloadtime數值
+     //等待线程结束，并取得返回的downloadtime数值
      pthread_join(threads[t],(void**)&downloadtime);  
      printf("Thread %d downloads the file %s in %d minutes.\n",t+1,files[t],downloadtime);
    }
 
-   //主綫程結束
+   //主线程结束
    pthread_exit(NULL); 
 }
 ```
 
-對代碼進行編譯運行。多次運行我們可以見到綫程的隨機創建（皆因綫程創建需要資源動態分配）。
-
+对代码进行编译，多次运行观察线程的随机创建（线程创建全靠资源动态分配）。
 ```bash
 [root@learn ~]# gcc download.c -lpthread -o download.out
 [root@learn ~]# ./download.out 
@@ -145,15 +143,15 @@ Thread 4 downloads the file file4.wmv in 15 minutes.
 Thread 5 downloads the file file5.flv in 77 minutes.
 ```
 
-## 0x02 綫程的數據(when and where?)
+## 0x02 线程的数据(when and where?)
 
 ---
 
-在瞭解并发多綫程的運作模式及優勢，緊接要解決綫程對**三種不同位置類別數據**的處理方式。
+了解完并发多线程的运作模式和优势，接着是线程对**三种不同位置类别数据**的处理方式。
 
-### 綫程棧上的本地數據
+### 线程栈上的本地数据
 
-默認被賦予了每個綫程8MB的綫程棧空間，用於存儲其中的局部變量。
+默认被赋予了每个线程8MB的线程栈空间，用于存储其中的局部变量。
 
 ```bash
 [root@learn ~]# ulimit -a
@@ -175,9 +173,9 @@ virtual memory          (kbytes, -v) unlimited
 file locks                      (-x) unlimited
 ```
 
-而内存中綫程棧間有用小塊區域來隔離各自空間，儅被踏入則會引發[段錯誤](https://baike.baidu.com/item/%E6%AE%B5%E9%94%99%E8%AF%AF)***[(Segmentation fault)](https://en.wikipedia.org/wiki/Segmentation_fault)***。
+而内存中线程栈间有用小块区域来隔离各自空间，当被踏入则会引发[段错误](https://baike.baidu.com/item/%E6%AE%B5%E9%94%99%E8%AF%AF)***[(Segmentation fault)](https://en.wikipedia.org/wiki/Segmentation_fault)***。
 
-可以通過函數pthread_attr_t來修改單個綫程棧大小，或者通過ulimit -s來進行全局修改。
+可以通过函数pthread_attr_t来修改单个线程栈大小，或者通过ulimit -s来进行全局修改。
 
 ```bash
 int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
@@ -185,17 +183,17 @@ int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
 ulimit -s 16384
 ```
 
-### 進程中共享的全局數據
+### 进程中共享的全局数据
 
-綫程在讀取進程中共享的全局數據時，引入互斥鎖**Mutex(Mutual Exclusion)**來避免數據不一，需要**等待互斥鎖[(pthread_mutex_lock()]** 或**嘗試互斥鎖[pthread_mutex_trylock()]** 來保證獨占。 前者需要一直等待，後者則可以根據沒搶到的提示佛系搶佔。
+线程在读取进程中共享的全局数据时，引入互斥锁**Mutex(Mutual Exclusion)**来避免数据不一，需要**等待互斥锁[(pthread_mutex_lock()]** 或**尝试互斥锁[pthread_mutex_trylock()]** 來保证独占。 前者需要一直等待，后者则可以根据没抢到的提示佛系抢占。
 
-- 無條件變量的等待互斥鎖
+- 无条件变量的等待互斥锁
 
     ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexwork.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexwork.jpg)
 
-    **有無鎖的情況對比，可幫助明白鎖的重要性。**
+    **有无锁的情况对比，可帮助明白锁的重要性。**
 
-    **無互斥鎖**，受多綫程影響的全局變量**(money_of_tom + money_of_jerry)**：
+    **无互斥锁**，受多线程影响的全局变量**(money_of_tom + money_of_jerry)**：
 
     ```bash
     [root@learn ~]# cat mutex.c 
@@ -211,7 +209,7 @@ ulimit -s 16384
     //暂不启用mutex
     //pthread_mutex_t g_money_lock;
     
-    //創建子綫程用於執行金額轉賬
+	//创建子线程用于执行金额转账
     void *transfer(void *notused)   
     {
       pthread_t tid = pthread_self();
@@ -228,7 +226,7 @@ ulimit -s 16384
       pthread_exit((void *)0);
     }
     
-    //主綫程負責輸出總額，子綫程負責交易細節
+	//主线程负责输出总额，子线程负责交易细节
     int main(int argc, char *argv[])  
     {
       pthread_t threads[NUM_OF_TASKS];
@@ -238,7 +236,7 @@ ulimit -s 16384
       //pthread_mutex_init(&g_money_lock, NULL);
     
       for(t=0;t<NUM_OF_TASKS;t++){
-        //創建子綫程開啓轉賬
+	    //创建子线程开启转账
         rc = pthread_create(&threads[t], NULL, transfer, NULL); 
         if (rc){
           printf("ERROR; return code from pthread_create() is %d\n", rc);
@@ -250,7 +248,7 @@ ulimit -s 16384
         //暂不启用mutex
         //pthread_mutex_lock(&g_money_lock);
         printf("money_of_tom + money_of_jerry = %d\n", money_of_tom + money_of_jerry);
-        //隨機輸出時間
+		//随机输出时间
         sleep(rand()%3);  
         //暂不启用mutex
         //pthread_mutex_unlock(&g_money_lock);
@@ -320,7 +318,7 @@ ulimit -s 16384
     money_of_tom + money_of_jerry = 200
     ```
 
-    **有互斥鎖**，受多綫程影響的全局變量**(money_of_tom + money_of_jerry)**：
+    **有互斥锁**，受多线程影响的全局变量**(money_of_tom + money_of_jerry)**：
 
     ```bash
     [root@learn ~]# cat mutex.c 
@@ -340,13 +338,13 @@ ulimit -s 16384
     {
       pthread_t tid = pthread_self();
       printf("Thread %u is transfering money!\n", (unsigned int)tid);
-      //開始轉賬前，等待互斥鎖獨占共享變量
+	  //开始转账前，等待互斥锁独占共享变量
       pthread_mutex_lock(&g_money_lock);   
       sleep(rand()%10);
       money_of_tom+=10;
       sleep(rand()%10);
       money_of_jerry-=10;
-      //完成轉賬後，釋放互斥鎖
+	  //完成转账后，释放互斥锁
       pthread_mutex_unlock(&g_money_lock);  
       printf("Thread %u finish transfering money!\n", (unsigned int)tid);
       pthread_exit((void *)0);
@@ -357,7 +355,7 @@ ulimit -s 16384
       pthread_t threads[NUM_OF_TASKS];
       int rc;
       int t;
-      //開始創建綫程前，初始化一個互斥鎖&g_money_lock
+	  //开始创建线程前，初始化一个互斥锁 &g_money_lock
       pthread_mutex_init(&g_money_lock, NULL); 
     
       for(t=0;t<NUM_OF_TASKS;t++){
@@ -369,14 +367,14 @@ ulimit -s 16384
       }
       
       for(t=0;t<100;t++){
-        //開始打印共享變量前，等待互斥鎖獨占共享變量
+        //开始打印共享变量前，等待互斥锁独占共享变量
         pthread_mutex_lock(&g_money_lock);   
         printf("money_of_tom + money_of_jerry = %d\n", money_of_tom + money_of_jerry);
         sleep(rand()%10);
-        //完成輸出后解鎖
+        //完成输出后解锁
         pthread_mutex_unlock(&g_money_lock);  
       }
-      //全部完成後，銷毀鎖
+      //全部完成后，销毁锁
       pthread_mutex_destroy(&g_money_lock); 
       pthread_exit(NULL);
     }
@@ -403,11 +401,11 @@ ulimit -s 16384
     Thread 4127127296 finish transfering money!
     ```
 
-- 有條件變量的等待互斥鎖
+- 有条件变量的等待互斥锁
 
     ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg)
 
-    根據流程圖，構建與之對應的測試代碼。
+    根据流程图，构建与之对应的测试代码。
 
 ```bash
 [root@learn ~]# cat varmutex.c
@@ -418,55 +416,55 @@ ulimit -s 16384
 #define NUM_OF_TASKS 3
 #define MAX_TASK_QUEUE 11
 
-char tasklist[MAX_TASK_QUEUE]="ABCDEFGHIJ";  //聲明含十個任務的數組
+char tasklist[MAX_TASK_QUEUE]="ABCDEFGHIJ";  //声明含十个任务的数组
 int head = 0;
 int tail = 0;
 
 int quit = 0;
 
-pthread_mutex_t g_task_lock;                // 聲明互斥鎖 g_task_lock
-pthread_cond_t g_task_cv;                   // 聲明條件變量 g_task_cv
+pthread_mutex_t g_task_lock;                // 声明互斥锁 g_task_lock
+pthread_cond_t g_task_cv;                   // 声明条件变量 g_task_cv
 
-void *coder(void *notused)                  // 定義子綫程工作内容
+void *coder(void *notused)                  // 定义子线程工作内容
 {
-  pthread_t tid = pthread_self();           // 聲明子綫程的tid
+  pthread_t tid = pthread_self();           // 声明子线程的tid
 
-  while(!quit){                            //  反運算符，不爲零則假，爲零則真
+  while(!quit){                            //  反运算符，≠0为假，=0则真
 
-    pthread_mutex_lock(&g_task_lock);       // 等待互斥鎖
-    while(tail == head){                    // 僅所有task完成後，tail==head
-      if(quit){                             // 如果收到quit信號退出
-        pthread_mutex_unlock(&g_task_lock); // 釋放互斥鎖
-        pthread_exit((void *)0);            // 退出綫程
+    pthread_mutex_lock(&g_task_lock);       // 等待互斥锁
+    while(tail == head){                    // 仅所有task完成后，tail==head
+      if(quit){                             // 如果收到quit信号退出
+        pthread_mutex_unlock(&g_task_lock); // 释放互斥锁
+        pthread_exit((void *)0);            // 退出线程
       }
-      // 打印等待綫程
+      // 打印等待线程
       printf("No task now! Thread %u is waiting!\n", (unsigned int)tid);  
-      // 一直等待條件變量和互斥鎖的入參將自動搶鎖。
+      // 一直等待条件变量和互斥锁的入参将自动抢锁。
       pthread_cond_wait(&g_task_cv, &g_task_lock); 
-      //綫程id開始執行綫程
+      //线程id开始执行线程
       printf("Have task now! Thread %u is grabing the task !\n", (unsigned int)tid); 
     }
-    char task = tasklist[head++];          // 推進已完成head
-    pthread_mutex_unlock(&g_task_lock);    // 釋放整個子綫程的互斥鎖
-    printf("Thread %u has a task %c now!\n", (unsigned int)tid, task); //  獲得任務
-    sleep(5);                              // 摸魚五秒后打印完成    
+    char task = tasklist[head++];          // 推进已完成head
+    pthread_mutex_unlock(&g_task_lock);    // 释放整个子线程的互斥锁
+    printf("Thread %u has a task %c now!\n", (unsigned int)tid, task); //  获得任务
+    sleep(5);                              // 摸鱼五秒后打印完成    
     printf("Thread %u finish the task %c!\n", (unsigned int)tid, task);
   }
 
   pthread_exit((void *)0);
 }
 
-int main(int argc, char *argv[])            // 定義主綫程工作内容 
+int main(int argc, char *argv[])            // 定义主线程工作内容 
 {
-  pthread_t threads[NUM_OF_TASKS];          // 聲明綫程。其中包含十個任務數組
+  pthread_t threads[NUM_OF_TASKS];          // 声明线程。其中包含十个任务数组
   int rc;
   int t;
 
-  pthread_mutex_init(&g_task_lock, NULL);   // 初始化互斥鎖
-  pthread_cond_init(&g_task_cv, NULL);      // 初始化條件變量
+  pthread_mutex_init(&g_task_lock, NULL);   // 初始化互斥锁
+  pthread_cond_init(&g_task_cv, NULL);      // 初始化条件变量
 
   for(t=0;t<NUM_OF_TASKS;t++){  
-    // 創建無屬性綫程，調用coder之後就繼續往下。
+    // 创建无属性线程，调用coder之后就继续往下。
     rc = pthread_create(&threads[t], NULL, coder, NULL); 
     if (rc){
       printf("ERROR; return code from pthread_create() is %d\n", rc);
@@ -474,24 +472,24 @@ int main(int argc, char *argv[])            // 定義主綫程工作内容
     }
   }
 
-  sleep(5);  // 等待五秒避免與子進程請求互斥鎖的衝突。
+  sleep(5);  // 等待五秒避免与子进程请求互斥锁的冲突。
 
   for(t=1;t<=4;t++){
-    pthread_mutex_lock(&g_task_lock);      // 等待互斥鎖
-    tail+=t;                               // 標志待完成位為1開始標記，2，3，4
-    printf("I am Boss, I assigned %d tasks, I notify all coders!\n", t); // 打印發佈任務數
-    pthread_cond_broadcast(&g_task_cv);    // 使用pthread_cond_broadcast通知所有綫程的條件變量
-    pthread_mutex_unlock(&g_task_lock);    // 之後吊銷發佈任務的互斥鎖
-    sleep(20);                             // 並等待20秒后繼續發佈任務
+    pthread_mutex_lock(&g_task_lock);      // 等待互斥锁
+    tail+=t;                               // 标志待完成位为1开始标记，2，3，4
+    printf("I am Boss, I assigned %d tasks, I notify all coders!\n", t); // 打印发布任务数
+    pthread_cond_broadcast(&g_task_cv);    // 使用pthread_cond_broadcast通知所有线程的条件变量
+    pthread_mutex_unlock(&g_task_lock);    // 吊销发布任务的互斥锁
+    sleep(20);                             // 并等待20秒后继续发布任务
   }
 
-  pthread_mutex_lock(&g_task_lock);        // 請求互斥鎖
-  quit = 1;                                // 不爲零，停止子綫程創建
-  pthread_cond_broadcast(&g_task_cv);      // 並通知現有綫程
-  pthread_mutex_unlock(&g_task_lock);      // 釋放互斥鎖
+  pthread_mutex_lock(&g_task_lock);        // 请求互斥锁
+  quit = 1;                                // 不为0，停止子线程创建
+  pthread_cond_broadcast(&g_task_cv);      // 并通知现有线程
+  pthread_mutex_unlock(&g_task_lock);      // 释放互斥锁
 
-  pthread_mutex_destroy(&g_task_lock);     // 銷毀互斥鎖
-  pthread_cond_destroy(&g_task_cv);        // 銷毀條件變量
+  pthread_mutex_destroy(&g_task_lock);     // 销毁互斥锁
+  pthread_cond_destroy(&g_task_cv);        // 销毁条件变量
   pthread_exit(NULL);
 }
 
@@ -573,9 +571,9 @@ Thread 3491833600 finish the task J !
 No task now! Thread 3491833600 is waiting!
 ```
 
-### 綫程的私有數據
+### 线程的私有数据
 
-與本地數據的區別在於，前者只是局部變量，私有數據是于綫程創建的全局變量，亦非進程的全局變量。
+与本地数据的区别在于，前者只是局部变量，私有数据是于线程创建的全局变量，亦非进程的全局变量。
 
 #### 創建key对应的value
 
@@ -583,22 +581,22 @@ No task now! Thread 3491833600 is waiting!
 int pthread_setspecific(pthread_key_t key, const void *value)
 ```
 
-#### 獲得key对应的value
+#### 获得key对应的value
 
 ```c
 void *pthread_getspecific(pthread_key_t key)
 ```
 
-## 0x03 結語
+## 0x03 结语
 
 ---
 
-1. 主要闡述了三部分，what and why，how，when and where 。
-2. 當中how通過代碼樣例，示範了創建綫程的步驟，創建並運行了一個多綫程樣例隨機運行的情況。
-3. 在when and where中，通過比較，得出互斥鎖對於保護綫程操作數據的必要性。
-4. 之後在三種不同的綫程數據中，重點解剖了有無變量控制下的互斥鎖工作過程。
-5. 以下是總結貼圖。
+1. 主要阐述了三部分，what and why，how，when and where 。
+2. 当中how通过代码样例，示范了创建线程的步骤，创建并运行了一个多线程样例随机运行的情况。
+3. 在when and where中，通过比较，得出互斥锁对于保护线程操作数据的必要性。
+4. 之后在三种不同的线程数据中，重点解剖了有无变量控制下的互斥锁工作过程。
+5. 以下是总结贴图。
 
     ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/summarytasks.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/summarytasks.png)
 
-6. 個人學習筆記，歡迎斧正。
+6. 个人学习笔记，欢迎斧正。
