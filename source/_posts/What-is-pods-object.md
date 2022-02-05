@@ -9,11 +9,12 @@ tags:
 - "Linux "
 - "Kubernetes "
 - "Pod "
-
 ---
 # 深入剖析K8s笔记<Pod的对象们>
+
 ## 0x00 引言
 编写yaml时很容易遇到的一个问题：什么属性属于Pod对象，而什么又属于Container对象？
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/pod.png" width=50% /></center>
 
 <!-- more -->
 
