@@ -1,5 +1,5 @@
 ---
-title: 深入剖析K8s笔记<Pod的对象们>
+title: 深入剖析K8s筆記(Pod的對象們)
 mathjax: true
 copyright: true
 comment: true
@@ -10,6 +10,7 @@ tags:
 - "Kubernetes "
 - "Pod "
 ---
+
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/pod.png" width=50% /></center>
 
 ## 0x00 引言

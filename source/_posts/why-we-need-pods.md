@@ -1,5 +1,5 @@
 ---
-title: 深入剖析K8s筆記<爲什麽我們需要Pod>
+title: 深入剖析K8s筆記(爲什麽我們需要Pod)
 mathjax: true
 copyright: true
 comment: true
