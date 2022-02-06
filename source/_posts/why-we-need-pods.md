@@ -13,8 +13,6 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/pod.png" width=50% /></center>
 
-本文旨在简单记录学习Pod的笔记。
-
 ## 0x00 前言
 Pod，是Kubernetes项目的原子调度单位。但为什么是呢？
 
