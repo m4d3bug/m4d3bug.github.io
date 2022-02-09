@@ -1,5 +1,5 @@
 ---
-title: 深入剖析K8s笔记(特殊的Volume)
+title: 深入剖析K8s筆記(特殊的Volume)
 mathjax: true
 copyright: true
 comment: true
