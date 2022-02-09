@@ -303,7 +303,7 @@ metadata.annotations - Pod的所有Annotation
 ## 0x04 ServiceAccountToken
 其实是Secret的变种，专门用于K8s系统内置的服务账户凭证。
 
-## 调用(InClusterConfig
+### 调用(InClusterConfig
 默认情况下会把相应的密钥信息挂载进容器里
 
 ```bash
