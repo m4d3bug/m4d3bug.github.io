@@ -86,7 +86,7 @@ Events:
   Warning  Unhealthy  13m (x9 over 16m)     kubelet            Liveness probe failed: cat: can't open '/tmp/healthy': No such file or directory
   Normal   Killing    13m (x3 over 15m)     kubelet            Container liveness failed liveness probe, will be restarted
 ```
-这就是K8s的Pod的恢复机制，且恢复永远在同一节点，这就是`kind: Pod`和`kind: Deployment`的区别。
+这就是K8s的Pod的恢复机制，但为什么总是在同一节点恢复呢？这就是`kind: Pod`和`kind: Deployment`的区别。
 
 ## 0x02 恢复机制-pod.spec.restartPolicy
 谈到恢复机制，pod.spec.restartPolicy的状态有以下三种。
