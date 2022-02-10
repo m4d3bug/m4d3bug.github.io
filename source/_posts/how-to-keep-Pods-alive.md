@@ -90,12 +90,10 @@ Events:
 
 ## 0x02 恢复机制-pod.spec.restartPolicy
 谈到恢复机制，pod.spec.restartPolicy的状态有以下三种。
-
 * Always：在任何情况下，只要Container不在运行状态，就自动重启Container；
-
 * OnFailure: 只在Container异常时才自动重启Container；
 * Never: 从来不重启Container。
-PS：
+另外需要注意：
 * Container被重新自动创建，内容可能丢失。
 * 默认的恢复策略就是Always。
 * Pod内所有的容器都异常才会显示为Failed。
