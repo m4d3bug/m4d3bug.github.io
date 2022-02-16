@@ -14,11 +14,11 @@ tags:
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/ulimit-command.jpg" width=50% /></center>
 
 ## 0x00 前言
-        最近遇到一个问题，`/etc/system/system.conf` 和`/etc/system/user.conf` 的区别，没看到有很合适的笔记，简单记录一下。
+最近遇到一个问题，`/etc/system/system.conf` 和`/etc/system/user.conf` 的区别，没看到有很合适的笔记，简单记录一下。
 <!-- more -->
 
-## 0x01 它们的概念
-        遇到不懂的东西，自然而言首先求助于Linux真身自带的文档。
+## 0x01 概念
+遇到不懂的Linux概念，自然而言首先求助于`Linux`自带的文档。
 
 ```bash
 # rpm -qd systemd |grep user
@@ -40,10 +40,10 @@ tags:
 DESCRIPTION
 When run as a system instance, systemd interprets the configuration file system.conf and the files in system.conf.d directories; when run as a user instance, systemd interprets the configuration file user.conf and the files in user.conf.d directories. These configuration files contain a few settings controlling basic manager operations. See systemd.syntax(5) for a general description of the syntax.
 ```
-        至此，我们可以得到一个简单清晰的关系链，当作为`system instance`时，`systemd`会引入`system.conf`，当作为`user instance`时，`systemd`会引入`user.conf`。但是新的问题又来了。
+至此，我们可以得到一个简单清晰的关系链，当作为`system instance`时，`systemd`会引入`system.conf`，当作为`user instance`时，`systemd`会引入`user.conf`。但是新的问题又来了。
 
-## 0x02 什么是user instance？
-        简单google整理一下思路。
+## 0x02 user instance
+简单`google`整理一下思路。
 
 * 概念
 
@@ -56,7 +56,7 @@ https://wiki.archlinux.org/title/Systemd/User
 ```
 * [样例](https://www.unixsysadmin.com/systemd-user-services/)
 
-        PS:  我的过程中加入了`export XDG_RUNTIME_DIR=/run/user/$(id -u)`, [该变量用于设置用户自动登录](https://askubuntu.com/questions/872792/what-is-xdg-runtime-dir)。
+PS:  我的过程中加入了`export XDG_RUNTIME_DIR=/run/user/$(id -u)`, [该变量用于设置用户自动登录](https://askubuntu.com/questions/872792/what-is-xdg-runtime-dir)。
 
 ```bash
 [root@rhel8 ] useradd -d /home/myapp -m -s /bin/bash -c "My application account" myapp
@@ -108,10 +108,10 @@ Max nice priority         0                    0
 Max realtime priority     0                    0
 Max realtime timeout      unlimited            unlimited            us
 ```
-        至此，`user instance`和`user.conf`都了解得七七八八了，那就检验一下吧。
+至此，`user instance`和`user.conf`都了解得七七八八了，那就检验一下吧。
 
 ## 0x03 检验
-         检验的方式和`system.conf`一样，在`/etc/systemd/user.conf`中设置。
+检验的方式和`system.conf`一样，在`/etc/systemd/user.conf`中设置。
 
 ```bash
 [root@rhel8 ]# cat  /etc/systemd/user.conf  |grep -vE '^$|^#'
@@ -129,7 +129,7 @@ DefaultLimitNOFILE=65535
    CGroup: /user.slice/user-1001.slice/user@1001.service/myapp.service
            └─3943 /usr/bin/python3 -m http.server 8080
 ```
-        不一会儿
+不一会儿
 
 ```bash
 [myapp@rhel8 ~]$ cat /proc/3943/limits
@@ -152,7 +152,7 @@ Max realtime priority     0                    0
 Max realtime timeout      unlimited            unlimited            us
 ```
 ## 0x04 总结
-        本文简单地从`user.conf`谈起，到`user instance`的探讨，最后到检验它们两者的关联。可以看到，时至今日，systemd仍然在进化，而多用户管理场景，在云计算未兴起的场景下，是复用资源的利器。
+本文简单地从`user.conf`谈起，到`user instance`的探讨，最后到检验它们两者的关联。可以看到，时至今日，systemd仍然在进化，而多用户管理场景，在云计算未兴起的场景下，是复用资源的利器。
 
 
 
