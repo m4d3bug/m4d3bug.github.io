@@ -152,7 +152,7 @@ Max realtime priority     0                    0
 Max realtime timeout      unlimited            unlimited            us
 ```
 ## 0x04 总结
-本文简单地从`user.conf`谈起，到`user instance`的探讨，最后到检验它们两者的关联。可以看到，时至今日，systemd仍然在进化，而多用户管理场景，在云计算未兴起的场景下，是复用资源的利器。
+本文简单地从`user.conf`谈起，到`user instance`的探讨，最后到检验它们两者的关联。可以看到，时至今日，systemd仍然在进化，而多用户管理场景，在云计算不合适的场景下，也是复用资源的一种思路。
 
 
 
