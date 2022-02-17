@@ -59,10 +59,10 @@ https://wiki.archlinux.org/title/Systemd/User
 PS:  我的过程中加入了`export XDG_RUNTIME_DIR=/run/user/$(id -u)`, [该变量用于设置用户自动登录](https://askubuntu.com/questions/872792/what-is-xdg-runtime-dir)。
 
 ```bash
-[root@rhel8 ] useradd -d /home/myapp -m -s /bin/bash -c "My application account" myapp
-[root@rhel8 ] loginctl enable-linger myapp
-[root@rhel8 ] 
-[root@rhel8 ] su - myapp
+[root@rhel8 ]# useradd -d /home/myapp -m -s /bin/bash -c "My application account" myapp
+[root@rhel8 ]# loginctl enable-linger myapp
+[root@rhel8 ]# 
+[root@rhel8 ]# su - myapp
 [myapp@rhel8 ~]$ mkdir -p ~/.config/systemd/user/
 [myapp@rhel8 ~]$ cat >> ~/.config/systemd/user/myapp.service << EOF
 [Unit]
