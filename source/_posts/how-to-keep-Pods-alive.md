@@ -15,15 +15,15 @@ tags:
 
 ## 0x00 前言
 
-healthy check除了监控Pod/Container状态外，有没有更细致，监控Container内服务状态的方法呢？
+Q: `healthy check`除了监控`Pod/Container`状态外，有没有更细致，监控`Container`内服务状态的方法呢？
 
 <!-- more -->
 
-有，可以为Container定义一个“探针” Probe，kubelet就可以根据这个Probe的返回值断定Container的状态，而不只以Container运行为标准。而且探针有三种：
+A: 有，可以为`Container`定义一个“探针” `Probe`，`kubelet`就可以根据这个`Probe`的返回值断定`Container`的状态，而不只以`Container`运行为标准。而且探针有三种：
 
-* livenessProbe存活探针
-* readinessProbe就绪探针
-* startupProbe启动探针
+* `livenessProbe`存活探针
+* `readinessProbe`就绪探针
+* `startupProbe`启动探针
 
 ## 0x01 健康检查-探针
 ### livenessProbe存活探针
@@ -54,7 +54,7 @@ spec:
       #5秒一次
       periodSeconds: 5
 ```
-观察一下，kubelet的恢复机制（pod.spec.restartPolicy）在不停地拉起保活。
+观察一下，`kubelet`的恢复机制（pod.spec.restartPolicy）在不停地拉起保活。
 
 ```bash
 $ kubectl get pod test-liveness-exec -o wide --watch                                                                                 
@@ -99,9 +99,9 @@ Events:
 * Pod内所有的容器都异常才会显示为Failed。
 * [更多](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/)
 ## 0x03 多一重保险-预设字段
-那有没有办法可以从运维的角度去预设这些健康检查的字段呢？
+Q: 那有没有办法可以从运维的角度去预设这些健康检查的字段呢？
 
-有，PodPresent
+A: 有，PodPresent
 
 ```bash
 $ kubectl apply -f preset.yaml 
