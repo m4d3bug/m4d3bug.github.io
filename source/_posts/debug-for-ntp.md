@@ -1,6 +1,6 @@
 ---
 layout: posts
-title: 时钟源的一次debug
+title: 時鐘源的一次debug
 mathjax: true
 copyright: true
 comment: true
