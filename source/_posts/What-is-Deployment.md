@@ -248,7 +248,7 @@ $ kubectl rollout history deployment/nginx-deployment --revision=2
 ReplicaSet 的个数可以通过`kubectl rollout pause deployment/nginx-deployment` 控制，pause状态下的deployment不会因多次edit操作创建新的ReplicaSet（有点git为了控制comment次数，把多个add合并到一个comment的感觉。）之后，可以通过`kubectl rollout resume deployment/nginx-deployment` 合并当前所有的edit为一次更新，但老实说，这有悖每次变更操作的最小化原则。介意的话，或者可以试试`spec.revisionHistoryLimit` ，但我更倾向于都不做～
 
 ## 0x03 总结
-这篇难产了几天，终于啃完，也加深了理解，希望可以继续坚持。
+这篇难产了几天，终于啃完，也加深了deployment理解，希望可以继续坚持。后续方便理解[蓝绿发布](https://github.com/ContainerSolutions/k8s-deployment-strategies/tree/master/blue-green)，[金丝雀发布](https://github.com/ContainerSolutions/k8s-deployment-strategies/tree/master/canary)
 
 
 
