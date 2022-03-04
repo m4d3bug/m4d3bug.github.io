@@ -98,6 +98,7 @@ Events:
 * 默认的恢复策略就是Always。
 * Pod内所有的容器都异常才会显示为Failed。
 * [更多](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/)
+
 ## 0x03 多一重保险-预设字段
 Q: 那有没有办法可以从运维的角度去预设这些健康检查的字段呢？
 
