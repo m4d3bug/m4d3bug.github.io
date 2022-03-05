@@ -56,7 +56,7 @@ https://wiki.archlinux.org/title/Systemd/User
 ```
 * [样例](https://www.unixsysadmin.com/systemd-user-services/)
 
-PS:  我的过程中加入了`export XDG_RUNTIME_DIR=/run/user/$(id -u)`, [该变量用于设置用户自动登录](https://askubuntu.com/questions/872792/what-is-xdg-runtime-dir)。
+PS:  我的过程中加入了`export XDG_RUNTIME_DIR=/run/user/$(id -u)`, [该变量用于设置用户自动登录, 为对应用户生成uid](https://askubuntu.com/questions/872792/what-is-xdg-runtime-dir)。
 
 ```bash
 [root@rhel8 ]# useradd -d /home/myapp -m -s /bin/bash -c "My application account" myapp
