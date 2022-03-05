@@ -89,8 +89,6 @@ apply了Deployment，ReplicaSet也被创建了，也不难推出它们的关系�
 
 [drawio](gao8Do6yj1f-q2DHNmohGz9hkhON_8pTlhcLGZsiYRU.svg)
 
-{% diagramsnet "diagram.drawio" %}
-
 实现水平扩展 / 收缩的核心，就需要改改yml，或者使用`kubectl scale` 
 
 ```bash
