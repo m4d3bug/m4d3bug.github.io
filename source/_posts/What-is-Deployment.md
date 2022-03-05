@@ -1,4 +1,4 @@
----
+- --
 layout: posts
 title: 深入剖析K8s筆記(什麽是Deployment)
 mathjax: true
@@ -89,6 +89,8 @@ nginx-deployment-848bcb569b-8nw82   1/1     Running   0          8m16s
 apply了Deployment，ReplicaSet也被创建了，也不难推出它们的关系。
 
 [drawio](gao8Do6yj1f-q2DHNmohGz9hkhON_8pTlhcLGZsiYRU.svg)
+
+{% diagramsnet "diagram.drawio" %}
 
 实现水平扩展 / 收缩的核心，就需要改改yml，或者使用`kubectl scale` 
 
