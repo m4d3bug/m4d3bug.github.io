@@ -1,4 +1,4 @@
-- --
+---
 title: 深入剖析K8s筆記(什麽是Deployment)
 mathjax: true
 copyright: true
