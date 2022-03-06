@@ -11,7 +11,7 @@ tags:
 - "StatefulSet "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/tatefulset&topology.png" width=50% /></center>
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/statefulset&topology.png" width=50% /></center>
 
 ## 0x00 前言
 Q：有Deployment不就够了吗？StatefulSet 又是什么？
