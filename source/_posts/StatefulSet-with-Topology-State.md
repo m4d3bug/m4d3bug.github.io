@@ -18,9 +18,9 @@ Q：有Deployment不就够了吗？StatefulSet 又是什么？
 
 <!-- more -->
 
-A：Deployment的问题在于，更适合“无状态”应用，而非主从 / 主备关系分布式应用。
+A：Deployment: “无状态”应用√，主从 / 主备关系分布式应用x。
 
-而StatefulSet就是专门解决“有状态”（Stateful Application）应用，其不外乎两类状态。
+而StatefulSet专注“有状态”（Stateful Application）应用，其不外乎两类状态。
 
 * 拓扑状态：应用的按序创建 / 启动。
 * 存储状态：应用内多个实例，与不同存储的关系。
