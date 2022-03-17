@@ -11,7 +11,7 @@ tags:
 - "StatefulSet "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/pvc&pv.png" width=50% /></center>
+<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/pv&pvc.png" width=50% /></center>
 
 ## 0x00 前言
 
