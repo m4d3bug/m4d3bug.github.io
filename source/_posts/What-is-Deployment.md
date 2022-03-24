@@ -15,7 +15,7 @@ tags:
 
 ## 0x00 前言
 
-开门见山，这篇blog的主角是Deployment。
+开门见山，这篇blog的主角是`Deployment`。
 
 <!-- more -->
 
