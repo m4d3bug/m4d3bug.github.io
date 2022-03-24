@@ -109,7 +109,7 @@ Waiting for deployment "nginx-deployment" rollout to finish: 1 of 3 updated repl
 Waiting for deployment "nginx-deployment" rollout to finish: 2 of 3 updated replicas are available...
 deployment "nginx-deployment" successfully rolled out
 ```
-一个监控`deployment`
+一个监控`Deployment`
 
 ```bash
 # kubectl get deployments --watch
@@ -122,7 +122,7 @@ nginx-deployment   1/3     3            1           1s
 nginx-deployment   2/3     3            2           2s
 nginx-deployment   3/3     3            3           2s
 ```
-一个监控R`eplicaSet`
+一个监控`ReplicaSet`
 
 ```bash
 # kubectl get rs --watch
