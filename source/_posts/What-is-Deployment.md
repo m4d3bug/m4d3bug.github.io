@@ -156,7 +156,7 @@ $ kubectl edit deployment/nginx-deployment
 :wq
 deployment.extensions/nginx-deployment edited
 ```
-一个监控`deployment` 
+一个监控`Deployment` 
 
 ```bash
 # kubectl get deployments --watch
