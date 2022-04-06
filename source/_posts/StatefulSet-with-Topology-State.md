@@ -45,7 +45,7 @@ A：Two ways
    * Normal Service直接访问域名获得其 VIP，例如：my-svc.my-namespace.svc.cluster.local 
    * Headless Service直接查询不同域名获得具体Pod IP。
 
-举个🌰：
+举个headless的例子：
 
 ```bash
 $ cat >> svc.yml << EOF
