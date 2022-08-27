@@ -16,7 +16,7 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/funwithduck.jpg" width=50% /></center>
 
-本文將闡述從HomeLab選型購買、裝機到系統安裝的一次完整的實踐。
+本文將阐述從HomeLab選型購買、裝機到系統安裝的一次完整的實踐。
 
 <!-- more -->
 
