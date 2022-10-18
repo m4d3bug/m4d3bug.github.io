@@ -196,8 +196,7 @@ $ curl http://0.0.0.0:9090
 
    ```
    https://your-domain/windows
-   ```   
-
+   ```
 
 ## 0x03 结语
 
