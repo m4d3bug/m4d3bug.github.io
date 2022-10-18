@@ -195,7 +195,7 @@ $ curl http://0.0.0.0:9090
 4. Windows 加入方法。
 
    ```
-   https://your-domain/windows
+   https://<你前面的域名>/windows
    ```
 
 ## 0x03 结语
