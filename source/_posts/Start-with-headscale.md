@@ -198,23 +198,24 @@ $ curl http://0.0.0.0:9090
    https://<你前面的域名>windows
    ```   
 
+
 ## 0x03 结语
 
-   - headscale的打洞能力超强，并且自身还可以搭配/作为derper（derper类似zerotier的moon）。
+- headscale的打洞能力超强，并且自身还可以搭配/作为derper（derper类似zerotier的moon）。
 
-   - headscale本身只是实现了服务端，客户端可以直接沿用tailscale进行加入。
+- headscale本身只是实现了服务端，客户端可以直接沿用tailscale进行加入。
 
-   - 迁移的时候除了`containers-data`下的`private.key`不需要之外，其他都需要迁走。
+- 迁移的时候除了`containers-data`下的`private.key`不需要之外，其他都需要迁走。
 
-   - 我们的方案用了cloudflare tunnel，当然可以[优选出优质ip](https://github.com/XIU2/CloudflareSpeedTest)，然后在软路由侧写入解析。
+- 我们的方案用了cloudflare tunnel，当然可以[优选出优质ip](https://github.com/XIU2/CloudflareSpeedTest)，然后在软路由侧写入解析。
 
-   - 还是很建议[单独搭一个derper的](https://icloudnative.io/posts/custom-derp-servers/#%E4%BD%BF%E7%94%A8%E7%BA%AF-ip)，未必要把官方的derper全部去掉，但是这打洞效率很高。
+- 还是很建议[单独搭一个derper的](https://icloudnative.io/posts/custom-derp-servers/#%E4%BD%BF%E7%94%A8%E7%BA%AF-ip)，未必要把官方的derper全部去掉，但是这打洞效率很高。
 
-   - [headscale支持自定义网段转发](https://tailscale.com/kb/1019/subnets/?tab=linux#enable-ip-forwarding)。
+- [headscale支持自定义网段转发](https://tailscale.com/kb/1019/subnets/?tab=linux#enable-ip-forwarding)。
 
-     ```
-     tailscale up --login-server https://<你前面的域名> --accept-routes=true --accept-dns=false --authkey <你自己设的Preauth Keys> --advertise-routes=x.x.x.x/xx,x.x.x.x/xx
-     ```
+   ```shell
+   $ tailscale up --login-server https://<你前面的域名> --accept-routes=true --accept-dns=false --authkey <你自己设的Preauth Keys> --advertise-routes=x.x.x.x/xx,x.x.x.x/xx
+   ```
 
 ## 0x04 鸣谢
 
