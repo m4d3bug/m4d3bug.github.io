@@ -17,13 +17,13 @@ tags:
 
 ## 0x00 前言
 
-​       什么是headscae ？
+什么是headscae ？
 
-<! -- more -->
+<!-- more -->
 
 > An open source, self-hosted implementation of the Tailscale control server.
 
-​       什么是Tailscale ？
+什么是Tailscale ？
 
 > Tailscale is [a modern VPN](https://tailscale.com/) built on top of [Wireguard](https://www.wireguard.com/). It [works like an overlay network](https://tailscale.com/blog/how-tailscale-works/) between the computers of your networks - using [NAT traversal](https://tailscale.com/blog/how-nat-traversal-works/).
 >
@@ -33,7 +33,7 @@ tags:
 >
 > A [Tailscale network (tailnet)](https://tailscale.com/kb/1136/tailnet/) is private network which Tailscale assigns to a user in terms of private users or an organisation.
 
-​        之前使用wireguard和zerotier（甚至还试了docker版的zerotier root模式）搭建了局域网，现在用headscale再额外搭一个网。有人会嫌网络多吗？反正我不会。我对搭局域网的打洞软件要求不外乎是那么几点：
+之前使用wireguard和zerotier（甚至还试了docker版的zerotier root模式）搭建了局域网，现在用headscale再额外搭一个网。有人会嫌网络多吗？反正我不会。我对搭局域网的打洞软件要求不外乎是那么几点：
 
 - 可迁移
 - 不跨境
@@ -55,7 +55,7 @@ $ mkdir -p /opt/containers/headscale/container-config
 $ cd /opt/containers/headscale/container-config
 $ wget -O ./config.yaml https://img.madebug.net/juanfont/headscale/main/config-example.yaml
 $ sed -i '13c server_url\: https\:\/\/headscale.madebug.net' config.yaml #加入时的回显内容，可选项
-$ sed -i '58c \ \ \-\ 10.9.9.9/24' config.yaml 
+$ sed -i '58c \ \ \-\ 10.9.9.9/24' config.yaml #自定义网段，可选项
 $ cd ..
 $ cat > docker-compose.yaml << EOF
 services:
@@ -196,9 +196,7 @@ $ curl http://0.0.0.0:9090
 
    ```
    https://<你前面的域名>windows
-   ```
-
-   
+   ```   
 
 ## 0x03 结语
 
