@@ -180,7 +180,7 @@ $ curl http://0.0.0.0:9090
 
 3.  创建user就是创建namespace，用来隔离多个不同网段。
 
-## 0x02 客户端
+## 0x03 headscale客户端
 
 1. 安装[tailscale客户端](https://pkgs.tailscale.com/stable/)。
 
@@ -198,7 +198,7 @@ $ curl http://0.0.0.0:9090
    https://<你前面的域名>/windows
    ```
 
-## 0x03 结语
+## 0x04 结语
 
 - headscale的打洞能力超强，并且自身还可以搭配/作为derper（derper类似zerotier的moon）。
 
@@ -216,7 +216,7 @@ $ curl http://0.0.0.0:9090
    $ tailscale up --login-server https://<你前面的域名> --accept-routes=true --accept-dns=false --authkey <你自己设的Preauth Keys> --advertise-routes=x.x.x.x/xx,x.x.x.x/xx
    ```
 
-## 0x04 鸣谢
+## 0x05 鸣谢
 
 - [Setting Up Headscale :: Guru Computing Blog](https://blog.gurucomputing.com.au/smart-vpns-with-headscale/setting-up-headscale/)
 - [Tailscale 基础教程：Headscale 的部署方法和使用教程 – 云原生实验室 - Kubernetes|Docker|Istio|Envoy|Hugo|Golang|云原生](https://icloudnative.io/posts/how-to-set-up-or-migrate-headscale/)
