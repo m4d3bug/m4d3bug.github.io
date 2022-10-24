@@ -21,17 +21,17 @@ tags:
 
 <!-- more -->
 
-> An open source, self-hosted implementation of the Tailscale control server.
+> *An open source, self-hosted implementation of the Tailscale control server.*
 
 什么是Tailscale ？
 
-> Tailscale is [a modern VPN](https://tailscale.com/) built on top of [Wireguard](https://www.wireguard.com/). It [works like an overlay network](https://tailscale.com/blog/how-tailscale-works/) between the computers of your networks - using [NAT traversal](https://tailscale.com/blog/how-nat-traversal-works/).
+> *Tailscale is [a modern VPN](https://tailscale.com/) built on top of [Wireguard](https://www.wireguard.com/). It [works like an overlay network](https://tailscale.com/blog/how-tailscale-works/) between the computers of your networks - using [NAT traversal](https://tailscale.com/blog/how-nat-traversal-works/).*
 >
-> Everything in Tailscale is Open Source, except the GUI clients for proprietary OS (Windows and macOS/iOS), and the control server.
+> *Everything in Tailscale is Open Source, except the GUI clients for proprietary OS (Windows and macOS/iOS), and the control server.*
 >
-> The control server works as an exchange point of Wireguard public keys for the nodes in the Tailscale network. It assigns the IP addresses of the clients, creates the boundaries between each user, enables sharing machines between users, and exposes the advertised routes of your nodes.
+> *The control server works as an exchange point of Wireguard public keys for the nodes in the Tailscale network. It assigns the IP addresses of the clients, creates the boundaries between each user, enables sharing machines between users, and exposes the advertised routes of your nodes.*
 >
-> A [Tailscale network (tailnet)](https://tailscale.com/kb/1136/tailnet/) is private network which Tailscale assigns to a user in terms of private users or an organisation.
+> *A [Tailscale network (tailnet)](https://tailscale.com/kb/1136/tailnet/) is private network which Tailscale assigns to a user in terms of private users or an organisation.*
 
 之前使用wireguard和zerotier（甚至还试了docker版的zerotier root模式）搭建了局域网，现在用headscale再额外搭一个网。有人会嫌网络多吗？反正我不会。我对搭局域网的打洞软件要求不外乎是那么几点：
 
