@@ -55,7 +55,7 @@ $ mkdir -p /opt/containers/headscale/container-config
 $ cd /opt/containers/headscale/container-config
 $ wget -O ./config.yaml https://img.madebug.net/juanfont/headscale/main/config-example.yaml
 $ sed -i '13c server_url\: https\:\/\/headscale.madebug.net' config.yaml #加入时的回显内容，可选项
-$ sed -i '58c \ \ \-\ 10.9.9.9/24' config.yaml #自定义网段，可选项
+$ sed -i '58c \ \ \-\ 10.9.9.0/24' config.yaml #自定义网段，可选项
 $ cd ..
 $ cat > docker-compose.yaml << EOF
 services:
