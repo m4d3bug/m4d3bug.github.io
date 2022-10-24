@@ -89,7 +89,7 @@ EOF
 $ docker network create reverseproxy-nw
 $ docker-compose up -d 
 $ curl http://0.0.0.0:8080/windows
-$ curl http://0.0.0.0:9090
+$ curl http://0.0.0.0:9090/metrics
 ~~~
 
 - **cloudflare tunnel部分**
