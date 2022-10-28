@@ -1,4 +1,4 @@
-~~~
+---
 title: 每天5分钟OSP-Glance01
 mathjax: true
 copyright: true
@@ -12,7 +12,7 @@ tags:
 - "Storage "
 - "OpenStack "
 - "Glance "
-~~~
+---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221029000932.png" width=50% /></center>
 
 本文记录一些个人的glance学习笔记。
