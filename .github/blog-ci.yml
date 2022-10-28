@@ -3,12 +3,12 @@ name: WITH CI
 # 监听 gh-pages 分支的改动
 on:
   push:
-    branches: [ gh-pages ]
+    branches: 
+      - gh-pages
   
 jobs:
   Blog_CI:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2  #软件市场的名称
