@@ -1,0 +1,49 @@
+dist: bionic
+language: node_js
+node_js:
+  - lts/*
+
+# S: Build Lifecycle
+before_install:
+  - export TZ='Asia/Shanghai'
+
+install:
+  - npm install hexo-cli -g
+#  - npm install cheerio@0.22.0 hexo-renderer-pug hexo-renderer-stylus
+  - npm install
+
+#before_script:
+        #  - sed -i "s/https:\/\/\(github\.com\/m4d3bug\/m4d3bug\.github\.io\.git\)/https:\/\/$ACCESS_TOKEN@\1/" _config.yml
+        #  - sed -i "656c \ \ client_id: $GT_ID" themes/next/_config.yml
+        #- sed -i "657c \ \ client_id: $GT_SECRET" themes/next/_config.yml
+
+script:
+#  - cat themes/next/_config.yml | wc -l
+#  - sed -i "656c \ \ client_id: $GT_ID" themes/next/_config.yml
+#  - sed -i "657c \ \ client_id: $GT_SECRET" themes/next/_config.yml
+  - hexo version
+  - hexo clean
+  - hexo generate
+
+addons:
+  ssh_known_hosts:
+  - github.com
+
+after_script:
+  - cd ./public
+#  - echo "blog.madebug.net" > CNAME
+  - git init
+  - git config user.name "m4d3bug"
+  - git config user.email "m4d3bug@gmail.com"
+#  - sed -i "s/github_token/${GH_TOKEN}/g" _config.yml || exit 1
+  - git add .
+  - git commit -m "Travis CI Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
+  - git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" master:master
+# E: Build LifeCycle
+
+branches:
+  only:
+    - gh-pages
+env:
+ global:
+    - GH_REF: github.com/m4d3bug/m4d3bug.github.io.git
