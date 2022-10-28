@@ -1,0 +1,52 @@
+name: WITH CI
+
+# 只监听 gh-pages 分支的改动
+on:
+  push:
+    branches: [ gh-pages ]
+  
+jobs:
+  Blog_CI:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2  #软件市场的名称
+        with: # 参数
+          submodules: false
+
+      # 这里用的是 Node.js 13.x，14.x 生成 Hexo 静态页面会有问题
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+
+      # 配置Hexo环境 
+      - name: Setup Hexo
+        env:
+          ACTION_DEPLOY_KEY: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          npm install hexo-cli -g
+          npm install
+
+      # 生成静态文件
+      - name: Build
+        run: |
+          hexo clean 
+          hexo g
+
+      # 部署到 GitHub Pages
+      - name: Upload GitHub Repository
+        env: 
+          # Github 仓库
+          GITHUB_REPO: github.com/m4d3bug/m4d3bug.github.io
+         # 将编译后的博客文件推送到指定仓库
+        run: |
+          cd ./public && git init && git add .
+          git config user.name "m4d3bug"       #username改为你github的用户名
+          git config user.email "m4d3bug@gmail.com"     #username改为你github的注册邮箱
+          git add .
+          git commit -m "GitHub Actions Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
+          git push --force --quiet "https://${{ secrets.ACCESS_TOKEN }}@$GITHUB_REPO" master:master
+
+
