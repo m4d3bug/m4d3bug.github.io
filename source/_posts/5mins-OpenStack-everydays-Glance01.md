@@ -19,6 +19,7 @@ tags:
 
 <!-- more -->
 
+
 ## 0️⃣理解Image
 
 -  安装系统，from CD or Ghost
