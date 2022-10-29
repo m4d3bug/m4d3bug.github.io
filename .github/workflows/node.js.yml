@@ -1,4 +1,4 @@
-name: WITH CI
+name: Github CI
 
 # 监听 gh-pages 分支的改动
 on:
