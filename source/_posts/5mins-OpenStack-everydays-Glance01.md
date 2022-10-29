@@ -15,12 +15,14 @@ tags:
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221029000932.png" width=50% /></center>
 
+## 0x00️⃣前言
+
 本文记录一些个人的glance学习笔记。
 
 <!-- more -->
 
 
-## 0️⃣理解Image
+## 0x01️⃣理解Image
 
 -  安装系统，from CD or Ghost
 
@@ -34,7 +36,7 @@ tags:
 
 -  Image，模板，os+software，批量分发，快照
 
-## 1️⃣理解Image Service
+## 0x02️⃣理解Image Service
 
 - 管理Image，集发现、获取和保存
 
@@ -46,7 +48,7 @@ tags:
 
 - 对Instance Snapshot创建新的image
 
-## 2️⃣Glance架构
+## 0x03️⃣Glance架构
 
 ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221012181155.png)
 
@@ -92,6 +94,6 @@ tags:
 
   - VMware ESX
 
-## 😏总结感悟
+## 0x04️⃣总结感悟
 
 简洁明了了解一下glance，接下来实操glance。
