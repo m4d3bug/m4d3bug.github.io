@@ -12,6 +12,7 @@ tags:
 - "Storage "
 - "OpenStack "
 - "Glance "
+- "每天五分鐘玩轉OpenStack "
 ---
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221029000932.png" width=50% /></center>
 
