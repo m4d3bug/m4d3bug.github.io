@@ -100,8 +100,8 @@ search:
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 plugins: hexo-generator-sitemap
-theme: butterfly
-#theme: next
+#theme: butterfly
+theme: next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
