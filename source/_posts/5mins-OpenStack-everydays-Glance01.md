@@ -22,7 +22,6 @@ tags:
 
 <!-- more -->
 
-
 ## 0x01️⃣理解Image
 
 -  安装系统，from CD or Ghost
