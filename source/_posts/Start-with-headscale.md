@@ -55,8 +55,8 @@ $ mkdir -p /opt/containers/headscale/container-config
 $ cd /opt/containers/headscale/container-config
 $ wget -O ./config.yaml https://img.madebug.net/juanfont/headscale/main/config-example.yaml
 $ sed -i '13c server_url\: https\:\/\/<your-domain>' config.yaml #加入时的回显内容，可选项
-$ sed -i '58c \ \ \-\ 10.9.9.0/24' config.yaml #自定义网段，可选项
-$ sed -i '214c \ \ \magic_dns:\ false' config.yaml
+$ sed -i '56c \ \ \-\ 10.9.9.0/24' config.yaml #自定义网段，可选项
+$ sed -i '57c \ ' config.yaml #注释掉原来网段，可选项
 $ cd ..
 $ cat > docker-compose.yaml << EOF
 services:
@@ -65,8 +65,8 @@ services:
     #    image: headscale/headscale:latest-alpine 
     image: headscale/headscale:0.16.4 #最新版对cloudflare的websocket支持似乎有问题 
     restart: unless-stopped
-    # ports:
-      # - 8080:8080
+    ports:
+      - 8080:8080
     volumes:
       - ./container-config:/etc/headscale
       - ./container-data:/var/lib/headscale
@@ -89,7 +89,6 @@ EOF
 $ docker network create reverseproxy-nw
 $ docker-compose up -d 
 $ curl http://0.0.0.0:8080/windows
-$ curl http://0.0.0.0:9090/metrics
 ~~~
 
 - **cloudflare tunnel部分**
