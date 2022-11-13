@@ -119,15 +119,15 @@ $ curl http://0.0.0.0:8080/windows
 
   ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018190900.png)
 
-  ​        点击next进行headscale的设置：
-
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018191216.png)
-
-  ​        headscale-ui如法炮制，注意路径，以及关闭tls验证。
+  ​        点击next进行headscale-ui的设置，**一定要先设headscale-ui**
 
   ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018191845.png)
 
-  ​        测试成功，你应该可以在这个tunnel下的Public Hostname的位置看到两条转发规则，并且它们都是工作的。就可以加入到docker-compose.yaml了，它看起来应该是这样的。
+  ​        Save后再Add a public hostname 给headscale，注意路径，以及关闭tls验证。
+
+  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018191216.png)
+
+  ​        测试https://<域名>/windows，没问题就可以加入cloudflared到docker-compose.yaml了，它看起来应该是这样的。
 
   ~~~shell
   services:
@@ -147,7 +147,7 @@ $ curl http://0.0.0.0:8080/windows
   
     headscale-ui:
       container_name: headscale-ui
-      image: ghcr.io/gurucomputing/headscale-ui:latest
+      image: madebug/ghcr.io.gurucomputing.headscale-ui:latest
       restart: unless-stopped
       networks:
         reverseproxy-nw:
