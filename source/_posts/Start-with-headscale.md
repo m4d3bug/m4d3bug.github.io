@@ -119,11 +119,11 @@ $ curl http://0.0.0.0:8080/windows
 
   ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018190900.png)
 
-  ​        点击next进行headscale-ui的设置，**一定要先设headscale-ui**
+  ​        点击next进行headscale-ui的设置，，注意路径，以及关闭tls验证。**PS: 一定要先设headscale-ui**
 
   ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018191845.png)
 
-  ​        Save后再Add a public hostname 给headscale，注意路径，以及关闭tls验证。
+  ​        Save后再Add a public hostname 给headscale
 
   ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018191216.png)
 
@@ -176,7 +176,7 @@ $ curl http://0.0.0.0:8080/windows
    $ docker exec headscale headscale apikeys create
    ~~~
 
-2.  访问https://<前面设定的域名>/web，然后填入token即可，点击`Test Server Settings`。
+2.  访问https://<前面设定的域名>/web，然后填入token完成登录，点击`Test Server Settings`。
 
 3.  创建user就是创建namespace，用来隔离多个不同网段。
 
