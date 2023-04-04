@@ -31,7 +31,7 @@
     {%- endif %}
   </div>
   
-  <div class="site-nav-left" id="google_translate_element">
+  <div class="site-nav" id="google_translate_element">
   </div>
   <script type="text/javascript">
     function googleTranslateElementInit() {
