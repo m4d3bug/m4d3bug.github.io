@@ -22,8 +22,8 @@ tags:
 
 回顾前面，学习了以下描述系统情况的方式：
 
-- [平均负载](https://blog.madebug.net/ops/2019-09-02-linux-performance-tuning-study-notes-ii)：系统负载情况的反映。
-- [上下文切换：](https://blog.madebug.net/ops/2021-02-22-linux-performance-tuning-study-notes-iii-part1) 系统性能缺口情况的反映。
+- [平均负载](https://blog.madebug.net/Ops/2019-09-02-Linux-Performance-Tuning-study-notes-II.html)：系统负载情况的反映。
+- [上下文切换：](https://blog.madebug.net/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part1.html) 系统性能缺口情况的反映。
 
 而描述CPU，可以直接使用CPU使用率。
 
