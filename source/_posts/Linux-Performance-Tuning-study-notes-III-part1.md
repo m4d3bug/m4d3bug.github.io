@@ -26,7 +26,7 @@ tags:
 - 每次切換均需Linux為CPU（**保存/預設**）**CPU寄存器和程序計數器**
     - **CPU寄存器：**CPU内置高速小内存。
     - **程序計數器：**CPU内置指令暫存器。
-- 誘發場景：**[進程](https://blog.madebug.net/ops/2020-06-25-funny-with-linux-i-about-progress#0x02-%E5%9F%B7%E8%A1%8C%E5%87%BD%E6%95%B8%E7%9A%84%E4%B8%BB%E9%AB%94%EF%BC%9A%E9%80%B2%E7%A8%8B)の上下文切換、[綫程](https://blog.madebug.net/ops/2020-06-29-funny-with-linux-ii-about-multi-tasks)の上下文切換以及中斷の上下文切換。**
+- 誘發場景：**[進程](https://blog.madebug.net/Ops/2020-06-25-Funny-With-Linux-I-about-progress.html#0x02-%E5%9F%B7%E8%A1%8C%E5%87%BD%E6%95%B8%E7%9A%84%E4%B8%BB%E9%AB%94%EF%BC%9A%E9%80%B2%E7%A8%8B)の上下文切換、[綫程](https://blog.madebug.net/Ops/2020-06-29-Funny-With-Linux-II-about-multi-tasks.html)の上下文切換以及中斷の上下文切換。**
 
 ## 0x01 類型(who, when and where?)
 
@@ -34,7 +34,7 @@ tags:
 
 ### 進程の上下文切換
 
-- [進程通過執行函數去執行程序，是資源擁有的基本單位](https://blog.madebug.net/ops/2020-06-25-funny-with-linux-i-about-progress)，不再贅述。（who）
+- [進程通過執行函數去執行程序，是資源擁有的基本單位](https://blog.madebug.net/Ops/2020-06-25-Funny-With-Linux-I-about-progress.html)，不再贅述。（who）
 - 誘發進程“被”切換/釋放CPU上下文：(when)
     - 預定**時間**片耗盡。
     - 系統**資源**不足。
@@ -53,7 +53,7 @@ tags:
 
 ### 綫程の上下文切換
 
-- [綫程是調度的基本單位](https://blog.madebug.net/ops/2020-06-29-funny-with-linux-ii-about-multi-tasks)，不再贅述。（who）
+- [綫程是調度的基本單位](https://blog.madebug.net/Ops/2020-06-29-Funny-With-Linux-II-about-multi-tasks.html)，不再贅述。（who）
 - 誘發綫程“被”切換/釋放CPU上下文：（when, where）
     - 前後綫程分屬**不同進程切換≈進程間上下文切換**
     - 前後綫程均屬**同一進程切換=一次CPU上下文切换**
