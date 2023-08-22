@@ -221,4 +221,5 @@ curl http://0.0.0.0:8080/windows
 
 - [Setting Up Headscale :: Guru Computing Blog](https://blog.gurucomputing.com.au/smart-vpns-with-headscale/setting-up-headscale/)
 - [Tailscale 基础教程：Headscale 的部署方法和使用教程 – 云原生实验室 - Kubernetes|Docker|Istio|Envoy|Hugo|Golang|云原生](https://icloudnative.io/posts/how-to-set-up-or-migrate-headscale/)
+- [Running headscale in a container](https://github.com/juanfont/headscale/blob/main/docs/running-headscale-container.md)
 
