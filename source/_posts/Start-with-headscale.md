@@ -17,7 +17,7 @@ tags:
 
 ## 0x00 前言
 
-什么是headscae ？
+什么是headscale ？
 
 <!-- more -->
 
