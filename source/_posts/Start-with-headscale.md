@@ -88,9 +88,9 @@ networks:
   reverseproxy-nw:
     external: true
 EOF
-$ docker network create reverseproxy-nw
-$ docker-compose up -d 
-$ curl http://0.0.0.0:8080/windows
+docker network create reverseproxy-nw
+docker-compose up -d 
+curl http://0.0.0.0:8080/windows
 ~~~
 
 - **cloudflare tunnel部分**
