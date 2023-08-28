@@ -22,6 +22,8 @@ tags:
 
 本文旨在阐述个人搭建wireguard主备切换架构的细节。[wireguard的相关搭建](https://blog.madebug.net/Ops/2021-07-04-Use-Wireguard-to-rebuild-a-intranet-in-China.html)不做赘述，主要解决单server没有冗余的问题。
 
+<!-- more -->
+
 组成技术栈如下：
 
 - 服务器主体搭建，wg-gen-web
