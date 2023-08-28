@@ -1,3 +1,4 @@
+---
 title: 使用Wireguard基於國内網絡異地組網實踐
 mathjax: true
 copyright: true
@@ -15,11 +16,13 @@ tags:
 
 <center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/wireguard.png" width=50% /></center>
 
+## 0x00️⃣ 前言
+
 本文旨在阐述个人使用wireguard基于国内网络异地组网实践的细节。
 
 <!-- more -->
 
-## 0x00 需求分析
+## 0x01️⃣ 需求分析
 
 需求有哪些：
 
@@ -36,7 +39,7 @@ DDNS，国内挂靠域名。公网IP，需要耗费防护精力。Zerotier，客
 
 Wireguard，被Linus盛赞的艺术，前几年刚出的时候接触过，印象颇为深刻。这几年来被身边各种各样的资讯推荐，youtube，公众号。似乎它已经足够成熟了，于是有了本文。
 
-## 0x01 服务端
+## 0x02️⃣ 服务端
 
 服务端主要负责以下几项工作：
 
@@ -192,7 +195,7 @@ $ 刷新上述配置
 
 当然，另外你还会需要为这个页面做一个密码防护。[Nginx Basic Authentication]
 
-## 0x02 客户端
+## 0x03️⃣ 客户端
 
 ### 软件安装
 
@@ -234,7 +237,7 @@ WantedBy=multi-user.target
 # systemctl enable wg-quick@wg0 --now
 ```
 
-## 0x03 进阶
+## 0x04️⃣ 进阶
 
 至此，你已经可以拥有一个基于wireguard搭建的中继局域网了。但我们还有部分需求没解决。
 
@@ -287,13 +290,13 @@ WantedBy=timers.target
 # systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
 ```
 
-## 0x04 测速
+## 0x05️⃣ 测速
 
 完成上述设定之后，顺手做了一个国内的测速。很有幸处在UDP表现良好的地域，并且突破了良心云限定的带宽墙。(你没看错，就是用tcp_bw测，或者你喜欢可以用udp_bw看看结果)
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/speed_test_from_client.jpg?raw=true](https://img.madebug.net/m4d3bug/images-of-website/master/blog/speed_test_from_client.jpg?raw=true)
 
-## 0x05 总结
+## 0x06️⃣ 总结
 
 - 后续可以玩得更花一点。
 - 本文放弃了full mesh的组网方式。~~显然我比较懒。~~
@@ -304,7 +307,7 @@ WantedBy=timers.target
 - 国内互联互通，其实是对VPN不拦截的。特征明显，但不敏感。
 - wireguard发展日趋成熟稳定，某大厂已经用在公司关键网络负载了。
 
-## 0x06 鸣谢
+## 0x07️⃣ 鸣谢
 
 - [WireGuard 配置教程：使用 wg-gen-web 来管理 WireGuard 的配置 – 云原生实验室 - Kubernetes|Docker|Istio|Envoy|Hugo|Golang|云原生](https://fuckcloudnative.io/posts/configure-wireguard-using-wg-gen-web/)
 - [WireGuard - ArchWiki](https://wiki.archlinux.org/title/WireGuard)
