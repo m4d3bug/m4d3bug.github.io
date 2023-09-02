@@ -57,7 +57,7 @@ touch db.sqlite
 wget -O ./config.yaml https://img.madebug.net/juanfont/headscale/main/config-example.yaml
 sed -i '13c server_url\: https\:\/\/<your-domain>' config.yaml #加入时的回显内容，可选项
 sed -i 's/127\.0\.0\.1/0\.0\.0\.0/g' config.yaml
-sed -i '69c \ ' config.yaml #注释掉ipv6网段，可选项
+sed -i '68c \ ' config.yaml #注释掉ipv6网段，可选项
 cd ..
 cat > docker-compose.yaml << EOF
 services:
