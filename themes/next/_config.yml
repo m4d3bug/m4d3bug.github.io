@@ -670,7 +670,8 @@ gitalk:
   # Available values: en | es-ES | fr | ru | zh-CN | zh-TW
   language: en 
   labels: Gitalk
-  proxy: https://shielded-brushlands-08810.herokuapp.com/https://github.com/login/oauth/access_token
+  #proxy: https://shielded-brushlands-08810.herokuapp.com/https://github.com/login/oauth/access_token
+  proxy: https://github.com/login/oauth/access_token
   sitemap:
     path: sitemap.xml
 
