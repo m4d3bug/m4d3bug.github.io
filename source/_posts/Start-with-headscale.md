@@ -135,31 +135,31 @@ curl http://0.0.0.0:8080/windows
     headscale:
       container_name: headscale
       #    image: headscale/headscale:latest-alpine
-      image: headscale/headscale:0.16.4
-      restart: unless-stopped
-      # ports:
-        # - 8080:8080
+      image: headscale/headscale:0.22.3
+      restart: always
+      ports:
+        - 8080:8080
       volumes:
         - ./container-config:/etc/headscale
         - ./container-data:/var/lib/headscale
       entrypoint: headscale serve
       networks:
         reverseproxy-nw:
-  
+
     headscale-ui:
       container_name: headscale-ui
       image: madebug/ghcr.io.gurucomputing.headscale-ui:latest
-      restart: unless-stopped
+      restart: always
       networks:
         reverseproxy-nw:
-  
+
     cloudflared:
       container_name: cloudflared
       image: cloudflare/cloudflared:latest
       entrypoint: ["cloudflared", "tunnel", "--no-autoupdate", "run", "--token", "eyJhIjoiY2I5YzllOGY0ZjE3ZjFmOGU2NmIyOWU5N2M3NTIxNjIiLCJ0IjoiNTQ0OTFiY2ItMjMwMS00ZTI5LTk3OTgtN2E0OWI1Yzk5ZjNmIiwicyI6Ik1HTTRaVEkwTW1RdFlqWmxNaTAwT0RrekxUbGhPVFF0WWpBNFpUQTRNemMwT0RReSJ9"]
       networks:
         reverseproxy-nw:
-  
+
   networks:
     reverseproxy-nw:
       external: true
