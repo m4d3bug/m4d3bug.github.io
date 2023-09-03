@@ -137,8 +137,8 @@ curl http://0.0.0.0:8080/windows
       #    image: headscale/headscale:latest-alpine
       image: headscale/headscale:0.22.3
       restart: always
-      ports:
-        - 8080:8080
+      # ports:
+        # - 8080:8080
       volumes:
         - ./container-config:/etc/headscale
         - ./container-data:/var/lib/headscale
