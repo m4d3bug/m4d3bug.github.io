@@ -59,26 +59,26 @@ Wireguard，被Linus盛赞的艺术，前几年刚出的时候接触过，印象
 
 ```bash
 $ 内核转发
-# echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/99-sysctl.conf
-# echo "net.ipv4.conf.all.proxy_arp = 1" >> /etc/sysctl.d/99-sysctl.conf
-# sysctl -p /etc/sysctl.d/99-sysctl.conf
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/99-sysctl.conf
+echo "net.ipv4.conf.all.proxy_arp = 1" >> /etc/sysctl.d/99-sysctl.conf
+sysctl -p /etc/sysctl.d/99-sysctl.conf
 
 $ iptables配置端口转发自定义网段
-# iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-# iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-# iptables -A FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
-# iptables -t nat -A POSTROUTING -s 10.9.8.0/24 -o eth0 -j MASQUERADE
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
+iptables -t nat -A POSTROUTING -s 10.9.8.0/24 -o eth0 -j MASQUERADE
 
 $ 初始化wireguard
-# wg-quick up wg0
-# wg-quick down wg0
+wg-quick up wg0
+wg-quick down wg0
 ```
 
 ### 托管设置
 
 ```bash
 $ 直接使用wg-gen-web管理, 容器运行填入docker0的IP
-# nano docker-compose.yaml
+cat > docker-compose.yaml << EOF
 version: '3.6'
 services:
   wg-gen-web:
@@ -97,6 +97,8 @@ services:
     volumes:
       - /etc/wireguard:/data
     network_mode: bridge
+    depends_on:
+      - wg-json-api
   wg-json-api:
     image: james/wg-api:latest
     container_name: wg-json-api
@@ -105,8 +107,8 @@ services:
       - NET_ADMIN
     network_mode: "host"
     command: wg-api --device wg0 --listen 172.17.0.1:8182
-
-# docker-compose up -d
+EOF
+docker-compose up -d
 ```
 
 ### 软件设置
@@ -117,7 +119,7 @@ web访问<web_ip:8888>进行配置
 
 ```bash
 $ 检查生成的配置文件
-# nano /etc/wireguard/wg0.conf
+nano /etc/wireguard/wg0.conf
 
 # Updated: 2021-06-14 09:51:23.220280864 +0000 UTC / Created: 2021-06-12 18:27:38.627308446 +0000 UTC
 [Interface]
@@ -137,7 +139,7 @@ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j A
 
 ```bash
 $ 加入ExecReload在不中断活跃连接的情况下重新加载配置文件
-# nano /usr/lib/systemd/system/wg-quick@.service
+cat /usr/lib/systemd/system/wg-quick@.service
 [Unit]
 Description=WireGuard via wg-quick(8) for %I
 After=network-online.target nss-lookup.target
@@ -162,7 +164,7 @@ Environment=WG_ENDPOINT_RESOLUTION_RETRIES=infinity
 WantedBy=multi-user.target
 
 $ 为wg-gen-web添加自动Reload
-# nano /etc/systemd/system/wg-gen-web.service
+cat > /etc/systemd/system/wg-gen-web.service << EOF
 [Unit]
 Description=Restart WireGuard
 After=network.target
@@ -173,9 +175,10 @@ ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 
 [Install]
 WantedBy=multi-user.target
+EOF
 
 $ 添加wg-gen-web监听路径
-# nano /etc/systemd/system/wg-gen-web.path
+cat > /etc/systemd/system/wg-gen-web.path << EOF
 [Unit]
 Description=Watch /etc/wireguard for changes
 
@@ -184,11 +187,12 @@ PathModified=/etc/wireguard
 
 [Install]
 WantedBy=multi-user.target
+EOF
 
 $ 刷新上述配置
-# systemctl daemon-reload
-# wg-quick down wg0
-# systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
+systemctl daemon-reload
+wg-quick down wg0
+systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
 ```
 
 ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture](https://img.madebug.net/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture)
@@ -200,7 +204,7 @@ $ 刷新上述配置
 ### 软件安装
 
 ```bash
-# apt install wireguard wireguard-tools -y
+apt install wireguard wireguard-tools -y
 ```
 
 ### 软件设置
@@ -209,7 +213,7 @@ $ 刷新上述配置
 
 ```bash
 $ 加入ExecReload在不中断活跃连接的情况下重新加载配置文件
-# nano /usr/lib/systemd/system/wg-quick@.service
+cat > /usr/lib/systemd/system/wg-quick@.service << EOF
 [Unit]
 Description=WireGuard via wg-quick(8) for %I
 After=network-online.target nss-lookup.target
@@ -232,9 +236,10 @@ Environment=WG_ENDPOINT_RESOLUTION_RETRIES=infinity
 
 [Install]
 WantedBy=multi-user.target
+EOF
 
-# systemctl daemon-reload 
-# systemctl enable wg-quick@wg0 --now
+systemctl daemon-reload 
+systemctl enable wg-quick@wg0 --now
 ```
 
 ## 0x04️⃣ 进阶
@@ -259,7 +264,7 @@ CentOS
 /usr/share/doc/wireguard-tools-1.0.20210424/contrib/reresolve-dns/reresolve-dns.sh
 
 $ 设置启动后3秒执行，每9秒一次的定时器
-# nano /etc/systemd/system/wireguard_reresolve-dns.timer
+cat > /etc/systemd/system/wireguard_reresolve-dns.timer << EOF
 [Unit]
 Description=Periodically reresolve DNS of all WireGuard endpoints
 
@@ -269,9 +274,10 @@ OnUnitActiveSec=9
 
 [Install]
 WantedBy=timers.target
+EOF
 
 $ 设置相应的脚本执行重解析重reload，oneshot可以多个ExecStart
-# nano /etc/systemd/system/wireguard_reresolve-dns.service
+cat > /etc/systemd/system/wireguard_reresolve-dns.service << EOF
 [Unit]
 Description=Reresolve DNS of all WireGuard endpoints
 Wants=network-online.target
@@ -284,10 +290,11 @@ ExecStart=/usr/bin/systemctl reload wg-quick@wg0.service
 
 [Install]
 WantedBy=timers.target
+EOF
 
-# systemctl daemon-reload
-# systemctl enable wg-quick@wg0 --now |systemctl reload wg-quick@wg0
-# systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
+systemctl daemon-reload
+systemctl enable wg-quick@wg0 --now |systemctl reload wg-quick@wg0
+systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service --now
 ```
 
 ## 0x05️⃣ 测速
@@ -300,7 +307,7 @@ WantedBy=timers.target
 
 - 后续可以玩得更花一点。
 - 本文放弃了full mesh的组网方式。~~显然我比较懒。~~
-- cloudflare支持dns的fallback设置，五刀一个月，可以允许单点故障时解析到另一个ip（伪高可用）。
+- [cloudflare支持dns的fallback设置，五刀一个月，可以允许单点故障时解析到另一个ip](https://blog.madebug.net/Ops/2023-08-27-Standby-Wireguard-Server-Deployment.html)。
 - 有理由相信，会逐渐开放对UDP的相关QOS策略，毕竟http3 就是基于udp实现的。
 - 切换服务器时需要的窗口期比较长，可以配合tcpdump在客户端抓包观察，并且不要急着销毁已经在工作的实例。
 - 扩展设定未在更多客户端进行测试。~~显然我比较懒。~~
