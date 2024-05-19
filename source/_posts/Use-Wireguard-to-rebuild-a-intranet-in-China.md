@@ -70,6 +70,7 @@ iptables -A FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
 iptables -t nat -A POSTROUTING -s 10.9.8.0/24 -o eth0 -j MASQUERADE
 
 $ 初始化wireguard
+chmod 700 /etc/wireguard/
 wg-quick up wg0
 wg-quick down wg0
 ```
