@@ -66,7 +66,7 @@ tags:
 
 - database
 
-  - 默认使用mysql，但redhat openstack没有
+  - 默认使用mysql，但redhat openstack没有.
 
     ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221028230918.png)
 
