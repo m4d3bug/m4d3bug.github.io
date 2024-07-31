@@ -218,7 +218,7 @@ exit
 
 ---
 
-[不再贅述](https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#%E8%A8%AD%E5%AE%9AKickstart%E9%85%8D%E7%BD%AE)
+[不再贅述](https://blog.madebug.net/Ops/2020-08-01-hello-pxe-kickstart#%E9%97%9C%E9%96%89selinux-firewalld%E5%92%8Ciptables)
 
 ## 0x05 結語
 
