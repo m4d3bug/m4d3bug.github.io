@@ -63,7 +63,10 @@ VMware虛擬機的vmx文件，支持自定義rom及mrom，這些[固件的替換
 
 ```bash
 # mv bin/{8086100f.mrom,808610d3.mrom,10222000.rom,15ad07b0.rom} /mnt/g/Virtual Machines/iPXE-test-7
-# /m/g/V/iPXE-test-7 ls -alt                                                                                                                                                                           22:01:05total 8436196-rwxrwxrwx 1 m4d3bug m4d3bug 4337106944 Sep 11 22:02 iPXE-test-7.vmdk*-rwxrwxrwx 1 m4d3bug m4d3bug     577406 Sep 11 21:36 vmware.log*
+# ls -alt /mnt/g/Virtual Machines/iPXE-test-7                                                                                                                                                                          22:01:05
+total 8436196
+-rwxrwxrwx 1 m4d3bug m4d3bug 4337106944 Sep 11 22:02 iPXE-test-7.vmdk*
+-rwxrwxrwx 1 m4d3bug m4d3bug     577406 Sep 11 21:36 vmware.log*
 drwxrwxrwx 1 m4d3bug m4d3bug        512 Sep 10 22:35 ../
 drwxrwxrwx 1 m4d3bug m4d3bug        512 Sep 10 20:52 ./
 -rwxrwxrwx 1 m4d3bug m4d3bug       3035 Sep 10 20:52 iPXE-test-7.vmx*
@@ -97,7 +100,7 @@ nx3bios.filename = "15ad07b0.rom"
 
 ## 0x02 搭建iPXE环境
 
-[不再赘述](https://blog.madebug.net/ops/2020-08-08-hello-ipxe-over-pxe-kickstart)
+[不再赘述](https://blog.madebug.net/Ops/2020-08-08-hello-iPXE-over-PXE-Kickstart)
 
 ## 0x03 檢查日誌
 
