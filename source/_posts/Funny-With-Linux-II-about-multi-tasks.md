@@ -11,7 +11,7 @@ tags:
 - "Linux "
 - "趣談Linux操作系統筆記"
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
 本文旨在剖析线程的5个W和1个H。
 
@@ -32,7 +32,7 @@ tags:
 ---
 创建前，先了解调用线程的必经步骤。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howtaskwork.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howtaskwork.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howtaskwork.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howtaskwork.jpg)
 
 根据流程图，构建与之对应的测试代码。
 
@@ -189,7 +189,7 @@ ulimit -s 16384
 
 - 无条件变量的等待互斥锁
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexwork.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexwork.jpg)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexwork.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexwork.jpg)
 
     **有无锁的情况对比，可帮助明白锁的重要性。**
 
@@ -403,7 +403,7 @@ ulimit -s 16384
 
 - 有条件变量的等待互斥锁
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg)
 
     根据流程图，构建与之对应的测试代码。
 
@@ -597,6 +597,6 @@ void *pthread_getspecific(pthread_key_t key)
 4. 之后在三种不同的线程数据中，重点解剖了有无变量控制下的互斥锁工作过程。
 5. 以下是总结贴图。
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/summarytasks.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/summarytasks.png)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/summarytasks.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/summarytasks.png)
 
 6. 个人学习笔记，欢迎斧正。

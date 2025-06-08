@@ -14,7 +14,7 @@ tags:
 - "UDP "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/wireguard.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/wireguard.png" width=50% /></center>
 
 ## 0x00️⃣ 前言
 
@@ -116,7 +116,7 @@ docker-compose up -d
 
 web访问<web_ip:8888>进行配置
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/wireguardserver.png?raw=ture](https://img.madebug.net/m4d3bug/images-of-website/master/blog/wireguardserver.png?raw=ture)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/wireguardserver.png?raw=ture](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/wireguardserver.png?raw=ture)
 
 ```bash
 $ 检查生成的配置文件
@@ -196,7 +196,7 @@ wg-quick down wg0
 systemctl enable wg-gen-web.service wg-gen-web.path wg-quick@wg0 --now
 ```
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture](https://img.madebug.net/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/wg_client_setup.png?raw=ture)
 
 当然，另外你还会需要为这个页面做一个密码防护。[Nginx Basic Authentication]
 
@@ -302,7 +302,7 @@ systemctl enable wireguard_reresolve-dns.timer wireguard_reresolve-dns.service -
 
 完成上述设定之后，顺手做了一个国内的测速。很有幸处在UDP表现良好的地域，并且突破了良心云限定的带宽墙。(你没看错，就是用tcp_bw测，或者你喜欢可以用udp_bw看看结果)
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/speed_test_from_client.jpg?raw=true](https://img.madebug.net/m4d3bug/images-of-website/master/blog/speed_test_from_client.jpg?raw=true)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/speed_test_from_client.jpg?raw=true](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/speed_test_from_client.jpg?raw=true)
 
 ## 0x06️⃣ 总结
 

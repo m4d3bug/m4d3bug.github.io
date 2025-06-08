@@ -16,7 +16,7 @@ tags:
 - "Kubernetes "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/kubernetes%26zerotier.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/kubernetes%26zerotier.png" width=50% /></center>
 
 本文旨在嘗試驗證自己的一個~~<font color=#808080>奇葩</font>~~想法。
 
@@ -52,7 +52,7 @@ tags:
 
 #### 機器網絡狀況
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/machinesNetworks.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/machinesNetworks.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png)
 
 #### 寫入靜態IP 和hostname
 
@@ -400,15 +400,15 @@ KUBELET_EXTRA_ARGS=--fail-swap-on=false
 
 可以見到，即使加入成功也都是充斥著大量因爲timeout造成的failed的信息在其中。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/failedzerotier.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/failedzerotier.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/failedzerotier.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/failedzerotier.png)
 
 其後，通過睡了一覺，白天時分，QOS緩和的時候，順利將剩下搬瓦工節點加入。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8s-status.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8s-status.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8s-status.png)
 
 但也證明，SDN跨運營商，以node為最小單位組建K8S集群是可行的，但是需要💰。因此不難理解爲什麽現在混合雲架構都是傾向于以一個帶master節點集群為最小單位組建集群。~<font color=#808080>或許可以試試每個節點都是單master的去污點化部署。</font>~
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8scurl.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/k8scurl.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8scurl.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8scurl.png)
 
 ## 鳴謝
 

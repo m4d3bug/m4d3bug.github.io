@@ -19,7 +19,7 @@ tags:
 - "Dnsmasq "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
 
 本文將簡單搭建一個基於PXE網卡分發[iPXE](https://ipxe.org/)使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中dnsmasq&httpd將運行在同一個機器底下。
 
@@ -43,7 +43,7 @@ pxe -> ipxe.lkrn(ipxe.efi/undionly.kpxe) -> boot.ipxe)
 
 ### 設置自定義IP
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXEnetwork.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXEnetwork.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXEnetwork.png)
 
 ## 0x01 開始
 
@@ -115,11 +115,11 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dnsmasq.service
 
 在相同LAN下啓動無盤VM用於測試DHCP，測試期間檢查：開機提示、日志和抓包。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/Dnsmasqresult.png?raw=true](https://img.madebug.net/m4d3bug/images-of-website/master/blog/Dnsmasqresult.png?raw=true)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqresult.png?raw=true](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqresult.png?raw=true)
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/Dnsmasqlog.png?raw=true](https://img.madebug.net/m4d3bug/images-of-website/master/blog/Dnsmasqlog.png?raw=true)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlog.png?raw=true](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlog.png?raw=true)
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png)
 
 ## 0x03 配置網絡安裝源
 

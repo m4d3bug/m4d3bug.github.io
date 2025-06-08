@@ -11,7 +11,7 @@ tags:
 - "Pod "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/pod.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/pod.png" width=50% /></center>
 
 ## 0x00 前言
 Pod，是Kubernetes项目的原子调度单位。但为什么是呢？

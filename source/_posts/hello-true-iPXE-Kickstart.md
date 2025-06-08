@@ -19,7 +19,7 @@ tags:
 - "Dnsmasq "
 - "VMware "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
 
 本文將實踐通過燒錄iPXE到相應的VMware虛擬機中，來模擬一個無PXE的自動化安裝環境。
 
@@ -106,7 +106,7 @@ nx3bios.filename = "15ad07b0.rom"
 
 從日誌中可以清晰看到僅調用了boot.ipxe，相較於上篇文章，少了iPXE引導程序的加載。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/Dnsmasqlogs.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/Dnsmasqlogs.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlogs.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlogs.jpg)
 
 ## 0x04 結語
 

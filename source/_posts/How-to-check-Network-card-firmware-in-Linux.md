@@ -10,7 +10,7 @@ tags:
 - "Linux "
 - "RHEL "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/PCIENetworkcard.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/PCIENetworkcard.png" width=50% /></center>
 
 本文簡單記錄檢查Linux驅動來源以及相關信息。
 

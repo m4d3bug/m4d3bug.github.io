@@ -9,7 +9,7 @@ categories:
 tags:
 - "Linux "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/Linux-distro.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Linux-distro.png" width=50% /></center>
 
 本文旨在阐述如何使用virt-sysprep制作kvm的qcow2格式的模板，以及一些感想。
 
@@ -27,9 +27,9 @@ tags:
 
 ### 新建模板
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/ubuntu-template.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/ubuntu-template.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/ubuntu-template.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/ubuntu-template.png)
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/centos7-template.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/centos7-template.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/centos7-template.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/centos7-template.png)
 
 - 使用lvm，并且设置确保/home目录没有使用
 - 设置普通用户并赋予sudo权限

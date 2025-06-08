@@ -14,7 +14,7 @@ tags:
 - "Linux性能調優實戰筆記 "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
 <!-- more -->
 
@@ -32,7 +32,7 @@ tags:
 
 <center><font size="5"><B>↓从应用侧（吞吐量，延迟……）↓</B></font></center>
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411112804.png" width=60% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20200411112804.png" width=60% /></center>
 
 <center><font size="5"><B>↑从系统侧（CPU, 内存……）↑</B></font></center>
 
@@ -40,13 +40,13 @@ tags:
 
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411112954.png" width=120% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20200411112954.png" width=120% /></center>
 
 ## 0x03 Linux调优的脑图
 
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20200411113050.png" width=100% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20200411113050.png" width=100% /></center>
 
 ## 0x04 结语
 

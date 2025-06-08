@@ -12,7 +12,7 @@ tags:
 - "CPU usage "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
 本文旨在剖析系统CPU性能的指标：CPU使用率。
 
@@ -133,11 +133,11 @@ tags:
 
 3.  因此我们可以有了CPU使用率的计算公式：
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-1.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-1.jpg)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-1.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-1.jpg)
 
     但是Linux开机很久以来的时间也纳入计算，明显没有意义，因此我们常用的是优化版：
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-2.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-2.jpg)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-2.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-2.jpg)
 
     系统的角度考量的是/proc/stat , 而进程的角度考量的是/proc/[pid]/stat 。
 
@@ -396,7 +396,7 @@ root@d5bdfeec83b1:/tmp# perf_4.9 report
 
 3. 光标选中后回车进入，逐一检视← →
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/calltrace.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/calltrace.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/calltrace.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/calltrace.jpg)
 
 4. 基本得出结果了，源码核实一下
 
@@ -683,7 +683,7 @@ Server internal error: Array
 
 4. 光标选中后回车进入，逐一检视← →
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/perfcalltrace.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/perfcalltrace.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/perfcalltrace.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/perfcalltrace.jpg)
 
 
 ## 0x04 总结

@@ -11,7 +11,7 @@ tags:
 - "KVM "
 - "Network "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-kvm-1280x720.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-kvm-1280x720.png" width=50% /></center>
 
 本文簡單實踐KVM的限速設置並檢驗。
 

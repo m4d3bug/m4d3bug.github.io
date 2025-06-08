@@ -14,7 +14,7 @@ tags:
 - "Cockpit "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/funwithduck.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/funwithduck.jpg" width=50% /></center>
 
 本文將阐述從HomeLab選型購買、裝機到系統安裝的一次完整的實踐。
 
@@ -33,7 +33,7 @@ tags:
 
 ## 0x01 硬件選購
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/HomeLabHardware.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/HomeLabHardware.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/HomeLabHardware.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/HomeLabHardware.png)
 
 芯片：i9十代測試版QTB1，10C20T，定位是家用靜音低功耗，
 主板：選擇了自帶wifi6的主板，搭配房間華爲wif6+ 使用，大小符合MATX大小。 
@@ -50,19 +50,19 @@ tags:
 
 ~~<font color=#808080>(拍這個照片的時候我還發著不塗硅脂免得不好退貨這種白日夢，甚至塗了還不上散熱被熱熔了差點漏到芯片針脚。)</font>~~
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/hothothot.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/hothothot.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/hothothot.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/hothothot.jpg)
 
 ### 靈魂走綫
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/routingwithsoul.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/routingwithsoul.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/routingwithsoul.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/routingwithsoul.jpg)
 
 ### 正面來一張
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/boxinside.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/boxinside.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/boxinside.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/boxinside.jpg)
 
 ### 成品
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/rhel7lab.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/rhel7lab.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/rhel7lab.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/rhel7lab.png)
 
 ## 0x03 系統安裝
 

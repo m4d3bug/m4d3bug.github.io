@@ -16,7 +16,7 @@ tags:
 - "CloudFlare "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/wireguard.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/wireguard.png" width=50% /></center>
 
 ## 0x00️⃣ 前言
 
@@ -148,39 +148,39 @@ tags:
 
 - 然后网页配置它们的同步策略和互连。鼠标点点就行，没什么技术含量。
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/d3a70cdd417cc494c506764912f9f5b.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/d3a70cdd417cc494c506764912f9f5b.png)
 
 ## 0x03️⃣cloudflare
 
 创建load balancing，在Traffic下，依次创建Manage Monitors，Manage Pools 和 Load Balancer。
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20230828160624.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20230828160624.png)
 
 - Manage Monitors
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20230828161815.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20230828161815.png)
 
 - Manage Pool
 
   先创建pool，然后把服务器信息填入，一个pool一台服务器，因为wireguard的模式只能允许主备方式运行。而非常规的http可以提供响应检测搭配weight来进行工作。因此我们需要设置两个pool，其中一个pool作为failback选项。
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20230828161555.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20230828161555.png)
 
 - Load Balancer
 
   我们这里的目的是想要负载均衡，在其中一个服务器宕机的时候切换主备，而wireguard的endpoint依旧使用域名解析，因此这里的Hostname需要设入对应的域名，并且关闭cdn。因为wireguard协议不能经过cdn转发。
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20230828161038.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20230828161038.png)
 
   
 
   加入对应的pool，fallback pool选择备用的ip。
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20230828162002.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20230828162002.png)
 
 重点设置failover这里
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20230828162101.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20230828162101.png)
 
 ## 0x04️⃣测试
 
@@ -201,7 +201,7 @@ GRUB_ENABLE_BLSCFG=true
 # reboot
 ~~~
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20230828163204.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20230828163204.png)
 
 最后顺利完成主备切换做到自愈。
 

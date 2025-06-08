@@ -13,7 +13,7 @@ tags:
 - "Network "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221016212516.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221016212516.png" width=50% /></center>
 
 ## 0x00 前言
 
@@ -53,7 +53,7 @@ tags:
 ~~~shell
 mkdir -p headscale/container-config
 cd headscale/container-config
-wget -O ./config.yaml https://img.madebug.net/juanfont/headscale/main/config-example.yaml
+wget -O ./config.yaml https://raw.githubusercontent.com/juanfont/headscale/main/config-example.yaml
 sed -i '13c server_url\: https\:\/\/<your-domain>' config.yaml #加入时的回显内容，可选项
 sed -i 's|unix_socket: /var/run/headscale/headscale.sock|unix_socket: /var/run/headscale.sock|' config.yaml 
 sed -i 's/127\.0\.0\.1/0\.0\.0\.0/g' config.yaml
@@ -98,9 +98,9 @@ curl http://0.0.0.0:8080/windows
 
   ​        [打开cloudflare zero trust的界面](https://dash.teams.cloudflare.com/)，Access >> Tunnels >> Create a tunnel >> Tunnel name(随便填) >> Save tunnel >> Docker
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018183537.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018183537.png)
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018184140.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018184140.png)
 
   ​      在完成上述cloudflare tunnel侧的设置，就可以回到vps，尝试进行cloudflared的第一次创建和连接。注意加入`--network reverseproxy-nw`
 
@@ -118,15 +118,15 @@ curl http://0.0.0.0:8080/windows
 
   ​        进展顺利，你就可以看到connectors显示以下信息了
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018190900.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018190900.png)
 
   ​        点击next进行headscale-ui的设置，，注意路径，以及关闭tls验证。**PS: 一定要先设headscale-ui**
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018191845.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018191845.png)
 
   ​        Save后再Add a public hostname 给headscale
 
-  ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221018191216.png)
+  ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018191216.png)
 
   ​        测试https://<域名>/windows，没问题就可以加入cloudflared到docker-compose.yaml了，它看起来应该是这样的。
 

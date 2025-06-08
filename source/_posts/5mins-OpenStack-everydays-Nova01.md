@@ -15,7 +15,7 @@ tags:
 - "每天五分鐘玩轉OpenStack "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221030084802.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221030084802.png" width=50% /></center>
 
 ## 0x00️⃣前言
 
@@ -29,7 +29,7 @@ tags:
 
 
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221030085206.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221030085206.png)
 
 围绕在VM的四周，Nova 提供部署，Neutron提供网络，Glance提供镜像，cinder提供volumes。
 
@@ -37,7 +37,7 @@ tags:
 
 nova架构
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221030105555.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221030105555.png)
 
 ![Nova 架构](https://www.xjimmy.com/wp-content/uploads/image/20180108/1515342369642394.png)
 

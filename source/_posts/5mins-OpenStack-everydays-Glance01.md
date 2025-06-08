@@ -14,7 +14,7 @@ tags:
 - "Glance "
 - "每天五分鐘玩轉OpenStack "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221029000932.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221029000932.png" width=50% /></center>
 
 ## 0x00️⃣前言
 
@@ -50,7 +50,7 @@ tags:
 
 ## 0x03️⃣Glance架构
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221012181155.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221012181155.png)
 
 - glance-api
 
@@ -62,23 +62,23 @@ tags:
 
   - 镜像类型如下：
 
-    ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221028214306.png)
+    ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221028214306.png)
 
 - database
 
   - 默认使用mysql，但redhat openstack没有.
 
-    ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221028230918.png)
+    ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221028230918.png)
 
 - store backend，支持多种， /etc/glance/glance-api.conf 配置，不同配置[遵循](http://docs.openstack.org/liberty/config-reference/content/configuring-image-service-backends.html)
 
   - A directory on a local file system（这是默认配置），uuid名的image存储在对应文件夹
 
-    ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221028231400.png)
+    ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221028231400.png)
 
-    ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221028231302.png)
+    ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221028231302.png)
 
-    ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221028231316.png)
+    ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221028231316.png)
 
   - GridFS
 

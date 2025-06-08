@@ -9,7 +9,7 @@ categories:
 tags:
 - "sendmail "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
 
 本文簡單記錄Email自身以及其參與的工作机制閱讀筆記。
 
@@ -34,7 +34,7 @@ tags:
 - Internet尋址標識：user@host.domain user@domain
 - 過時的地址類型：(中繼轉發)
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/OldEmailAddressType.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/OldEmailAddressType.png)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/OldEmailAddressType.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/OldEmailAddressType.png)
 
 ## 0x02 郵件信頭
 
@@ -42,7 +42,7 @@ tags:
 - 用戶代理(MUA)，傳輸代理(MTA)各負責部分信頭。
 - 負責的部分如下：
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/header.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/header.png)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/header.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/header.png)
 
 - DA於最後一次投遞中添加最上面的From。
 - Return-Path: 回傳報錯信息。
@@ -58,7 +58,7 @@ tags:
 - Message-ID: 消息ID，世界範圍內郵件系統是唯一的。UA追加
 - 每次經過MTA都需要dns查詢來完成Received。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/MTADNSQuery.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/MTADNSQuery.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/MTADNSQuery.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/MTADNSQuery.jpg)
 
 ## 0x03 結語
 

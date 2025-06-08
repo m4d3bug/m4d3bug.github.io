@@ -15,7 +15,7 @@ tags:
 - "每天五分鐘玩轉OpenStack "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221029000932.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221029000932.png" width=50% /></center>
 
 ## 0x00️⃣前言
 
@@ -27,9 +27,9 @@ tags:
 
 下载地址： http://download.cirros-cloud.net/
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221029144641.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221029144641.png)
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221029150152.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221029150152.png)
 
 **关于Public ，Private，Shared和Community的区别如下。**
 
@@ -59,7 +59,7 @@ tags:
 
 **点击我们上传的cirros超链接，就跳转下面页面。**
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20221029153615.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221029153615.png)
 
 ## 0x02️⃣CLI操作image
 

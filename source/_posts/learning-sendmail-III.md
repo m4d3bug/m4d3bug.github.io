@@ -11,7 +11,7 @@ tags:
 - "IMAP "
 - "POP "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
 
 本文記錄關於郵件服務器的相關。
 
@@ -29,7 +29,7 @@ tags:
 
 - 直接接入Internet的站點。
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/DesignEmailSystem.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/DesignEmailSystem.jpg)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/DesignEmailSystem.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/DesignEmailSystem.jpg)
 
     - 傳入傳出需要防火牆隔離。
     - 多台傳入可搭配負載均衡。
@@ -37,7 +37,7 @@ tags:
     - 不建議使用NFS來共享/var/spool/mail
 - 不直接接入Internet的站點。
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/DeployEmailSystemII.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/DeployEmailSystemII.jpg)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/DeployEmailSystemII.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/DeployEmailSystemII.jpg)
 
 ## 0x02 使用IMAP或POP
 

@@ -11,7 +11,7 @@ tags:
 - "Deployment "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/deployment.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/deployment.png" width=50% /></center>
 
 ## 0x00 前言
 
@@ -87,7 +87,7 @@ nginx-deployment-848bcb569b-8nw82   1/1     Running   0          8m16s
 ```
 apply了Deployment，ReplicaSet也被创建了，也不难推出它们的关系。
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/deployment&replicaset1.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/deployment&replicaset1.png" width=50% /></center>
 
 实现水平扩展 / 收缩的核心，就需要改改yml，或者使用`kubectl scale` 
 
@@ -224,7 +224,7 @@ spec:
       maxSurge: 1 #每次操作多少个pod，可用%
       maxUnavailable: 1 #每次删除多少pod，可用%
 ```
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/deployment&replicaset2.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/deployment&replicaset2.png" width=50% /></center>
 
 ### 更新后悔药
 kubectl也提供了后悔药。

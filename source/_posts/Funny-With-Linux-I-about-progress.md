@@ -12,7 +12,7 @@ tags:
 - "趣談Linux操作系統筆記"
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
 本文旨在從三個方面（被執行的主體[Executable and Linkable Format]，執行程序的主體，執行函數的主體）闡述系統調用的全過程。
 
@@ -84,7 +84,7 @@ EOF
 
 對其内部sections進行檢視。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/relocatableFileFormat.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/relocatableFileFormat.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/relocatableFileFormat.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/relocatableFileFormat.jpg)
 
 ```bash
 [root@learn ~]# readelf -S ./createprocess.o                             
@@ -196,7 +196,7 @@ Key to Flags:
 
 > Section Header Table（段頭表，struct elf32_phdr 和 struct elf64_phdr兩個描述代碼運行于32/64位。還有p_vaddr加載内存地址）
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/executableFileFormat.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/executableFileFormat.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/executableFileFormat.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/executableFileFormat.jpg)
 
 ```bash
 [root@learn ~]# ./staticcreateprocess 
@@ -478,7 +478,7 @@ sys_execve->do_execve->do_execveat_common->exec_binprm->search_binary_handler。
 >- 包含 l 的函数（execl, execlp, execle）以列表的形式接收参数；
 >- 包含 e 的函数（execve, execle）以数组的形式接收环境变量。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/execnamerule.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/execnamerule.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/execnamerule.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/execnamerule.jpg)
 
 ## 0x02 執行函數的主體：進程
 

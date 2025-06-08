@@ -12,7 +12,7 @@ tags:
 - "CPU Content Switch "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
 
 本文旨在剖析CPU上下文切換的五個W。
 
@@ -49,7 +49,7 @@ tags:
     - 虛擬内存刷新→TLB刷新其映射物理内存位置→内存變慢→其他共享緩存處理器。
     - 如下所示：
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/switchcontentbetweenprogress.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/switchcontentbetweenprogress.png)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/switchcontentbetweenprogress.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/switchcontentbetweenprogress.png)
 
 ### 綫程の上下文切換
 

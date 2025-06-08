@@ -10,7 +10,7 @@ tags:
 - "Linux "
 - "sendmail "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
 
 本文簡單記錄sendmail的工作模式模型閱讀筆記。
 
@@ -25,7 +25,7 @@ tags:
 - 可有可无的“访问代理（access agent）”，它可以把用户代理连接到消息库（例如，通过IMAP或POP协议）
 - 邮件提交代理（mail submission agent，MSA），这种代理使用SMTP（simple mail transport protocol，简单邮件传输协议），并完成传输代理的一些工作。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/emailsystem.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/emailsystem.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/emailsystem.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/emailsystem.jpg)
 
 ## 0x01 用戶代理(MUA/UA)
 
@@ -68,7 +68,7 @@ Qualcomm的Eudora，用于Mac机或者运行Windows的PC。
 - 本地计算机上保存电子邮件的地方。/var/spool/mail或/var/mail。
 - 不同OS權限如下：
 
-    ![https://img.madebug.net/m4d3bug/images-of-website/master/blog/authmail.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/authmail.jpg)
+    ![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/authmail.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/authmail.jpg)
 
 - SUSE的权限要宽松一点儿，但是在邮件缓存目录中的文件模式为660，属组为root。设置了粘附位的目录（在权限位中的t）不允许用户彼此删除对方的文件，即便他们有这个目录的写权限也不行。不过，恶意的用户可以填满邮件缓存目录，把它当作一个乱写乱画的分区，或者创建另一个用户的邮箱。
 

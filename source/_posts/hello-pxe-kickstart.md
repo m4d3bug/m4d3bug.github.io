@@ -15,7 +15,7 @@ tags:
 - "UEFI "
 - "Anaconda "
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/PXE_diagram.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/PXE_diagram.png" width=50% /></center>
 
 本文將簡單搭建一個基於PXE網絡使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中TFTP,DHCP&httpd將運行在同一個機器底下。
 
@@ -45,17 +45,17 @@ Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 
 1. 停用vmnet的DHCP功能。
 
-   ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20191012215006.png?raw=true)
+   ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20191012215006.png?raw=true)
 
 2. 新建一個LAN區段。(本文采用方法)
 
-   ![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/setupLAN.png?raw=true)
+   ![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/setupLAN.png?raw=true)
 
 
 
 ### 設置自定義IP
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/PXEnetwork.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/PXEnetwork.png)
 
 ## 0x01 開始
 
@@ -209,11 +209,11 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/dhcpd.service t
 
 在相同LAN下啓動無盤VM用於測試DHCP，測試期間檢查：開機提示、日志和抓包。
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/DHCPresult.png?raw=true)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/DHCPresult.png?raw=true)
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/DHCPlog.png?raw=true)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/DHCPlog.png?raw=true)
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/tcpdumpDHCP.png)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/tcpdumpDHCP.png)
 
 ## 0x04 配置網絡安裝源
 
@@ -435,15 +435,15 @@ EOF
 
 啓用之前的VM，并且確保其不包含ISO。
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20191012215904.png?raw=true)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20191012215904.png?raw=true)
 
 有以下界面出現就代表成功。
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/20191012215957.png?raw=true)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20191012215957.png?raw=true)
 
 創建UEFI也可以更改以下設置。
 
-![](https://img.madebug.net/m4d3bug/images-of-website/master/blog/UEFIVM.png?raw=true)
+![](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/UEFIVM.png?raw=true)
 
 ## 0x06 結語
 

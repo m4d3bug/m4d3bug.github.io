@@ -17,7 +17,7 @@ tags:
 - "Linux性能調優實戰筆記 "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>       
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>       
 
 本文旨在阐述，关于平均负载的知识点
 

@@ -9,7 +9,7 @@ categories:
 tags:
 - "sendmail"
 ---
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
 
 本文簡單記錄郵件別名。
 
@@ -100,7 +100,7 @@ sendmail支持好几种别名机制：
 
 ## 0x04 别名举例
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/AliaesExample.jpg](https://img.madebug.net/m4d3bug/images-of-website/master/blog/AliaesExample.jpg)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/AliaesExample.jpg](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/AliaesExample.jpg)
 
 postmaster指定維護郵件系統的郵件，發送到trouble，evi兩個別名。其中trouble是由trouble.alias提供郵件列表。
 

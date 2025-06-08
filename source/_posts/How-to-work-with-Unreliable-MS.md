@@ -21,7 +21,7 @@ tags:
 - "bash "
 ---
 
-<center><img src="https://img.madebug.net/m4d3bug/images-of-website/master/blog/terminalworkstation.png" width=50% /></center>
+<center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/terminalworkstation.png" width=50% /></center>
 
 本文简单介绍我的环境setup，随缘更新。
 
@@ -324,7 +324,7 @@ https://windows10.pro/bash-on-ubuntu-on-windows/
 
 - [设置虚拟机共享宿主机目录](https://zhuanlan.zhihu.com/p/43920548)，能share自然不copy。
 
-![https://img.madebug.net/m4d3bug/images-of-website/master/blog/sharewithVM.png](https://img.madebug.net/m4d3bug/images-of-website/master/blog/sharewithVM.png)
+![https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/sharewithVM.png](https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/sharewithVM.png)
 
 ## 0x06 设置x11转发
 
