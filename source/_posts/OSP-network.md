@@ -21,6 +21,8 @@ tags:
 
 事情的起因是，客户的场景没有ovnController, 并且结合了SRIOV/DPDK的场景。但是没有见过所以用此文记录一下其中的详情。
 
+<!-- more -->
+
 因为场景是RHOSO，首先要明确以下概念
 ```
 Neutron network --+-- 东西流量 private network (tenant network) 
