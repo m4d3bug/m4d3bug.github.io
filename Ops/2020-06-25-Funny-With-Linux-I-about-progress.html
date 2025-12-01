@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文旨在從三個方面（被執行的主體[Executable and Linkable Format]，執行程序的主體，執行函數的主體）闡述系統調用的全過程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="趣談Linux操作系統筆記I（之剖析系統進程）">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2020-06-25-Funny-With-Linux-I-about-progress.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文旨在從三個方面（被執行的主體[Executable and Linkable Format]，執行程序的主體，執行函數的主體）闡述系統調用的全過程。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/relocatableFileFormat.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/executableFileFormat.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/execnamerule.jpg">
+<meta property="article:published_time" content="2020-06-25T21:21:52.000Z">
+<meta property="article:modified_time" content="2020-07-11T18:33:33.000Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="趣談Linux操作系統筆記">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2020-06-25-Funny-With-Linux-I-about-progress.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>趣談Linux操作系統筆記I（之剖析系統進程） | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2020-06-25-Funny-With-Linux-I-about-progress.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          趣談Linux操作系統筆記I（之剖析系統進程）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-25 21:21:52" itemprop="dateCreated datePublished" datetime="2020-06-25T21:21:52+00:00">2020-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-11 18:33:33" itemprop="dateModified" datetime="2020-07-11T18:33:33+00:00">2020-07-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>17k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>16 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
+
+<p>本文旨在從三個方面（被執行的主體[Executable and Linkable Format]，執行程序的主體，執行函數的主體）闡述系統調用的全過程。</p>
+<a id="more"></a>
+
+<h2 id="0x00-被執行的主體：ELF"><a href="#0x00-被執行的主體：ELF" class="headerlink" title="0x00 被執行的主體：ELF"></a>0x00 被執行的主體：ELF</h2><hr>
+<h3 id="ELF的第一種類型：可重定位文件"><a href="#ELF的第一種類型：可重定位文件" class="headerlink" title="ELF的第一種類型：可重定位文件"></a>ELF的第一種類型：可重定位文件</h3><p>可重定位文件全程：Relocatable File，環境準備，安裝軟體。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># yum -y groupinstall "Development Tools"</span></span><br></pre></td></tr></table></figure>
+
+<p>新建代碼工程文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># cat &gt;&gt; process.c &lt;&lt; EOF</span></span><br><span class="line"><span class="comment">#include &lt;stdio.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;stdlib.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;sys/types.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;unistd.h&gt;</span></span><br><span class="line"></span><br><span class="line">extern int create_process (char* program, char** arg_list);</span><br><span class="line"></span><br><span class="line">int create_process (char* program, char** arg_list)</span><br><span class="line">&#123;</span><br><span class="line">        pid_t child_pid;                  <span class="comment"># 初始化child_pid</span></span><br><span class="line">        child_pid = fork ();              <span class="comment"># 調用fork獲取進程號</span></span><br><span class="line">        <span class="keyword">if</span> (child_pid != 0)               <span class="comment"># 如果獲取成功</span></span><br><span class="line">            <span class="built_in">return</span> child_pid;             <span class="comment"># 則返回獲取的進程號</span></span><br><span class="line">        <span class="keyword">else</span> &#123;                            <span class="comment"># 否則</span></span><br><span class="line">            execvp (program, arg_list);   <span class="comment"># 調用執行，輸入程序名及其參數</span></span><br><span class="line">            abort ();                     <span class="comment"># 之後中斷                  </span></span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">[root@learn ~]<span class="comment"># cat &gt;&gt; createprocess.c &lt;&lt; EOF</span></span><br><span class="line"><span class="comment">#include &lt;stdio.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;stdlib.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;sys/types.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;unistd.h&gt;</span></span><br><span class="line"></span><br><span class="line">extern int create_process (char* program, char** arg_list);</span><br><span class="line"></span><br><span class="line">int main ()</span><br><span class="line">&#123;</span><br><span class="line">    char* arg_list[] = &#123;                  <span class="comment"># 參數列表</span></span><br><span class="line">        <span class="string">"ls"</span>,                             </span><br><span class="line">        <span class="string">"-l"</span>,</span><br><span class="line">        <span class="string">"/etc/yum.repos.d/"</span>,</span><br><span class="line">        NULL                              <span class="comment"># 完成輸入</span></span><br><span class="line">    &#125;;</span><br><span class="line">    create_process (<span class="string">"ls"</span>, arg_list);      <span class="comment"># 調用process.c中自定義的create_process函數</span></span><br><span class="line">    <span class="built_in">return</span> 0;</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<p>進行編譯，<strong>獲得ELF的第一種類型: 可重定位文件(Relocatable File)。</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># gcc -c -fPIC process.c</span></span><br><span class="line">[root@learn ~]<span class="comment"># gcc -c -fPIC createprocess.c</span></span><br></pre></td></tr></table></figure>
+
+<p>對其内部sections進行檢視。</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/relocatableFileFormat.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/relocatableFileFormat.jpg"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># readelf -S ./createprocess.o                             </span></span><br><span class="line">There are 13 section headers, starting at offset 0x368:</span><br><span class="line"></span><br><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type             Address           Offset    ⚠局部變量運行時存在</span><br><span class="line">       Size              EntSize          Flags  Link  Info  Align    棧，運行前的.o文件不</span><br><span class="line">  [ 0]                   NULL             0000000000000000  00000000  包含。</span><br><span class="line">       0000000000000000  0000000000000000           0     0     0</span><br><span class="line">  [ 1] **.text**             PROGBITS     0000000000000000  00000040 &lt;=== 編譯后的二進制代碼</span><br><span class="line">       000000000000004b  0000000000000000  AX       0     0     1</span><br><span class="line">  [ 2] .rela.text        RELA             0000000000000000  00000270 &lt;=== 標注需重定位的函數</span><br><span class="line">       0000000000000078  0000000000000018   I      10     1     8</span><br><span class="line">  [ 3] **.data**             PROGBITS     0000000000000000  0000008b &lt;=== 已初始化的全局變量</span><br><span class="line">       0000000000000000  0000000000000000  WA       0     0     1</span><br><span class="line">  [ 4] **.bss**              NOBITS       0000000000000000  0000008b &lt;=== 未初始化的全局變量</span><br><span class="line">       0000000000000000  0000000000000000  WA       0     0     1</span><br><span class="line">  [ 5] **.rodata**           PROGBITS     0000000000000000  0000008b &lt;=== 只讀數據，常量變量</span><br><span class="line">       0000000000000018  0000000000000000   A       0     0     1       （這正是process.o</span><br><span class="line">  [ 6] .comment          PROGBITS         0000000000000000  000000a3     所沒有的）</span><br><span class="line">       000000000000002e  0000000000000001  MS       0     0     1</span><br><span class="line">  [ 7] .note.GNU-stack   PROGBITS         0000000000000000  000000d1</span><br><span class="line">       0000000000000000  0000000000000000           0     0     1</span><br><span class="line">  [ 8] .eh_frame         PROGBITS         0000000000000000  000000d8</span><br><span class="line">       0000000000000038  0000000000000000   A       0     0     8</span><br><span class="line">  [ 9] .rela.eh_frame    RELA             0000000000000000  000002e8</span><br><span class="line">       0000000000000018  0000000000000018   I      10     8     8</span><br><span class="line">  [10] .symtab           SYMTAB           0000000000000000  00000110 &lt;=== 符號表，函數變量</span><br><span class="line">       0000000000000120  0000000000000018          11     9     8</span><br><span class="line">  [11] .strtab           STRTAB           0000000000000000  00000230 &lt;=== 字符串表，字符串常量</span><br><span class="line">       000000000000003b  0000000000000000           0     0     1        及變量名</span><br><span class="line">  [12] .shstrtab         STRTAB           0000000000000000  00000300</span><br><span class="line">       0000000000000061  0000000000000000           0     0     1</span><br><span class="line">Key to Flags:</span><br><span class="line">  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),</span><br><span class="line">  L (link order), O (extra OS processing required), G (group), T (TLS),</span><br><span class="line">  C (compressed), x (unknown), o (OS specific), E (exclude),</span><br><span class="line">  l (large), p (processor specific)</span><br></pre></td></tr></table></figure>
+
+<h3 id="ELF的第二種類型：可執行文件"><a href="#ELF的第二種類型：可執行文件" class="headerlink" title="ELF的第二種類型：可執行文件"></a>ELF的第二種類型：可執行文件</h3><p>可执行文件全稱：Executable file，先通過ar，將.o文件歸檔為.a文件，可作爲靜態鏈接庫。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># man ar</span></span><br><span class="line">c   Create the archive.  The specified archive is always created <span class="keyword">if</span> it did not exist, when you request an update.  But a warning is issued unless you specify <span class="keyword">in</span> advance that you expect to create        </span><br><span class="line">           it, by using this modifier.</span><br><span class="line">r   Insert the files member... into archive (with replacement). This operation differs from q <span class="keyword">in</span> that any previously existing members are deleted <span class="keyword">if</span> their names match those being added.</span><br><span class="line"></span><br><span class="line">           If one of the files named <span class="keyword">in</span> member... does not exist, ar displays an error message, and leaves undisturbed any existing members of the archive matching that name.</span><br><span class="line"></span><br><span class="line">           By default, new members are added at the end of the file; but you may use one of the modifiers a, b, or i to request placement relative to some existing member.</span><br><span class="line"></span><br><span class="line">           The modifier v used with this operation elicits a line of output <span class="keyword">for</span> each file inserted, along with one of the letters a or r to indicate whether the file was appended (no old member deleted)       </span><br><span class="line">           or replaced.</span><br><span class="line">[root@learn ~]<span class="comment"># ar cr libstaticprocess.a process.o</span></span><br><span class="line">[root@learn ~]<span class="comment"># readelf -S libstaticprocess.a </span></span><br><span class="line"></span><br><span class="line">File: libstaticprocess.a(process.o)   &lt;---   （只是歸檔，并非新文件）</span><br><span class="line">There are 12 section headers, starting at offset 0x328:</span><br><span class="line"></span><br><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type             Address           Offset</span><br><span class="line">       Size              EntSize          Flags  Link  Info  Align</span><br><span class="line">  [ 0]                   NULL             0000000000000000  00000000</span><br><span class="line">       0000000000000000  0000000000000000           0     0     0</span><br><span class="line">  [ 1] .text             PROGBITS         0000000000000000  00000040</span><br><span class="line">       000000000000003d  0000000000000000  AX       0     0     1</span><br><span class="line">  [ 2] .rela.text        RELA             0000000000000000  00000268</span><br><span class="line">       0000000000000048  0000000000000018   I       9     1     8</span><br><span class="line">  [ 3] .data             PROGBITS         0000000000000000  0000007d</span><br><span class="line">       0000000000000000  0000000000000000  WA       0     0     1</span><br><span class="line">  [ 4] .bss              NOBITS           0000000000000000  0000007d</span><br><span class="line">       0000000000000000  0000000000000000  WA       0     0     1</span><br><span class="line">  [ 5] .comment          PROGBITS         0000000000000000  0000007d</span><br><span class="line">       000000000000002e  0000000000000001  MS       0     0     1</span><br><span class="line">  [ 6] .note.GNU-stack   PROGBITS         0000000000000000  000000ab</span><br><span class="line">       0000000000000000  0000000000000000           0     0     1</span><br><span class="line">  [ 7] .eh_frame         PROGBITS         0000000000000000  000000b0</span><br><span class="line">       0000000000000038  0000000000000000   A       0     0     8</span><br><span class="line">  [ 8] .rela.eh_frame    RELA             0000000000000000  000002b0</span><br><span class="line">       0000000000000018  0000000000000018   I       9     7     8</span><br><span class="line">  [ 9] .symtab           SYMTAB           0000000000000000  000000e8</span><br><span class="line">       0000000000000138  0000000000000018          10     8     8</span><br><span class="line">  [10] .strtab           STRTAB           0000000000000000  00000220</span><br><span class="line">       0000000000000042  0000000000000000           0     0     1</span><br><span class="line">  [11] .shstrtab         STRTAB           0000000000000000  000002c8</span><br><span class="line">       0000000000000059  0000000000000000           0     0     1</span><br><span class="line">Key to Flags:</span><br><span class="line">  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),</span><br><span class="line">  L (link order), O (extra OS processing required), G (group), T (TLS),</span><br><span class="line">  C (compressed), x (unknown), o (OS specific), E (exclude),</span><br><span class="line">  l (large), p (processor specific)</span><br></pre></td></tr></table></figure>
+
+<p>后將.a文件鏈入目標文件<strong>(Relocatable File)</strong>中去編譯即可得到<strong>ELF的第二種形態，可執行文件(Executable file)</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">                                          目標文件  -L 查找當前目錄     </span><br><span class="line">[root@learn ~]<span class="comment"># gcc -o staticcreateprocess createprocess.o -L . -l staticprocess</span></span><br><span class="line">             編譯       輸出文件                               -l 指定library並補全lib和.a</span><br></pre></td></tr></table></figure>
+
+<p>對其内部sections進行檢視。</p>
+<blockquote>
+<p>ELF Header，e_entry虛擬地址入口。</p>
+</blockquote>
+<blockquote>
+<p>Section Header Table（段頭表，struct elf32_phdr 和 struct elf64_phdr兩個描述代碼運行于32/64位。還有p_vaddr加載内存地址）</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/executableFileFormat.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/executableFileFormat.jpg"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># ./staticcreateprocess </span></span><br><span class="line">total 228</span><br><span class="line">-rw-r--r--. 1 root root 231449 Jun 22 05:36 redhat.repo</span><br><span class="line">[root@learn ~]<span class="comment"># readelf -S ./staticcreateprocess </span></span><br><span class="line">There are 31 section headers, starting at offset 0x19e8:            ⚠ 準備加載到内存執行，因</span><br><span class="line">                                                                       此包含需要加載的代碼塊，</span><br><span class="line">Section Headers:                                                       數據段和不需要加載的部</span><br><span class="line">  [Nr] Name              Type             Address           Offset     分。</span><br><span class="line">       Size              EntSize          Flags  Link  Info  Align</span><br><span class="line">  [ 0]                   NULL             0000000000000000  00000000</span><br><span class="line">       0000000000000000  0000000000000000           0     0     0</span><br><span class="line">  [ 1] .interp           PROGBITS         0000000000400238  00000238</span><br><span class="line">       000000000000001c  0000000000000000   A       0     0     1</span><br><span class="line">  [ 2] .note.ABI-tag     NOTE             0000000000400254  00000254</span><br><span class="line">       0000000000000020  0000000000000000   A       0     0     4</span><br><span class="line">  [ 3] .note.gnu.build-i NOTE             0000000000400274  00000274</span><br><span class="line">       0000000000000024  0000000000000000   A       0     0     4</span><br><span class="line">  [ 4] .gnu.hash         GNU_HASH         0000000000400298  00000298</span><br><span class="line">       000000000000001c  0000000000000000   A       5     0     8</span><br><span class="line">  [ 5] .dynsym           DYNSYM           00000000004002b8  000002b8</span><br><span class="line">       0000000000000090  0000000000000018   A       6     1     8</span><br><span class="line">  [ 6] .dynstr           STRTAB           0000000000400348  00000348</span><br><span class="line">       000000000000004a  0000000000000000   A       0     0     1</span><br><span class="line">  [ 7] .gnu.version      VERSYM           0000000000400392  00000392</span><br><span class="line">       000000000000000c  0000000000000002   A       5     0     2</span><br><span class="line">  [ 8] .gnu.version_r    VERNEED          00000000004003a0  000003a0</span><br><span class="line">       0000000000000020  0000000000000000   A       6     1     8</span><br><span class="line">  [ 9] .rela.dyn         RELA             00000000004003c0  000003c0</span><br><span class="line">       0000000000000018  0000000000000018   A       5     0     8</span><br><span class="line">  [10] .rela.plt         RELA             00000000004003d8  000003d8</span><br><span class="line">       0000000000000060  0000000000000018  AI       5    24     8</span><br><span class="line">  [11] .init             PROGBITS         0000000000400438  00000438</span><br><span class="line">       000000000000001a  0000000000000000  AX       0     0     4</span><br><span class="line">  [12] .plt              PROGBITS         0000000000400460  00000460</span><br><span class="line">       0000000000000050  0000000000000010  AX       0     0     16</span><br><span class="line">  [13] .plt.got          PROGBITS         00000000004004b0  000004b0</span><br><span class="line">       0000000000000008  0000000000000000  AX       0     0     8</span><br><span class="line">  [14] .text             PROGBITS         00000000004004c0  000004c0  &lt;===  代碼段</span><br><span class="line">       00000000000001f2  0000000000000000  AX       0     0     16</span><br><span class="line">  [15] .fini             PROGBITS         00000000004006b4  000006b4</span><br><span class="line">       0000000000000009  0000000000000000  AX       0     0     4</span><br><span class="line">  [16] .rodata           PROGBITS         00000000004006c0  000006c0  &lt;===  代碼段</span><br><span class="line">       0000000000000028  0000000000000000   A       0     0     8</span><br><span class="line">  [17] .eh_frame_hdr     PROGBITS         00000000004006e8  000006e8</span><br><span class="line">       000000000000003c  0000000000000000   A       0     0     4</span><br><span class="line">  [18] .eh_frame         PROGBITS         0000000000400728  00000728</span><br><span class="line">       0000000000000114  0000000000000000   A       0     0     8</span><br><span class="line">  [19] .init_array       INIT_ARRAY       0000000000600e10  00000e10</span><br><span class="line">       0000000000000008  0000000000000008  WA       0     0     8</span><br><span class="line">  [20] .fini_array       FINI_ARRAY       0000000000600e18  00000e18</span><br><span class="line">       0000000000000008  0000000000000008  WA       0     0     8</span><br><span class="line">  [21] .jcr              PROGBITS         0000000000600e20  00000e20</span><br><span class="line">       0000000000000008  0000000000000000  WA       0     0     8</span><br><span class="line">  [22] .dynamic          DYNAMIC          0000000000600e28  00000e28</span><br><span class="line">       00000000000001d0  0000000000000010  WA       6     0     8</span><br><span class="line">  [23] .got              PROGBITS         0000000000600ff8  00000ff8</span><br><span class="line">       0000000000000008  0000000000000008  WA       0     0     8</span><br><span class="line">  [24] .got.plt          PROGBITS         0000000000601000  00001000</span><br><span class="line">       0000000000000038  0000000000000008  WA       0     0     8</span><br><span class="line">  [25] .data             PROGBITS         0000000000601038  00001038  &lt;===  數據段  </span><br><span class="line">       0000000000000004  0000000000000000  WA       0     0     1</span><br><span class="line">  [26] .bss              NOBITS           000000000060103c  0000103c  &lt;===  數據段 </span><br><span class="line">       0000000000000004  0000000000000000  WA       0     0     1</span><br><span class="line">  [27] .comment          PROGBITS         0000000000000000  0000103c</span><br><span class="line">       000000000000002d  0000000000000001  MS       0     0     1</span><br><span class="line">  [28] .symtab           SYMTAB           0000000000000000  00001070  &lt;===  不加載到内存段 </span><br><span class="line">       0000000000000660  0000000000000018          29    48     8</span><br><span class="line">  [29] .strtab           STRTAB           0000000000000000  000016d0  &lt;===  不加載到内存段</span><br><span class="line">       0000000000000208  0000000000000000           0     0     1</span><br><span class="line">  [30] .shstrtab         STRTAB           0000000000000000  000018d8</span><br><span class="line">       000000000000010c  0000000000000000           0     0     1</span><br><span class="line">Key to Flags:</span><br><span class="line">  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),</span><br><span class="line">  L (link order), O (extra OS processing required), G (group), T (TLS),</span><br><span class="line">  C (compressed), x (unknown), o (OS specific), E (exclude),</span><br><span class="line">  l (large), p (processor specific)</span><br></pre></td></tr></table></figure>
+
+<p>運行結果</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># ./staticcreateprocess </span></span><br><span class="line">total 228</span><br><span class="line">-rw-r--r--. 1 root root 231449 Jun 22 05:36 redhat.repo</span><br></pre></td></tr></table></figure>
+
+<h3 id="ELF的第三種類型：共享對象文件"><a href="#ELF的第三種類型：共享對象文件" class="headerlink" title="ELF的第三種類型：共享對象文件"></a>ELF的第三種類型：共享對象文件</h3><p>共享對象文件全稱：Shared Object，先通過gcc，由.o文件編譯為.so文件，可得到<strong>動態鏈接庫，亦就是ELF第三種類型</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># gcc -shared -fPIC -o libdynamicprocess.so process.o</span></span><br></pre></td></tr></table></figure>
+
+<p>對其内部sections進行檢視。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># readelf -S libdynamicprocess.so </span></span><br><span class="line">There are 28 section headers, starting at offset 0x18c0:</span><br><span class="line"></span><br><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type             Address           Offset</span><br><span class="line">       Size              EntSize          Flags  Link  Info  Align</span><br><span class="line">  [ 0]                   NULL             0000000000000000  00000000</span><br><span class="line">       0000000000000000  0000000000000000           0     0     0</span><br><span class="line">  [ 1] .note.gnu.build-i NOTE             00000000000001c8  000001c8</span><br><span class="line">       0000000000000024  0000000000000000   A       0     0     4</span><br><span class="line">  [ 2] .gnu.hash         GNU_HASH         00000000000001f0  000001f0</span><br><span class="line">       000000000000003c  0000000000000000   A       3     0     8</span><br><span class="line">  [ 3] .dynsym           DYNSYM           0000000000000230  00000230</span><br><span class="line">       0000000000000168  0000000000000018   A       4     1     8</span><br><span class="line">  [ 4] .dynstr           STRTAB           0000000000000398  00000398</span><br><span class="line">       00000000000000c4  0000000000000000   A       0     0     1</span><br><span class="line">  [ 5] .gnu.version      VERSYM           000000000000045c  0000045c</span><br><span class="line">       000000000000001e  0000000000000002   A       3     0     2</span><br><span class="line">  [ 6] .gnu.version_r    VERNEED          0000000000000480  00000480</span><br><span class="line">       0000000000000020  0000000000000000   A       4     1     8</span><br><span class="line">  [ 7] .rela.dyn         RELA             00000000000004a0  000004a0</span><br><span class="line">       00000000000000c0  0000000000000018   A       3     0     8</span><br><span class="line">  [ 8] .rela.plt         RELA             0000000000000560  00000560</span><br><span class="line">       0000000000000048  0000000000000018  AI       3    22     8</span><br><span class="line">  [ 9] .init             PROGBITS         00000000000005a8  000005a8</span><br><span class="line">       000000000000001a  0000000000000000  AX       0     0     4</span><br><span class="line">  [10] .plt              PROGBITS         00000000000005d0  000005d0</span><br><span class="line">       0000000000000040  0000000000000010  AX       0     0     16</span><br><span class="line">  [11] .plt.got          PROGBITS         0000000000000610  00000610</span><br><span class="line">       0000000000000010  0000000000000000  AX       0     0     8</span><br><span class="line">  [12] .text             PROGBITS         0000000000000620  00000620</span><br><span class="line">       0000000000000122  0000000000000000  AX       0     0     16</span><br><span class="line">  [13] .fini             PROGBITS         0000000000000744  00000744</span><br><span class="line">       0000000000000009  0000000000000000  AX       0     0     4</span><br><span class="line">  [14] .eh_frame_hdr     PROGBITS         0000000000000750  00000750</span><br><span class="line">       000000000000001c  0000000000000000   A       0     0     4</span><br><span class="line">  [15] .eh_frame         PROGBITS         0000000000000770  00000770</span><br><span class="line">       0000000000000064  0000000000000000   A       0     0     8</span><br><span class="line">  [16] .init_array       INIT_ARRAY       0000000000200df8  00000df8</span><br><span class="line">       0000000000000008  0000000000000008  WA       0     0     8</span><br><span class="line">  [17] .fini_array       FINI_ARRAY       0000000000200e00  00000e00</span><br><span class="line">       0000000000000008  0000000000000008  WA       0     0     8</span><br><span class="line">  [18] .jcr              PROGBITS         0000000000200e08  00000e08</span><br><span class="line">       0000000000000008  0000000000000000  WA       0     0     8</span><br><span class="line">  [19] .data.rel.ro      PROGBITS         0000000000200e10  00000e10</span><br><span class="line">       0000000000000008  0000000000000000  WA       0     0     8</span><br><span class="line">  [20] .dynamic          DYNAMIC          0000000000200e18  00000e18</span><br><span class="line">       00000000000001c0  0000000000000010  WA       4     0     8</span><br><span class="line">  [21] .got              PROGBITS         0000000000200fd8  00000fd8</span><br><span class="line">       0000000000000028  0000000000000008  WA       0     0     8</span><br><span class="line">  [22] .got.plt          PROGBITS         0000000000201000  00001000</span><br><span class="line">       0000000000000030  0000000000000008  WA       0     0     8</span><br><span class="line">  [23] .bss              NOBITS           0000000000201030  00001030</span><br><span class="line">       0000000000000008  0000000000000000  WA       0     0     1</span><br><span class="line">  [24] .comment          PROGBITS         0000000000000000  00001030</span><br><span class="line">       000000000000002d  0000000000000001  MS       0     0     1</span><br><span class="line">  [25] .symtab           SYMTAB           0000000000000000  00001060</span><br><span class="line">       0000000000000570  0000000000000018          26    44     8</span><br><span class="line">  [26] .strtab           STRTAB           0000000000000000  000015d0</span><br><span class="line">       00000000000001f5  0000000000000000           0     0     1</span><br><span class="line">  [27] .shstrtab         STRTAB           0000000000000000  000017c5</span><br><span class="line">       00000000000000f5  0000000000000000           0     0     1</span><br><span class="line">Key to Flags:</span><br><span class="line">  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),</span><br><span class="line">  L (link order), O (extra OS processing required), G (group), T (TLS),</span><br><span class="line">  C (compressed), x (unknown), o (OS specific), E (exclude),</span><br><span class="line">  l (large), p (processor specific)</span><br></pre></td></tr></table></figure>
+
+<p>之後.so文件同樣可鏈入目標文件（可重定位文件）中去編譯出來。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">                             形態2                形態1                形態3</span><br><span class="line">[root@learn ~]<span class="comment"># gcc -o dynamiccreateprocess createprocess.o -L. -l dynamicprocess</span></span><br></pre></td></tr></table></figure>
+
+<p>運行結果，運行時需要手動指定load的路徑。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># export LD_LIBRARY_PATH=.</span></span><br><span class="line">[root@learn ~]<span class="comment"># ./dynamiccreateprocess </span></span><br><span class="line">total 228</span><br><span class="line">-rw-r--r--. 1 root root 231449 Jun 22 05:36 redhat.repo</span><br><span class="line">[root@learn ~]<span class="comment"># readelf -S dynamiccreateprocess </span></span><br><span class="line">There are 31 section headers, starting at offset 0x1940:</span><br><span class="line"></span><br><span class="line">Section Headers:</span><br><span class="line">  [Nr] Name              Type             Address           Offset</span><br><span class="line">       Size              EntSize          Flags  Link  Info  Align</span><br><span class="line">  [ 0]                   NULL             0000000000000000  00000000</span><br><span class="line">       0000000000000000  0000000000000000           0     0     0</span><br><span class="line">  [ 1] .interp           PROGBITS         0000000000400238  00000238 &lt;--- ld-linux.so</span><br><span class="line">       000000000000001c  0000000000000000   A       0     0     1         負責運行時進行鏈接</span><br><span class="line">  [ 2] .note.ABI-tag     NOTE             0000000000400254  00000254</span><br><span class="line">       0000000000000020  0000000000000000   A       0     0     4</span><br><span class="line">  [ 3] .note.gnu.build-i NOTE             0000000000400274  00000274</span><br><span class="line">       0000000000000024  0000000000000000   A       0     0     4</span><br><span class="line">  [ 4] .gnu.hash         GNU_HASH         0000000000400298  00000298</span><br><span class="line">       0000000000000038  0000000000000000   A       5     0     8</span><br><span class="line">  [ 5] .dynsym           DYNSYM           00000000004002d0  000002d0</span><br><span class="line">       00000000000000d8  0000000000000018   A       6     1     8</span><br><span class="line">  [ 6] .dynstr           STRTAB           00000000004003a8  000003a8</span><br><span class="line">       0000000000000080  0000000000000000   A       0     0     1</span><br><span class="line">  [ 7] .gnu.version      VERSYM           0000000000400428  00000428</span><br><span class="line">       0000000000000012  0000000000000002   A       5     0     2</span><br><span class="line">  [ 8] .gnu.version_r    VERNEED          0000000000400440  00000440</span><br><span class="line">       0000000000000020  0000000000000000   A       6     1     8</span><br><span class="line">  [ 9] .rela.dyn         RELA             0000000000400460  00000460</span><br><span class="line">       0000000000000018  0000000000000018   A       5     0     8</span><br><span class="line">  [10] .rela.plt         RELA             0000000000400478  00000478</span><br><span class="line">       0000000000000030  0000000000000018  AI       5    24     8</span><br><span class="line">  [11] .init             PROGBITS         00000000004004a8  000004a8</span><br><span class="line">       000000000000001a  0000000000000000  AX       0     0     4</span><br><span class="line">  [12] .plt              PROGBITS         00000000004004d0  000004d0  &lt;---過程鏈接表 PLT</span><br><span class="line">       0000000000000030  0000000000000010  AX       0     0     16   Procedure Linkage Table，</span><br><span class="line">  [13] .plt.got          PROGBITS         0000000000400500  00000500</span><br><span class="line">       0000000000000008  0000000000000000  AX       0     0     8</span><br><span class="line">  [14] .text             PROGBITS         0000000000400510  00000510</span><br><span class="line">       00000000000001b2  0000000000000000  AX       0     0     16</span><br><span class="line">  [15] .fini             PROGBITS         00000000004006c4  000006c4</span><br><span class="line">       0000000000000009  0000000000000000  AX       0     0     4</span><br><span class="line">  [16] .rodata           PROGBITS         00000000004006d0  000006d0</span><br><span class="line">       0000000000000028  0000000000000000   A       0     0     8</span><br><span class="line">  [17] .eh_frame_hdr     PROGBITS         00000000004006f8  000006f8</span><br><span class="line">       0000000000000034  0000000000000000   A       0     0     4</span><br><span class="line">  [18] .eh_frame         PROGBITS         0000000000400730  00000730</span><br><span class="line">       00000000000000f4  0000000000000000   A       0     0     8</span><br><span class="line">  [19] .init_array       INIT_ARRAY       0000000000600e00  00000e00</span><br><span class="line">       0000000000000008  0000000000000008  WA       0     0     8</span><br><span class="line">  [20] .fini_array       FINI_ARRAY       0000000000600e08  00000e08</span><br><span class="line">       0000000000000008  0000000000000008  WA       0     0     8</span><br><span class="line">  [21] .jcr              PROGBITS         0000000000600e10  00000e10</span><br><span class="line">       0000000000000008  0000000000000000  WA       0     0     8</span><br><span class="line">  [22] .dynamic          DYNAMIC          0000000000600e18  00000e18</span><br><span class="line">       00000000000001e0  0000000000000010  WA       6     0     8</span><br><span class="line">  [23] .got              PROGBITS         0000000000600ff8  00000ff8</span><br><span class="line">       0000000000000008  0000000000000008  WA       0     0     8</span><br><span class="line">  [24] .got.plt          PROGBITS         0000000000601000  00001000  &lt;--- 全局偏移量表 GOT</span><br><span class="line">       0000000000000028  0000000000000008  WA       0     0     8      Global Offset Table    </span><br><span class="line">  [25] .data             PROGBITS         0000000000601028  00001028</span><br><span class="line">       0000000000000004  0000000000000000  WA       0     0     1</span><br><span class="line">  [26] .bss              NOBITS           000000000060102c  0000102c</span><br><span class="line">       0000000000000004  0000000000000000  WA       0     0     1</span><br><span class="line">  [27] .comment          PROGBITS         0000000000000000  0000102c</span><br><span class="line">       000000000000002d  0000000000000001  MS       0     0     1</span><br><span class="line">  [28] .symtab           SYMTAB           0000000000000000  00001060</span><br><span class="line">       0000000000000600  0000000000000018          29    47     8</span><br><span class="line">  [29] .strtab           STRTAB           0000000000000000  00001660</span><br><span class="line">       00000000000001cf  0000000000000000           0     0     1</span><br><span class="line">  [30] .shstrtab         STRTAB           0000000000000000  0000182f</span><br><span class="line">       000000000000010c  0000000000000000           0     0     1</span><br><span class="line">Key to Flags:</span><br><span class="line">  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),</span><br><span class="line">  L (link order), O (extra OS processing required), G (group), T (TLS),</span><br><span class="line">  C (compressed), x (unknown), o (OS specific), E (exclude),</span><br><span class="line">  l (large), p (processor specific)</span><br></pre></td></tr></table></figure>
+
+<p>工作流程（編譯時建立PLT代替去找，PLT因爲GOT告知，因此會問GOT，GOT引路讓PLT去加載ld-linux.so直接在内存中找），之所以必須PLT去找因爲其作用為存放stub代碼，GOT存放so對應的真實代碼地址。</p>
+<p>dynamiccreateprocess→ PLT⇋GOT→ld-linux.so→libdynamicprocess.so(create_process)</p>
+<blockquote>
+<p>它们是怎么工作的，使得程序运行的时候，可以将 so 文件动态链接到进程空间的呢？dynamiccreateprocess 这个程序要调用 libdynamicprocess.so 里的 create_process 函数。由于是运行时才去找，编译的时候，压根不知道这个函数在哪里，所以就在 PLT 里面建立一项 PLT[x]。这一项也是一些代码，有点像一个本地的代理，在二进制程序里面，不直接调用 create_process 函数，而是调用 PLT[x]里面的代理代码，这个代理代码会在运行的时候找真正的 create_process 函数。去哪里找代理代码呢？这就用到了 GOT，这里面也会为 create_process 函数创建一项 GOT[y]。这一项是运行时 create_process 函数在内存中真正的地址。如果这个地址在 dynamiccreateprocess 调用 PLT[x]里面的代理代码，代理代码调用 GOT 表中对应项 GOT[y]，调用的就是加载到内存中的 libdynamicprocess.so 里面的 create_process 函数了。但是 GOT 怎么知道的呢？对于 create_process 函数，GOT 一开始就会创建一项 GOT[y]，但是这里面没有真正的地址，因为它也不知道，但是它有办法，它又回调 PLT，告诉它，你里面的代理代码来找我要 create_process 函数的真实地址，我不知道，你想想办法吧。PLT 这个时候会转而调用 PLT[0]，也即第一项，PLT[0]转而调用 GOT[2]，这里面是 ld-linux.so 的入口函数，这个函数会找到加载到内存中的 libdynamicprocess.so 里面的 create_process 函数的地址，然后把这个地址放在 GOT[y]里面。下次，PLT[x]的代理函数就能够直接调用了。</p>
+</blockquote>
+<h2 id="0x01-執行程序的主體：load-elf-binary等函數"><a href="#0x01-執行程序的主體：load-elf-binary等函數" class="headerlink" title="0x01 執行程序的主體：load_elf_binary等函數"></a>0x01 執行程序的主體：load_elf_binary等函數</h2><hr>
+<p>系統中大體通過以下的調用順序執行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sys_execve-&gt;do_execve-&gt;do_execveat_common-&gt;exec_binprm-&gt;search_binary_handler。</span><br></pre></td></tr></table></figure>
+
+<p>而exec函數的命名還遵循以下規則：</p>
+<blockquote>
+<ul>
+<li>包含 p 的函数（execvp, execlp）会在 PATH 路径下面寻找程序；</li>
+<li>不包含 p 的函数需要输入程序的全路径；</li>
+<li>包含 v 的函数（execv, execvp, execve）以数组的形式接收参数；</li>
+<li>包含 l 的函数（execl, execlp, execle）以列表的形式接收参数；</li>
+<li>包含 e 的函数（execve, execle）以数组的形式接收环境变量。</li>
+</ul>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/execnamerule.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/execnamerule.jpg"></p>
+<h2 id="0x02-執行函數的主體：進程"><a href="#0x02-執行函數的主體：進程" class="headerlink" title="0x02 執行函數的主體：進程"></a>0x02 執行函數的主體：進程</h2><hr>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@deployer ~]<span class="comment"># ps -ef</span></span><br><span class="line">           進程 父進程        發起地             無括號，用戶態，父進程為1，systemd init進程</span><br><span class="line">                             問號為後臺          中括號，内核態，父進程為2，kthreadd内核綫程</span><br><span class="line">UID        PID  PPID  C STIME TTY          TIME CMD</span><br><span class="line">root         1     0  0  2018 ?        00:00:29 /usr/lib/systemd/systemd --system --deserialize 21</span><br><span class="line">root         2     0  0  2018 ?        00:00:00 [kthreadd]</span><br><span class="line">root         3     2  0  2018 ?        00:00:00 [ksoftirqd/0]</span><br><span class="line">root         5     2  0  2018 ?        00:00:00 [kworker/0:0H]</span><br><span class="line">root         9     2  0  2018 ?        00:00:40 [rcu_sched]</span><br><span class="line">......</span><br><span class="line">root       337     2  0  2018 ?        00:00:01 [kworker/3:1H]</span><br><span class="line">root       380     1  0  2018 ?        00:00:00 /usr/lib/systemd/systemd-udevd</span><br><span class="line">root       415     1  0  2018 ?        00:00:01 /sbin/auditd</span><br><span class="line">root       498     1  0  2018 ?        00:00:03 /usr/lib/systemd/systemd-logind</span><br><span class="line">......</span><br><span class="line">root       852     1  0  2018 ?        00:06:25 /usr/sbin/rsyslogd -n</span><br><span class="line">root      2580     1  0  2018 ?        00:00:00 /usr/sbin/sshd -D</span><br><span class="line">root     29058     2  0 Jan03 ?        00:00:01 [kworker/1:2]</span><br><span class="line">root     29672     2  0 Jan04 ?        00:00:09 [kworker/2:1]</span><br><span class="line">root     30467     1  0 Jan06 ?        00:00:00 /usr/sbin/crond -n</span><br><span class="line">root     31574     2  0 Jan08 ?        00:00:01 [kworker/u128:2]</span><br><span class="line">......</span><br><span class="line">root     32792  2580  0 Jan10 ?        00:00:00 sshd: root@pts/0</span><br><span class="line">root     32794 32792  0 Jan10 pts/0    00:00:00 -bash</span><br><span class="line">root     32901 32794  0 00:01 pts/0    00:00:00 ps -ef</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-結語"><a href="#0x03-結語" class="headerlink" title="0x03 結語"></a>0x03 結語</h2><hr>
+<p>終於啃完進程了，耗時好幾天，果然寫博客方便整理思路。</p>
+<ol>
+<li>ELF的三種形態，.o , 二進制文件, .so ，.a只是.o的簡單歸檔。</li>
+<li>既然ELF是被執行的主體，自然系統調用到最後需要load_elf_binary函數。</li>
+<li>而在系統層面，用戶態的祖宗進程和内核態的祖宗進程分別以自己的方式進行函數的調用。</li>
+</ol>
+<p>個人學習筆記，如果有誤，歡迎指正。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2020/06/25 - 21:06
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2020/07/11 - 18:07
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2020-06-25-Funny-With-Linux-I-about-progress.html" title="趣談Linux操作系統筆記I（之剖析系統進程）">https://blog.madebug.net/Ops/2020-06-25-Funny-With-Linux-I-about-progress.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/%E8%B6%A3%E8%AB%87Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%B5%B1%E7%AD%86%E8%A8%98/" rel="tag"># 趣談Linux操作系統筆記</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2020-06-21-Kubernetes-Dislikes-ZeroTier.html" rel="prev" title="基於Zerotier搭建"跨供應商"的K8S集群带阻嘗試">
+      <i class="fa fa-chevron-left"></i> 基於Zerotier搭建"跨供應商"的K8S集群带阻嘗試
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2020-06-25-Funny-With-firewalld-but-not-iptables.html" rel="next" title="關於iptables與firewalld趣事">
+      關於iptables與firewalld趣事 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-被執行的主體：ELF"><span class="nav-text">0x00 被執行的主體：ELF</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ELF的第一種類型：可重定位文件"><span class="nav-text">ELF的第一種類型：可重定位文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ELF的第二種類型：可執行文件"><span class="nav-text">ELF的第二種類型：可執行文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ELF的第三種類型：共享對象文件"><span class="nav-text">ELF的第三種類型：共享對象文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-執行程序的主體：load-elf-binary等函數"><span class="nav-text">0x01 執行程序的主體：load_elf_binary等函數</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-執行函數的主體：進程"><span class="nav-text">0x02 執行函數的主體：進程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-結語"><span class="nav-text">0x03 結語</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : '59f45013c792c8fcf77b758d1ba45975',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

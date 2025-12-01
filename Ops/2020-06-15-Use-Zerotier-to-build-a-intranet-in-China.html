@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文將簡單闡述個人理解的Zerotier。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Zerotier基於國内網絡組建局域網">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2020-06-15-Use-Zerotier-to-build-a-intranet-in-China.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文將簡單闡述個人理解的Zerotier。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/ZeroTier.png">
+<meta property="article:published_time" content="2020-06-15T22:59:32.000Z">
+<meta property="article:modified_time" content="2020-07-11T18:33:33.000Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="Network ">
+<meta property="article:tag" content="UDP ">
+<meta property="article:tag" content="P2P ">
+<meta property="article:tag" content="Zerotier ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/ZeroTier.png">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2020-06-15-Use-Zerotier-to-build-a-intranet-in-China.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>使用Zerotier基於國内網絡組建局域網 | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2020-06-15-Use-Zerotier-to-build-a-intranet-in-China.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用Zerotier基於國内網絡組建局域網
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-15 22:59:32" itemprop="dateCreated datePublished" datetime="2020-06-15T22:59:32+00:00">2020-06-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-11 18:33:33" itemprop="dateModified" datetime="2020-07-11T18:33:33+00:00">2020-07-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>2.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/ZeroTier.png" width=50% /></center>
+
+<p>本文將簡單闡述個人理解的Zerotier。</p>
+<a id="more"></a>
+
+<h2 id="什麽是Zerotier"><a href="#什麽是Zerotier" class="headerlink" title="什麽是Zerotier"></a>什麽是Zerotier</h2><hr>
+<p>   來自<a href="https://www.zerotier.com/manual/#1" target="_blank" rel="noopener">官網</a>的説明：</p>
+<blockquote>
+<p><em>ZeroTier is a smart Ethernet switch for planet Earth.</em></p>
+</blockquote>
+<blockquote>
+<p><em>It’s a distributed network hypervisor built atop a cryptographically secure global peer to peer network. It provides advanced network virtualization and management capabilities on par with an enterprise SDN switch, but across both local and wide area networks and connecting almost any kind of app or device.</em></p>
+</blockquote>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><hr>
+<ol>
+<li><p><a href="https://my.zerotier.com/" target="_blank" rel="noopener">注冊</a>。</p>
+</li>
+<li><p>創建Network私有網絡並取得16位Network ID。</p>
+</li>
+<li><p>在apt系安裝zerotier：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># apt -y update</span></span><br><span class="line">~]<span class="comment"># apt -y install curl sudo net-tools</span></span><br><span class="line">~]<span class="comment"># curl -s https://install.zerotier.com/ | sudo bash</span></span><br></pre></td></tr></table></figure>
+
+<p>其中遇到了關於gpg error的問題：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The following signatures couldn&#39;t be verified because the public key is not available: NO_PUBKEY 1657198823E52A61</span><br></pre></td></tr></table></figure>
+
+<p>安裝gnupg來對其進行驗證導入再進行安裝。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># apt -y install gnupg</span></span><br><span class="line">~]<span class="comment"># apt-key adv --keyserver keyserver.ubuntu.com --recv-keys  1657198823E52A61</span></span><br><span class="line">~]<span class="comment"># curl -s https://install.zerotier.com/ | sudo bash</span></span><br><span class="line">*** Waiting <span class="keyword">for</span> identity generation...*** Success! You are ZeroTier address [ xxxxxxxx ].</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="如何建立中轉服務器moon"><a href="#如何建立中轉服務器moon" class="headerlink" title="如何建立中轉服務器moon"></a>如何建立中轉服務器moon</h2><hr>
+<p>   這是關於它的定義：</p>
+<blockquote>
+<p>PLANET 行星級服務器，Zerotier位於各地的根服務器，有日本、新加坡等地。 MOON 衛星級服務器，用戶自建的私有根服務器，起到中轉加速的作用。 LEAF 節點級服務器，就是每臺連接到該網絡的機器節點。</p>
+</blockquote>
+<p>   不得不驚嘆這個方案的明智之處 ，自帶支持中轉服務器的架設，這也是吸引我選擇它的初衷，p2p的組網方式本質是去中心化，不僅維護起來簡單，而且這種扁平化的網絡架構，其誕生迄今我一直認爲是一個計算機史上的思維方式的<a href="https://www.youtube.com/watch?v=sjx_rpay9rk" target="_blank" rel="noopener">奇異點</a>，也十分方便後期加入或者退出節點。</p>
+<ol>
+<li><p>加入你的網絡，填入你的16位network ID。</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># zerotier-cli join xxxxxxxxx</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通過自身工具生成moon.json配置文件。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">~]# cd /var/lib/zerotier-one</span><br><span class="line">~]# zerotier-idtool initmoon <span class="keyword">identity</span>.<span class="built_in">public</span> &gt; moon.json</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>將公網IP加入其中。</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">~]# cat moon.json </span><br><span class="line">&#123;</span><br><span class="line"> <span class="string">"id"</span>: <span class="string">"xxxxxxxx"</span>, </span><br><span class="line"> <span class="string">"objtype"</span>: <span class="string">"world"</span>, </span><br><span class="line"> <span class="string">"roots"</span>: [  </span><br><span class="line">  &#123;</span><br><span class="line">   <span class="string">"identity"</span>: <span class="string">"dd31a3ee4c:0:40971299f1f4875edfadfc221ffba68a283cf51a67a27fbc223da18b6257d236474b9f13e3e50b46c0ae8096339d3eb450e12ab0361bf5e8ef82c69acd86ebb8"</span>,   </span><br><span class="line">   <span class="string">"stableEndpoints"</span>: []        # 把它改成<span class="string">"stableEndpoints"</span>: [ <span class="string">"xxx.xxx.xxx.xxx/9993"</span> ]  </span><br><span class="line">  &#125; </span><br><span class="line"> ], </span><br><span class="line"> <span class="string">"signingKey"</span>: <span class="string">"592c748e40de1bd39db07bcdc98ad220ac82d67494483b410c0133939fc0c03059d3a2b2c9948ec1939c4d42e2c3f07b310a337bc47a77b94153e4f9f6df56d7"</span>, </span><br><span class="line"> <span class="string">"signingKey_SECRET"</span>: <span class="string">"c2810d04474b737ada418e1407bdc49ea9a0879393e5cb8b585eaec0feadbb0dcbbc52c6c85db9db2a2d83b6a36c01ed839e105d67f7bd4e0ea8d22559f29fd6"</span>, </span><br><span class="line"> <span class="string">"updatesMustBeSignedBy"</span>: <span class="string">"592c748e40de1bd39db07bcdc98ad220ac82d67494483b410c0133939fc0c03059d3a2b2c9948ec1939c4d42e2c3f07b310a337bc47a77b94153e4f9f6df56d7"</span>, </span><br><span class="line"> <span class="string">"worldType"</span>: <span class="string">"moon"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>生成moon節點的籤名文件。</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># zerotier-idtool genmoon moon.json</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>將該moon節點加入網絡。</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># mkdir moons.d</span></span><br><span class="line">~]<span class="comment"># mv 000000xxxxxxxxxx.moon moons.d/</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重啓zerotier-one服務即可完成moon節點的設置。</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># systemctl restart zerotier-one.service</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="如何使用自建的moon節點"><a href="#如何使用自建的moon節點" class="headerlink" title="如何使用自建的moon節點"></a>如何使用自建的moon節點</h2><hr>
+<ol>
+<li><p>在其他leaf節點完成安裝后加入你的網絡，其後通過以下命令加入自建的moon節點。( ⚠️注意moon的id輸入兩次。)</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~]# zerotier-cli orbit <span class="number">000000</span>xxxxxxxxxx <span class="number">000000</span>xxxxxxxxxx</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>其後在leaf節點查看加入情況。</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># zerotier-cli listpeers|grep MOON</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>離開節點也很容易。( ⚠️注意moon的id輸入壹次。)</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~]# zerotier-cli deorbit <span class="number">000000</span>xxxxxxxxxx</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><hr>
+<ol>
+<li><p>p2p組網天下第一，可以通過以下簡單的類比方式來理解其中原理，其實也是區塊鏈組網的基礎。</p>
+<blockquote>
+<p>PLANET節點就是BT網絡中的根服務器<br>MOON節點就是BT網絡中的tracker服務器<br>LEAF節點就是BT網絡中客戶端的qBittorrent</p>
+</blockquote>
+</li>
+<li><p>組了一張大内網，我們來玩點什麽呢？</p>
+<ul>
+<li><input disabled="" type="checkbox"> <a href="https://blog.madebug.net/ops/2020-06-21-kubernetes-dislikes-zerotier">Kubernetes/Openshift，跨機房跨運營商實現多master多node集群，實現混合雲架構。</a></li>
+<li><input disabled="" type="checkbox"> 區塊鏈實驗場景。<del><font color=#808080>（其實沒想好）</font></del></li>
+<li><input disabled="" type="checkbox"> 個人專屬内網。</li>
+<li><input disabled="" type="checkbox"> 滲透後階段，低調的後門維持方式，而且去中心化。</li>
+</ul>
+</li>
+<li><p>另外說一嘴，實驗下來，果然搬瓦工的cn2傳家寶還是沒救了，只能上trojan和squid了。</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2020/06/15 - 22:06
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2020/07/11 - 18:07
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2020-06-15-Use-Zerotier-to-build-a-intranet-in-China.html" title="使用Zerotier基於國内網絡組建局域網">https://blog.madebug.net/Ops/2020-06-15-Use-Zerotier-to-build-a-intranet-in-China.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/Network/" rel="tag"># Network </a>
+              <a href="/tags/UDP/" rel="tag"># UDP </a>
+              <a href="/tags/P2P/" rel="tag"># P2P </a>
+              <a href="/tags/Zerotier/" rel="tag"># Zerotier </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2019-09-02-Linux-Performance-Tuning-study-notes-II.html" rel="prev" title="Linux性能調優實戰筆記II">
+      <i class="fa fa-chevron-left"></i> Linux性能調優實戰筆記II
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2020-06-21-Kubernetes-Dislikes-ZeroTier.html" rel="next" title="基於Zerotier搭建"跨供應商"的K8S集群带阻嘗試">
+      基於Zerotier搭建"跨供應商"的K8S集群带阻嘗試 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什麽是Zerotier"><span class="nav-text">什麽是Zerotier</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用"><span class="nav-text">如何使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何建立中轉服務器moon"><span class="nav-text">如何建立中轉服務器moon</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用自建的moon節點"><span class="nav-text">如何使用自建的moon節點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#結語"><span class="nav-text">結語</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : 'c7e7558a56126f04b9efdfe228aaf79e',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

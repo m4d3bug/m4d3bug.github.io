@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>m4d3bug&#39;s blog</title>
+  <icon>https://blog.madebug.net/icon.png</icon>
+  <subtitle>DevSecOps</subtitle>
+  <link href="https://blog.madebug.net/atom.xml" rel="self"/>
+  
+  <link href="https://blog.madebug.net/"/>
+  <updated>2025-12-01T08:53:16.486Z</updated>
+  <id>https://blog.madebug.net/</id>
+  
+  <author>
+    <name>m4d3bug</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>OSP的网络</title>
+    <link href="https://blog.madebug.net/Ops/2025-11-26-OSP-network.html"/>
+    <id>https://blog.madebug.net/Ops/2025-11-26-OSP-network.html</id>
+    <published>2025-11-26T22:15:53.000Z</published>
+    <updated>2025-12-01T08:53:16.486Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/RHOSO_18.0_ml2_OVN_ovngateway_on_OCP_with_memo.jpg&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00️⃣-起因&quot;&gt;&lt;a href=&quot;#0x00️⃣-起因&quot; class=&quot;headerlink&quot; title=&quot;0x00️⃣ 起因&quot;&gt;&lt;/a&gt;0x00️⃣ 起因&lt;/h2&gt;&lt;p&gt;事情的起因是，客户的场景没有ovnController, 并且结合了SRIOV/DPDK的场景。但是没有见过所以用此文记录一下其中的详情。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="OpenStack " scheme="https://blog.madebug.net/tags/OpenStack/"/>
+    
+    <category term="OpenShift " scheme="https://blog.madebug.net/tags/OpenShift/"/>
+    
+    <category term="OVN " scheme="https://blog.madebug.net/tags/OVN/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>搭建Wireguard主备切换架构</title>
+    <link href="https://blog.madebug.net/Ops/2023-08-27-Standby-Wireguard-Server-Deployment.html"/>
+    <id>https://blog.madebug.net/Ops/2023-08-27-Standby-Wireguard-Server-Deployment.html</id>
+    <published>2023-08-27T13:41:46.000Z</published>
+    <updated>2023-08-27T13:41:33.000Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/wireguard.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00️⃣-前言&quot;&gt;&lt;a href=&quot;#0x00️⃣-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00️⃣ 前言&quot;&gt;&lt;/a&gt;0x00️⃣ 前言&lt;/h2&gt;&lt;p&gt;本文旨在阐述个人搭建wireguard主备切换架构的细节。&lt;a href=&quot;https://blog.madebug.net/Ops/2021-07-04-Use-Wireguard-to-rebuild-a-intranet-in-China.html&quot;&gt;wireguard的相关搭建&lt;/a&gt;不做赘述，主要解决单server没有冗余的问题。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Network " scheme="https://blog.madebug.net/tags/Network/"/>
+    
+    <category term="UDP " scheme="https://blog.madebug.net/tags/UDP/"/>
+    
+    <category term="Wireguard " scheme="https://blog.madebug.net/tags/Wireguard/"/>
+    
+    <category term="Syncthing " scheme="https://blog.madebug.net/tags/Syncthing/"/>
+    
+    <category term="CloudFlare " scheme="https://blog.madebug.net/tags/CloudFlare/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>每天5分钟OSP-Nova01</title>
+    <link href="https://blog.madebug.net/Ops/2022-10-30-5mins-OpenStack-everydays-Nova01.html"/>
+    <id>https://blog.madebug.net/Ops/2022-10-30-5mins-OpenStack-everydays-Nova01.html</id>
+    <published>2022-10-30T08:47:12.000Z</published>
+    <updated>2022-10-30T23:14:37.000Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221030084802.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00️⃣前言&quot;&gt;&lt;a href=&quot;#0x00️⃣前言&quot; class=&quot;headerlink&quot; title=&quot;0x00️⃣前言&quot;&gt;&lt;/a&gt;0x00️⃣前言&lt;/h2&gt;&lt;p&gt;本文记录一些个人的nova架构的学习笔记。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="OpenStack " scheme="https://blog.madebug.net/tags/OpenStack/"/>
+    
+    <category term="每天五分鐘玩轉OpenStack " scheme="https://blog.madebug.net/tags/%E6%AF%8F%E5%A4%A9%E4%BA%94%E5%88%86%E9%90%98%E7%8E%A9%E8%BD%89OpenStack/"/>
+    
+    <category term="Compute " scheme="https://blog.madebug.net/tags/Compute/"/>
+    
+    <category term="Nova " scheme="https://blog.madebug.net/tags/Nova/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>每天5分钟OSP-Glance02</title>
+    <link href="https://blog.madebug.net/Ops/2022-10-29-5mins-OpenStack-everydays-Glance02.html"/>
+    <id>https://blog.madebug.net/Ops/2022-10-29-5mins-OpenStack-everydays-Glance02.html</id>
+    <published>2022-10-29T23:14:37.000Z</published>
+    <updated>2022-10-29T23:14:37.000Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221029000932.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00️⃣前言&quot;&gt;&lt;a href=&quot;#0x00️⃣前言&quot; class=&quot;headerlink&quot; title=&quot;0x00️⃣前言&quot;&gt;&lt;/a&gt;0x00️⃣前言&lt;/h2&gt;&lt;p&gt;本文继续记录一些个人的glance学习笔记。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Storage " scheme="https://blog.madebug.net/tags/Storage/"/>
+    
+    <category term="OpenStack " scheme="https://blog.madebug.net/tags/OpenStack/"/>
+    
+    <category term="Glance " scheme="https://blog.madebug.net/tags/Glance/"/>
+    
+    <category term="每天五分鐘玩轉OpenStack " scheme="https://blog.madebug.net/tags/%E6%AF%8F%E5%A4%A9%E4%BA%94%E5%88%86%E9%90%98%E7%8E%A9%E8%BD%89OpenStack/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>每天5分钟OSP-Glance01</title>
+    <link href="https://blog.madebug.net/Ops/2022-10-28-5mins-OpenStack-everydays-Glance01.html"/>
+    <id>https://blog.madebug.net/Ops/2022-10-28-5mins-OpenStack-everydays-Glance01.html</id>
+    <published>2022-10-28T23:14:37.000Z</published>
+    <updated>2022-10-28T23:14:37.000Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221029000932.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00️⃣前言&quot;&gt;&lt;a href=&quot;#0x00️⃣前言&quot; class=&quot;headerlink&quot; title=&quot;0x00️⃣前言&quot;&gt;&lt;/a&gt;0x00️⃣前言&lt;/h2&gt;&lt;p&gt;本文记录一些个人的glance学习笔记。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Storage " scheme="https://blog.madebug.net/tags/Storage/"/>
+    
+    <category term="OpenStack " scheme="https://blog.madebug.net/tags/OpenStack/"/>
+    
+    <category term="Glance " scheme="https://blog.madebug.net/tags/Glance/"/>
+    
+    <category term="每天五分鐘玩轉OpenStack " scheme="https://blog.madebug.net/tags/%E6%AF%8F%E5%A4%A9%E4%BA%94%E5%88%86%E9%90%98%E7%8E%A9%E8%BD%89OpenStack/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用headscale搭建國内局域網</title>
+    <link href="https://blog.madebug.net/Ops/2022-10-16-Start-with-headscale.html"/>
+    <id>https://blog.madebug.net/Ops/2022-10-16-Start-with-headscale.html</id>
+    <published>2022-10-16T21:24:06.000Z</published>
+    <updated>2022-11-13T18:20:06.000Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221016212516.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;什么是headscale ？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Network " scheme="https://blog.madebug.net/tags/Network/"/>
+    
+    <category term="Headscale " scheme="https://blog.madebug.net/tags/Headscale/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入剖析K8s筆記(StatefulSet之存儲狀態)</title>
+    <link href="https://blog.madebug.net/Ops/2022-03-17-StatefulSet-with-Storage-State.html"/>
+    <id>https://blog.madebug.net/Ops/2022-03-17-StatefulSet-with-Storage-State.html</id>
+    <published>2022-03-17T23:56:36.000Z</published>
+    <updated>2025-12-01T08:53:16.487Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/pv&amp;pvc.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;书接前文，StatefulSet 专注处理应用的两类状态。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Kubernetes " scheme="https://blog.madebug.net/tags/Kubernetes/"/>
+    
+    <category term="StatefulSet " scheme="https://blog.madebug.net/tags/StatefulSet/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入剖析K8s筆記(StatefulSet之拓撲狀態)</title>
+    <link href="https://blog.madebug.net/Ops/2022-03-07-StatefulSet-with-Topology-State.html"/>
+    <id>https://blog.madebug.net/Ops/2022-03-07-StatefulSet-with-Topology-State.html</id>
+    <published>2022-03-07T00:36:32.000Z</published>
+    <updated>2025-12-01T08:53:16.487Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/statefulset&amp;topology.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;Q：有Deployment不就够了吗？StatefulSet 又是什么？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Kubernetes " scheme="https://blog.madebug.net/tags/Kubernetes/"/>
+    
+    <category term="StatefulSet " scheme="https://blog.madebug.net/tags/StatefulSet/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入剖析K8s筆記(什麽是Deployment)</title>
+    <link href="https://blog.madebug.net/Ops/2022-03-05-What-is-Deployment.html"/>
+    <id>https://blog.madebug.net/Ops/2022-03-05-What-is-Deployment.html</id>
+    <published>2022-03-05T00:38:57.000Z</published>
+    <updated>2025-12-01T08:53:16.487Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/deployment.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;开门见山，这篇blog的主角是&lt;code&gt;Deployment&lt;/code&gt;。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Kubernetes " scheme="https://blog.madebug.net/tags/Kubernetes/"/>
+    
+    <category term="Deployment " scheme="https://blog.madebug.net/tags/Deployment/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入剖析K8s筆記(Controller模型)</title>
+    <link href="https://blog.madebug.net/Ops/2022-02-19-K8s-Controller-explaination.html"/>
+    <id>https://blog.madebug.net/Ops/2022-02-19-K8s-Controller-explaination.html</id>
+    <published>2022-02-19T23:03:58.000Z</published>
+    <updated>2025-12-01T08:53:16.486Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/operator-controller-reconciliation.jpeg&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;Q：何为Controller？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Kubernetes " scheme="https://blog.madebug.net/tags/Kubernetes/"/>
+    
+    <category term="Controller " scheme="https://blog.madebug.net/tags/Controller/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>从user.conf谈起</title>
+    <link href="https://blog.madebug.net/Ops/2022-02-16-from-user-conf.html"/>
+    <id>https://blog.madebug.net/Ops/2022-02-16-from-user-conf.html</id>
+    <published>2022-02-16T20:41:17.000Z</published>
+    <updated>2025-12-01T08:53:16.487Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/ulimit-command.jpg&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;最近遇到一个问题，&lt;code&gt;/etc/system/system.conf&lt;/code&gt; 和&lt;code&gt;/etc/system/user.conf&lt;/code&gt; 的区别，没看到有很合适的笔记，简单记录一下。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="ulimit " scheme="https://blog.madebug.net/tags/ulimit/"/>
+    
+    <category term="Services " scheme="https://blog.madebug.net/tags/Services/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入剖析K8s筆記(如何保證的Pod的健康)</title>
+    <link href="https://blog.madebug.net/Ops/2022-02-10-how-to-keep-Pods-alive.html"/>
+    <id>https://blog.madebug.net/Ops/2022-02-10-how-to-keep-Pods-alive.html</id>
+    <published>2022-02-10T20:20:36.000Z</published>
+    <updated>2025-12-01T08:53:16.487Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/pod.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;Q: &lt;code&gt;healthy check&lt;/code&gt;除了监控&lt;code&gt;Pod/Container&lt;/code&gt;状态外，有没有更细致，监控&lt;code&gt;Container&lt;/code&gt;内服务状态的方法呢？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Kubernetes " scheme="https://blog.madebug.net/tags/Kubernetes/"/>
+    
+    <category term="Pod " scheme="https://blog.madebug.net/tags/Pod/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入剖析K8s筆記(特殊的Volume)</title>
+    <link href="https://blog.madebug.net/Ops/2022-02-09-Special-Volume-for-Pods.html"/>
+    <id>https://blog.madebug.net/Ops/2022-02-09-Special-Volume-for-Pods.html</id>
+    <published>2022-02-09T22:43:09.000Z</published>
+    <updated>2025-12-01T08:53:16.486Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/pod.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;先上定义，Projected Volume。译作“投射数据卷”&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Kubernetes " scheme="https://blog.madebug.net/tags/Kubernetes/"/>
+    
+    <category term="Pod " scheme="https://blog.madebug.net/tags/Pod/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入剖析K8s筆記(Pod的對象們)</title>
+    <link href="https://blog.madebug.net/Ops/2022-02-06-What-is-pods-object.html"/>
+    <id>https://blog.madebug.net/Ops/2022-02-06-What-is-pods-object.html</id>
+    <published>2022-02-06T00:22:48.000Z</published>
+    <updated>2025-12-01T08:53:16.487Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/pod.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-引言&quot;&gt;&lt;a href=&quot;#0x00-引言&quot; class=&quot;headerlink&quot; title=&quot;0x00 引言&quot;&gt;&lt;/a&gt;0x00 引言&lt;/h2&gt;&lt;p&gt;编写yaml时很容易遇到的一个问题：什么属性属于Pod对象，而什么又属于Container对象？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Kubernetes " scheme="https://blog.madebug.net/tags/Kubernetes/"/>
+    
+    <category term="Pod " scheme="https://blog.madebug.net/tags/Pod/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入剖析K8s筆記(爲什麽我們需要Pod)</title>
+    <link href="https://blog.madebug.net/Ops/2022-01-31-why-we-need-pods.html"/>
+    <id>https://blog.madebug.net/Ops/2022-01-31-why-we-need-pods.html</id>
+    <published>2022-01-31T01:17:49.000Z</published>
+    <updated>2025-12-01T08:53:16.488Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/pod.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;Pod，是Kubernetes项目的原子调度单位。但为什么是呢？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Kubernetes " scheme="https://blog.madebug.net/tags/Kubernetes/"/>
+    
+    <category term="Pod " scheme="https://blog.madebug.net/tags/Pod/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>從KVM模板到OS淺談</title>
+    <link href="https://blog.madebug.net/Ops/2021-09-26-From-KVM-Template-To-Linux-Distro.html"/>
+    <id>https://blog.madebug.net/Ops/2021-09-26-From-KVM-Template-To-Linux-Distro.html</id>
+    <published>2021-09-26T21:38:05.000Z</published>
+    <updated>2025-12-01T08:53:16.485Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Linux-distro.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;p&gt;本文旨在阐述如何使用virt-sysprep制作kvm的qcow2格式的模板，以及一些感想。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用Wireguard基於國内網絡異地組網實踐</title>
+    <link href="https://blog.madebug.net/Ops/2021-07-04-Use-Wireguard-to-rebuild-a-intranet-in-China.html"/>
+    <id>https://blog.madebug.net/Ops/2021-07-04-Use-Wireguard-to-rebuild-a-intranet-in-China.html</id>
+    <published>2021-07-04T20:11:46.000Z</published>
+    <updated>2021-07-05T07:33:33.000Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/wireguard.png&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;h2 id=&quot;0x00️⃣-前言&quot;&gt;&lt;a href=&quot;#0x00️⃣-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00️⃣ 前言&quot;&gt;&lt;/a&gt;0x00️⃣ 前言&lt;/h2&gt;&lt;p&gt;本文旨在阐述个人使用wireguard基于国内网络异地组网实践的细节。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Network " scheme="https://blog.madebug.net/tags/Network/"/>
+    
+    <category term="UDP " scheme="https://blog.madebug.net/tags/UDP/"/>
+    
+    <category term="Wireguard " scheme="https://blog.madebug.net/tags/Wireguard/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux性能調優實戰筆記IV（CPU占用率）</title>
+    <link href="https://blog.madebug.net/Ops/2021-06-20-Linux-Performance-Tuning-study-notes-IV.html"/>
+    <id>https://blog.madebug.net/Ops/2021-06-20-Linux-Performance-Tuning-study-notes-IV.html</id>
+    <published>2021-06-20T01:46:18.000Z</published>
+    <updated>2025-12-01T08:53:16.486Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;p&gt;本文旨在剖析系统CPU性能的指标：CPU使用率。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Linux性能調優實戰筆記 " scheme="https://blog.madebug.net/tags/Linux%E6%80%A7%E8%83%BD%E8%AA%BF%E5%84%AA%E5%AF%A6%E6%88%B0%E7%AD%86%E8%A8%98/"/>
+    
+    <category term="CPU usage " scheme="https://blog.madebug.net/tags/CPU-usage/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux性能調優實戰筆記III（CPU上下文切換-下）</title>
+    <link href="https://blog.madebug.net/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part2.html"/>
+    <id>https://blog.madebug.net/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part2.html</id>
+    <published>2021-03-16T22:11:05.000Z</published>
+    <updated>2025-12-01T08:53:16.486Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;p&gt;本文旨在剖析CPU上下文切换的一个H。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Linux性能調優實戰筆記 " scheme="https://blog.madebug.net/tags/Linux%E6%80%A7%E8%83%BD%E8%AA%BF%E5%84%AA%E5%AF%A6%E6%88%B0%E7%AD%86%E8%A8%98/"/>
+    
+    <category term="CPU Content Switch " scheme="https://blog.madebug.net/tags/CPU-Content-Switch/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux性能調優實戰筆記III（CPU上下文切換-上）</title>
+    <link href="https://blog.madebug.net/Ops/2021-02-22-Linux-Performance-Tuning-study-notes-III-part1.html"/>
+    <id>https://blog.madebug.net/Ops/2021-02-22-Linux-Performance-Tuning-study-notes-III-part1.html</id>
+    <published>2021-02-22T22:15:53.000Z</published>
+    <updated>2025-12-01T08:53:16.486Z</updated>
+    
+    
+    <summary type="html">&lt;center&gt;&lt;img src=&quot;https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg&quot; width=50% /&gt;&lt;/center&gt;
+
+&lt;p&gt;本文旨在剖析CPU上下文切換的五個W。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Ops " scheme="https://blog.madebug.net/categories/Ops/"/>
+    
+    
+    <category term="Linux " scheme="https://blog.madebug.net/tags/Linux/"/>
+    
+    <category term="Linux性能調優實戰筆記 " scheme="https://blog.madebug.net/tags/Linux%E6%80%A7%E8%83%BD%E8%AA%BF%E5%84%AA%E5%AF%A6%E6%88%B0%E7%AD%86%E8%A8%98/"/>
+    
+    <category term="CPU Content Switch " scheme="https://blog.madebug.net/tags/CPU-Content-Switch/"/>
+    
+  </entry>
+  
+</feed>

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="0x00 前言什么是headscale ？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用headscale搭建國内局域網">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2022-10-16-Start-with-headscale.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="0x00 前言什么是headscale ？">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221016212516.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018183537.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018184140.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018190900.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018191845.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018191216.png">
+<meta property="article:published_time" content="2022-10-16T21:24:06.000Z">
+<meta property="article:modified_time" content="2022-11-13T18:20:06.000Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="Network ">
+<meta property="article:tag" content="Headscale ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221016212516.png">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2022-10-16-Start-with-headscale.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>使用headscale搭建國内局域網 | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2022-10-16-Start-with-headscale.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用headscale搭建國内局域網
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-10-16 21:24:06" itemprop="dateCreated datePublished" datetime="2022-10-16T21:24:06+00:00">2022-10-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-11-13 18:20:06" itemprop="dateModified" datetime="2022-11-13T18:20:06+00:00">2022-11-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>5.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221016212516.png" width=50% /></center>
+
+<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>什么是headscale ？</p>
+<a id="more"></a>
+
+<blockquote>
+<p><em>An open source, self-hosted implementation of the Tailscale control server.</em></p>
+</blockquote>
+<p>什么是Tailscale ？</p>
+<blockquote>
+<p><em>Tailscale is <a href="https://tailscale.com/" target="_blank" rel="noopener">a modern VPN</a> built on top of <a href="https://www.wireguard.com/" target="_blank" rel="noopener">Wireguard</a>. It <a href="https://tailscale.com/blog/how-tailscale-works/" target="_blank" rel="noopener">works like an overlay network</a> between the computers of your networks - using <a href="https://tailscale.com/blog/how-nat-traversal-works/" target="_blank" rel="noopener">NAT traversal</a>.</em></p>
+<p><em>Everything in Tailscale is Open Source, except the GUI clients for proprietary OS (Windows and macOS/iOS), and the control server.</em></p>
+<p><em>The control server works as an exchange point of Wireguard public keys for the nodes in the Tailscale network. It assigns the IP addresses of the clients, creates the boundaries between each user, enables sharing machines between users, and exposes the advertised routes of your nodes.</em></p>
+<p><em>A <a href="https://tailscale.com/kb/1136/tailnet/" target="_blank" rel="noopener">Tailscale network (tailnet)</a> is private network which Tailscale assigns to a user in terms of private users or an organisation.</em></p>
+</blockquote>
+<p>之前使用wireguard和zerotier（甚至还试了docker版的zerotier root模式）搭建了局域网，现在用headscale再额外搭一个网。有人会嫌网络多吗？反正我不会。我对搭局域网的打洞软件要求不外乎是那么几点：</p>
+<ul>
+<li>可迁移</li>
+<li>不跨境</li>
+<li>最好有面板</li>
+</ul>
+<h2 id="0x01-前置准备"><a href="#0x01-前置准备" class="headerlink" title="0x01 前置准备"></a>0x01 前置准备</h2><ul>
+<li>docker</li>
+<li>docker-compose</li>
+<li><a href="https://www.cloudflare.com/zh-cn/products/tunnel/" target="_blank" rel="noopener">cloudflare tunnel</a> (自行注册，需要绑定支付方式)</li>
+<li>域名托管在cloudflare </li>
+</ul>
+<h2 id="0x02-headscale服务端"><a href="#0x02-headscale服务端" class="headerlink" title="0x02 headscale服务端"></a>0x02 headscale服务端</h2><ul>
+<li><strong>headscale部分</strong></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p headscale/container-config</span><br><span class="line">cd headscale/container-config</span><br><span class="line">wget -O ./config.yaml https://raw.githubusercontent.com/juanfont/headscale/main/config-example.yaml</span><br><span class="line">sed -i '13c server_url\: https\:\/\/&lt;your-domain&gt;' config.yaml #加入时的回显内容，可选项</span><br><span class="line">sed -i 's|unix_socket: /var/run/headscale/headscale.sock|unix_socket: /var/run/headscale.sock|' config.yaml </span><br><span class="line">sed -i 's/127\.0\.0\.1/0\.0\.0\.0/g' config.yaml</span><br><span class="line">sed -i '68c \ ' config.yaml #注释掉ipv6网段，可选项</span><br><span class="line">cd ..</span><br><span class="line">cat &gt; docker-compose.yaml &lt;&lt; EOF</span><br><span class="line">services:</span><br><span class="line">  headscale:</span><br><span class="line">    container_name: headscale</span><br><span class="line">    #    image: headscale/headscale:latest-alpine </span><br><span class="line">    image: headscale/headscale:0.16.4 #最新版对cloudflare的websocket支持似乎有问题 </span><br><span class="line">    restart: unless-stopped</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:8080</span><br><span class="line">    volumes:</span><br><span class="line">      - ./container-config:/etc/headscale</span><br><span class="line">      - ./container-data:/var/lib/headscale</span><br><span class="line">    entrypoint: headscale serve</span><br><span class="line">    networks:</span><br><span class="line">      reverseproxy-nw:</span><br><span class="line"></span><br><span class="line">  headscale-ui:</span><br><span class="line">    container_name: headscale-ui</span><br><span class="line">    # image: ghcr.io/gurucomputing/headscale-ui:latest </span><br><span class="line">    image: madebug/ghcr.io.gurucomputing.headscale-ui:latest #sync了一个在dockerhub</span><br><span class="line">    restart: unless-stopped</span><br><span class="line">    networks:</span><br><span class="line">      reverseproxy-nw:</span><br><span class="line"></span><br><span class="line">networks:</span><br><span class="line">  reverseproxy-nw:</span><br><span class="line">    external: true</span><br><span class="line">EOF</span><br><span class="line">docker network create reverseproxy-nw</span><br><span class="line">docker-compose up -d </span><br><span class="line">curl http://0.0.0.0:8080/windows</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>cloudflare tunnel部分</strong></p>
+<p>​         众所周知，国内的vps的80和443都是默认不启用的，这里用cloudflare tunnel绕过80和443的限制，并且转发headscale-ui和headscale的服务达到国内vps就可以搭建的目的。</p>
+<p>​        <a href="https://dash.teams.cloudflare.com/" target="_blank" rel="noopener">打开cloudflare zero trust的界面</a>，Access &gt;&gt; Tunnels &gt;&gt; Create a tunnel &gt;&gt; Tunnel name(随便填) &gt;&gt; Save tunnel &gt;&gt; Docker</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018183537.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018184140.png" alt=""></p>
+<p>​      在完成上述cloudflare tunnel侧的设置，就可以回到vps，尝试进行cloudflared的第一次创建和连接。注意加入<code>--network reverseproxy-nw</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker run --network reverseproxy-nw cloudflare/cloudflared:latest tunnel --no-autoupdate run --token eyJhIjoiY2I5YzllOGY0ZjE3ZjFmOGU2NmIyOWU5N2M3NTIxNjIiLCJ0IjoiNTQ0OTFiY2ItMjMwMS00ZTI5LTk3OTgtN2E0OWI1Yzk5ZjNmIiwicyI6Ik1HTTRaVEkwTW1RdFlqWmxNaTAwT0RrekxUbGhPVFF0WWpBNFpUQTRNemMwT0RReSJ9</span></span><br><span class="line">2022-10-18T10:59:08Z INF Thank you for trying Cloudflare Tunnel. Doing so, without a Cloudflare account, is a quick way to experiment and try it out. However, be aware that these account-less Tunnels have no uptime guarantee. If you intend to use Tunnels in production you should use a pre-created named tunnel by following: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps</span><br><span class="line">2022-10-18T10:59:08Z INF Requesting new quick Tunnel on trycloudflare.com...</span><br><span class="line">2022-10-18T10:59:11Z INF +--------------------------------------------------------------------------------------------+</span><br><span class="line">2022-10-18T10:59:11Z INF |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |</span><br><span class="line">2022-10-18T10:59:11Z INF |  https://bars-bidding-tucson-transportation.trycloudflare.com                              |</span><br><span class="line">2022-10-18T10:59:11Z INF +--------------------------------------------------------------------------------------------+</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>​        进展顺利，你就可以看到connectors显示以下信息了</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018190900.png" alt=""></p>
+<p>​        点击next进行headscale-ui的设置，，注意路径，以及关闭tls验证。<strong>PS: 一定要先设headscale-ui</strong></p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018191845.png" alt=""></p>
+<p>​        Save后再Add a public hostname 给headscale</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/20221018191216.png" alt=""></p>
+<p>​        测试https://&lt;域名&gt;/windows，没问题就可以加入cloudflared到docker-compose.yaml了，它看起来应该是这样的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">services:</span><br><span class="line">  headscale:</span><br><span class="line">    container_name: headscale</span><br><span class="line">    #    image: headscale/headscale:latest-alpine</span><br><span class="line">    image: headscale/headscale:0.22.3</span><br><span class="line">    restart: always</span><br><span class="line">    # ports:</span><br><span class="line">      # - 8080:8080</span><br><span class="line">    volumes:</span><br><span class="line">      - ./container-config:/etc/headscale</span><br><span class="line">      - ./container-data:/var/lib/headscale</span><br><span class="line">    entrypoint: headscale serve</span><br><span class="line">    networks:</span><br><span class="line">      reverseproxy-nw:</span><br><span class="line"></span><br><span class="line">  headscale-ui:</span><br><span class="line">    container_name: headscale-ui</span><br><span class="line">    image: madebug/ghcr.io.gurucomputing.headscale-ui:latest</span><br><span class="line">    restart: always</span><br><span class="line">    networks:</span><br><span class="line">      reverseproxy-nw:</span><br><span class="line"></span><br><span class="line">  cloudflared:</span><br><span class="line">    container_name: cloudflared</span><br><span class="line">    image: cloudflare/cloudflared:latest</span><br><span class="line">    entrypoint: ["cloudflared", "tunnel", "--no-autoupdate", "run", "--token", "eyJhIjoiY2I5YzllOGY0ZjE3ZjFmOGU2NmIyOWU5N2M3NTIxNjIiLCJ0IjoiNTQ0OTFiY2ItMjMwMS00ZTI5LTk3OTgtN2E0OWI1Yzk5ZjNmIiwicyI6Ik1HTTRaVEkwTW1RdFlqWmxNaTAwT0RrekxUbGhPVFF0WWpBNFpUQTRNemMwT0RReSJ9"]</span><br><span class="line">    networks:</span><br><span class="line">      reverseproxy-nw:</span><br><span class="line"></span><br><span class="line">networks:</span><br><span class="line">  reverseproxy-nw:</span><br><span class="line">    external: true</span><br></pre></td></tr></table></figure>
+
+<p>没有问题直接<code>docker-compose up -d</code></p>
+</li>
+<li><p><strong>headscale-ui部分</strong></p>
+<p>前面基本完成了90%的工作了，接下来就是登录headscale-ui进行一些登录的设置了。</p>
+</li>
+</ul>
+<ol>
+<li><p>headscale生成页面登录的token</p>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker <span class="built_in">exec</span> headscale headscale apikeys <span class="keyword">create</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>访问https://&lt;前面设定的域名&gt;/web，然后填入token完成登录，点击<code>Test Server Settings</code>。</p>
+</li>
+<li><p>创建user就是创建namespace，用来隔离多个不同网段。</p>
+</li>
+</ol>
+<h2 id="0x03-headscale客户端"><a href="#0x03-headscale客户端" class="headerlink" title="0x03 headscale客户端"></a>0x03 headscale客户端</h2><ol>
+<li><p>安装<a href="https://pkgs.tailscale.com/stable/" target="_blank" rel="noopener">tailscale客户端</a>。</p>
+</li>
+<li><p>在headscale-ui创建<strong>Preauth Keys</strong>。</p>
+</li>
+<li><p>然后使用以下命令加入。</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ tailscale up <span class="params">--login-server</span> https:<span class="string">//</span>&lt;你前面的域名&gt; <span class="params">--accept-routes=true</span> <span class="params">--accept-dns=false</span> <span class="params">--authkey</span> &lt;你自己设的Preauth Keys&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Windows 加入方法。</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">https:</span><span class="comment">//&lt;你前面的域名&gt;/windows</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="0x04-结语"><a href="#0x04-结语" class="headerlink" title="0x04 结语"></a>0x04 结语</h2><ul>
+<li><p>headscale的打洞能力超强，并且自身还可以搭配/作为derper（derper类似zerotier的moon）。</p>
+</li>
+<li><p>headscale本身只是实现了服务端，客户端可以直接沿用tailscale进行加入。</p>
+</li>
+<li><p>迁移的时候除了<code>containers-data</code>下的<code>private.key</code>不需要之外，其他都需要迁走。</p>
+</li>
+<li><p>我们的方案用了cloudflare tunnel，当然可以<a href="https://github.com/XIU2/CloudflareSpeedTest" target="_blank" rel="noopener">优选出优质ip</a>，然后在软路由侧写入解析。</p>
+</li>
+<li><p>还是很建议<a href="https://icloudnative.io/posts/custom-derp-servers/#%E4%BD%BF%E7%94%A8%E7%BA%AF-ip" target="_blank" rel="noopener">单独搭一个derper的</a>，未必要把官方的derper全部去掉，但是这打洞效率很高。</p>
+</li>
+<li><p><a href="https://tailscale.com/kb/1019/subnets/?tab=linux#enable-ip-forwarding" target="_blank" rel="noopener">headscale支持自定义网段转发</a>。</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tailscale up --login-server https://&lt;你前面的域名&gt; --accept-routes=<span class="literal">true</span> --accept-dns=<span class="literal">false</span> --authkey &lt;你自己设的Preauth Keys&gt; --advertise-routes=x.x.x.x/xx,x.x.x.x/xx</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="0x05-鸣谢"><a href="#0x05-鸣谢" class="headerlink" title="0x05 鸣谢"></a>0x05 鸣谢</h2><ul>
+<li><a href="https://blog.gurucomputing.com.au/smart-vpns-with-headscale/setting-up-headscale/" target="_blank" rel="noopener">Setting Up Headscale :: Guru Computing Blog</a></li>
+<li><a href="https://icloudnative.io/posts/how-to-set-up-or-migrate-headscale/" target="_blank" rel="noopener">Tailscale 基础教程：Headscale 的部署方法和使用教程 – 云原生实验室 - Kubernetes|Docker|Istio|Envoy|Hugo|Golang|云原生</a></li>
+<li><a href="https://github.com/juanfont/headscale/blob/main/docs/running-headscale-container.md" target="_blank" rel="noopener">Running headscale in a container</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2022/10/16 - 21:10
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2022/11/13 - 18:11
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2022-10-16-Start-with-headscale.html" title="使用headscale搭建國内局域網">https://blog.madebug.net/Ops/2022-10-16-Start-with-headscale.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/Network/" rel="tag"># Network </a>
+              <a href="/tags/Headscale/" rel="tag"># Headscale </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2022-03-17-StatefulSet-with-Storage-State.html" rel="prev" title="深入剖析K8s筆記(StatefulSet之存儲狀態)">
+      <i class="fa fa-chevron-left"></i> 深入剖析K8s筆記(StatefulSet之存儲狀態)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2022-10-28-5mins-OpenStack-everydays-Glance01.html" rel="next" title="每天5分钟OSP-Glance01">
+      每天5分钟OSP-Glance01 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-前言"><span class="nav-text">0x00 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-前置准备"><span class="nav-text">0x01 前置准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-headscale服务端"><span class="nav-text">0x02 headscale服务端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-headscale客户端"><span class="nav-text">0x03 headscale客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-结语"><span class="nav-text">0x04 结语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-鸣谢"><span class="nav-text">0x05 鸣谢</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : '02452b781b73e25f59e770d278902d85',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

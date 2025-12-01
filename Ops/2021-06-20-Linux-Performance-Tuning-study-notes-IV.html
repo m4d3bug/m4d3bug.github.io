@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文旨在剖析系统CPU性能的指标：CPU使用率。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux性能調優實戰筆記IV（CPU占用率）">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2021-06-20-Linux-Performance-Tuning-study-notes-IV.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文旨在剖析系统CPU性能的指标：CPU使用率。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-1.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-2.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/calltrace.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/perfcalltrace.jpg">
+<meta property="article:published_time" content="2021-06-20T01:46:18.000Z">
+<meta property="article:modified_time" content="2025-12-01T08:53:16.486Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="Linux性能調優實戰筆記 ">
+<meta property="article:tag" content="CPU usage ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2021-06-20-Linux-Performance-Tuning-study-notes-IV.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Linux性能調優實戰筆記IV（CPU占用率） | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2021-06-20-Linux-Performance-Tuning-study-notes-IV.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux性能調優實戰筆記IV（CPU占用率）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-06-20 01:46:18" itemprop="dateCreated datePublished" datetime="2021-06-20T01:46:18+00:00">2021-06-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-12-01 08:53:16" itemprop="dateModified" datetime="2025-12-01T08:53:16+00:00">2025-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>19k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>17 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
+
+<p>本文旨在剖析系统CPU性能的指标：CPU使用率。</p>
+<a id="more"></a>
+
+<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>回顾前面，学习了以下描述系统情况的方式：</p>
+<ul>
+<li><a href="https://blog.madebug.net/Ops/2019-09-02-Linux-Performance-Tuning-study-notes-II.html">平均负载</a>：系统负载情况的反映。</li>
+<li><a href="https://blog.madebug.net/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part1.html">上下文切换：</a> 系统性能缺口情况的反映。</li>
+</ul>
+<p>而描述CPU，可以直接使用CPU使用率。</p>
+<h2 id="0x01-什么是CPU使用率"><a href="#0x01-什么是CPU使用率" class="headerlink" title="0x01 什么是CPU使用率"></a>0x01 什么是CPU使用率</h2><ol>
+<li><p>Linux身为多任务操作系统，靠的是短时间片（CPU时间的最小单位）+调度器（轮流分配）。</p>
+<ul>
+<li><p>短时间片：事先约定来触发中断的节拍率（HZ），并使用Jiffies记录开机依赖节拍数。</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cat /proc/timer_list|grep -m1 -E '^jiffies'|cut -d" " -f2</span></span><br><span class="line">7604634289</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>节拍率（HZ）：不同发行版会有不同的内核预设值，<strong>意味每秒钟触发的时间中断次数。</strong></p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># grep 'CONFIG_HZ=' /boot/config-$(uname -r)</span></span><br><span class="line">CONFIG_HZ=1000</span><br><span class="line">ubuntu@localhost:~$ grep <span class="string">'CONFIG_HZ='</span> /boot/config-$(uname -r)</span><br><span class="line">CONFIG_HZ=250</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>而用户空间往往使用的是USER_HZ，<a href="https://stackoverflow.com/questions/12480486/how-to-check-hz-in-the-terminal#:~:text=100-,Any%20of%20the%20compile,%24,-man" target="_blank" rel="noopener">任何运行时kernel的编译选项都可以使用getconf进行显示</a>，这个值被固定为100，也就是1秒中断100次。</p>
+<blockquote>
+<p>$ man 7 time<br>  …<br>  The software clock, HZ, and jiffies<br>  The accuracy of various system calls that set timeouts, (e.g., select(2), sigtimedwait(2)) and measure CPU time (e.g., getrusage(2)) is limited by the resolution of the software clock, a clock<br>  maintained by the kernel which measures time in jiffies. The size of a jiffy is determined by the value of the kernel constant HZ.<br>  The value of HZ varies across kernel versions and hardware platforms. On i386 the situation is as follows: on kernels up to and including 2.4.x, HZ was 100, giving a jiffy value of 0.01 seconds;<br>  starting with 2.6.0, HZ was raised to 1000, giving a jiffy of 0.001 seconds. Since kernel 2.6.13, the HZ value is a kernel configuration parameter and can be 100, 250 (the default) or 1000, yield‐<br>  ing a jiffies value of, respectively, 0.01, 0.004, or 0.001 seconds. Since kernel 2.6.20, a further frequency is available: 300, a number that divides evenly for the common video frame rates (PAL,<br>  25 HZ; NTSC, 30 HZ).<br>  The times(2) system call is a special case. It reports times with a granularity defined by the kernel constant USER_HZ. User-space applications can determine the value of this constant using<br>  sysconf(_SC_CLK_TCK).</p>
+</blockquote>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># getconf CLK_TCK</span></span><br><span class="line">100</span><br><span class="line">ubuntu@localhost:~$ getconf CLK_TCK</span><br><span class="line">100</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Linux通过伪文件系统 /proc来向用户提供OS内部状态信息，而<strong>/proc/stat 提供了系统的CPU和系统任务统计信息</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 重点查看不同场景下CPU的累计节拍数。</span></span><br><span class="line">[root@rhel7 ~]<span class="comment"># cat /proc/stat |grep ^cpu</span></span><br><span class="line">cpu  34606696 176287 4467987 6580945956 1271138 0 43622 0 29486561 0   &lt;&lt;&lt; 总体累加值</span><br><span class="line">cpu0 595076 20722 276949 329973186 13384 0 13257 0 362976 0</span><br><span class="line">cpu1 1127636 67877 201993 328548578 930793 0 18742 0 756795 0</span><br><span class="line">cpu2 1263945 20524 166542 329398032 229204 0 34 0 1069117 0</span><br><span class="line">cpu3 2598239 8315 279844 328137468 39873 0 33 0 2418959 0</span><br><span class="line">cpu4 3152236 4124 276053 327627575 9873 0 16 0 2983401 0</span><br><span class="line">cpu5 3758087 1714 254151 327048933 4333 0 11 0 3607109 0</span><br><span class="line">cpu6 3694695 2045 240707 327126810 3759 0 17 0 3554974 0</span><br><span class="line">cpu7 3828972 4117 240018 326989822 3392 0 21 0 3688237 0</span><br><span class="line">cpu8 3905215 3004 243946 326913132 2545 0 7 0 3765278 0</span><br><span class="line">cpu9 4009330 1172 246768 326807704 2270 0 19 0 3870190 0</span><br><span class="line">cpu10 554056 9355 214524 330129039 442 0 11371 0 159670 0</span><br><span class="line">cpu11 533244 15006 200194 330390188 4311 0 1 0 187749 0</span><br><span class="line">cpu12 540121 6568 190984 330403882 545 0 2 0 203736 0</span><br><span class="line">cpu13 643304 2944 196357 330296946 338 0 2 0 345497 0</span><br><span class="line">cpu14 895960 1370 199230 330038803 260 0 1 0 620911 0</span><br><span class="line">cpu15 671360 1116 202075 330264781 374 0 2 0 370423 0</span><br><span class="line">cpu16 778120 3359 209582 330147575 276 0 3 0 463865 0</span><br><span class="line">cpu17 582231 757 203751 330350880 299 0 0 0 295223 0</span><br><span class="line">cpu18 836571 669 215387 330086448 291 0 3 0 495057 0</span><br><span class="line">cpu19 638288 1522 208925 330266164 24565 0 70 0 267386 0</span><br></pre></td></tr></table></figure>
+
+<p>其含义：</p>
+<blockquote>
+<p>$ man proc<br>…<br>/proc/stat<br>kernel/system statistics. Varies with architecture. Common entries include:<br>cpu 3357 0 4313 1362393<br>The amount of time, measured in units of USER_HZ (1/100ths of a second on most architectures, use sysconf(_SC_CLK_TCK) to obtain the right value), that the system spent in various<br>states:<br>user (1) Time spent in user mode.<br>（缩写为us）用户态时间，不含nice，但包含guest。<br>nice (2) Time spent in user mode with low priority (nice).<br>（缩写为ni）低优先级用户态时间，取值范围-20 -19，数值越大优先级越低。<br>system (3) Time spent in system mode.<br>（缩写为sys）内核态CPU时间。<br>idle (4) Time spent in the idle task. This value should be USER_HZ times the second entry in the /proc/uptime pseudo-file.<br>（缩写为id）空闲时间，不含IO等待（iowait），/proc/uptime第二个值的100倍。<br>iowait (since Linux 2.5.41)<br>(5) Time waiting for I/O to complete.<br>（缩写为wa）,代表等待I/O的CPU时间。<br>irq (since Linux 2.6.0-test4)<br>(6) Time servicing interrupts.<br>（缩写为hi），代表硬中断的CPU时间。<br>softirq (since Linux 2.6.0-test4)<br>(7) Time servicing softirqs.<br>（缩写为si），代表软中断的CPU时间。<br>steal (since Linux 2.6.11)<br>(8) Stolen time, which is the time spent in other operating systems when running in a virtualized environment<br>（缩写为st），代表vm系统被其他vm抢占的CPU时间。<br>guest (since Linux 2.6.24)<br>(9) Time spent running a virtual CPU for guest operating systems under the control of the Linux kernel.<br>（缩写为guest），代表作为hypervisor运行虚拟机的CPU时间。<br>guest_nice (since Linux 2.6.33)<br>(10) Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).<br>（缩写为gnice），代表作为低优先级运行虚拟机的时间。</p>
+</blockquote>
+</li>
+<li><p>因此我们可以有了CPU使用率的计算公式：</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-1.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-1.jpg"></p>
+<p>但是Linux开机很久以来的时间也纳入计算，明显没有意义，因此我们常用的是优化版：</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-2.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/CPUCalculationFormula-2.jpg"></p>
+<p>系统的角度考量的是/proc/stat , 而进程的角度考量的是/proc/[pid]/stat 。</p>
+</li>
+<li><p>而常见的分析工具<strong>top（3秒时间间隔）和ps（进程全生命周期）</strong>都可以帮我们计算好，我们只需要注意它们的时间间隔。</p>
+</li>
+</ol>
+<h2 id="0x02-怎么查看CPU使用率"><a href="#0x02-怎么查看CPU使用率" class="headerlink" title="0x02 怎么查看CPU使用率"></a>0x02 怎么查看CPU使用率</h2><ul>
+<li><p>top：</p>
+<ul>
+<li><p>系统的资源（总体CPU和内存）使用情况。</p>
+</li>
+<li><p>进程的资源（不区分用户态/内核态）使用情况。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">top - 09:03:15 up 2 days,  8:11,  3 users,  load average: 0.00, 0.03, 0.05</span><br><span class="line">Tasks: 466 total,   1 running, 465 sleeping,   0 stopped,   0 zombie</span><br><span class="line">%Cpu(s):  0.1 us,  0.1 sy,  0.0 ni, 99.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st</span><br><span class="line">KiB Mem : 13172561+total, 12070921+free,  5016792 used,  5999608 buff/cache</span><br><span class="line">KiB Swap:  4194300 total,  4194300 free,        0 used. 12589456+avail Mem</span><br><span class="line">                                           （用户态%CPU+内核态%CPU）</span><br><span class="line">  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                                                                                                                        2147 root      20   0 1462688  20152   5340 S   0.3  0.0   0:37.21 docker-containe</span><br><span class="line"> 3953 root      20   0   23164   2688   1312 S   0.3  0.0   5:00.06 tmux</span><br><span class="line">    1 root      20   0  191856   4860   2644 S   0.0  0.0   0:02.15 systemd</span><br><span class="line">    2 root      20   0       0      0      0 S   0.0  0.0   0:00.01 kthreadd</span><br><span class="line">    4 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/0:0H</span><br><span class="line">    6 root      20   0       0      0      0 S   0.0  0.0   0:01.66 ksoftirqd/0</span><br><span class="line">    7 root      rt   0       0      0      0 S   0.0  0.0   0:00.19 migration/0</span><br><span class="line">    8 root      20   0       0      0      0 S   0.0  0.0   0:00.00 rcu_bh</span><br><span class="line">    9 root      20   0       0      0      0 S   0.0  0.0   0:07.40 rcu_sched</span><br><span class="line">   10 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 lru-add-drain</span><br><span class="line">   11 root      rt   0       0      0      0 S   0.0  0.0   0:00.12 watchdog/0</span><br><span class="line">   12 root      rt   0       0      0      0 S   0.0  0.0   0:00.10 watchdog/1</span><br><span class="line">   13 root      rt   0       0      0      0 S   0.0  0.0   0:00.18 migration/1</span><br><span class="line">   14 root      20   0       0      0      0 S   0.0  0.0   0:00.27 ksoftirqd/1</span><br><span class="line">   16 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/1:0H</span><br><span class="line">   17 root      rt   0       0      0      0 S   0.0  0.0   0:00.10 watchdog/2</span><br><span class="line">   18 root      rt   0       0      0      0 S   0.0  0.0   0:00.53 migration/2</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>ps：进程的资源（区分用户态/内核态）使用情况。</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">   [root@rhel7 ~]<span class="comment"># pidstat 1  5                                                                                                                                                                           </span></span><br><span class="line">Linux 3.10.0-1160.11.1.el7.x86_64   06/20/2021      _x86_64_        (20 CPU)</span><br><span class="line"></span><br><span class="line">                                  用户态 内核态  虚拟机    等待    总使用率</span><br><span class="line">                                              CPU使用率 CPU使用率</span><br><span class="line">   12:10:18 AM   UID       PID    %usr %system  %guest   %<span class="built_in">wait</span>    %CPU   CPU  Command</span><br><span class="line">   12:10:19 AM  1000       206    0.00    6.00    0.00    0.00    6.00     0  tmux: server</span><br><span class="line">   12:10:19 AM  1000     17722    0.00    1.00    0.00    0.00    1.00     0  pidstat</span><br><span class="line"></span><br><span class="line">   12:10:19 AM   UID       PID    %usr %system  %guest   %<span class="built_in">wait</span>    %CPU   CPU  Command</span><br><span class="line">   12:10:20 AM  1000       206    0.00    8.00    0.00    0.00    8.00     0  tmux: server</span><br><span class="line"></span><br><span class="line">   12:10:20 AM   UID       PID    %usr %system  %guest   %<span class="built_in">wait</span>    %CPU   CPU  Command</span><br><span class="line">   12:10:21 AM  1000       206    1.00    6.00    0.00    0.00    7.00     0  tmux: server</span><br><span class="line"></span><br><span class="line">   12:10:21 AM   UID       PID    %usr %system  %guest   %<span class="built_in">wait</span>    %CPU   CPU  Command</span><br><span class="line">   12:10:22 AM  1000       206    0.00   10.00    0.00    0.00   10.00     0  tmux: server</span><br><span class="line"></span><br><span class="line">   12:10:22 AM   UID       PID    %usr %system  %guest   %<span class="built_in">wait</span>    %CPU   CPU  Command</span><br><span class="line">   12:10:23 AM  1000       206    0.00    7.00    0.00    0.00    7.00     0  tmux: server</span><br><span class="line"></span><br><span class="line">   Average:      UID       PID    %usr %system  %guest   %<span class="built_in">wait</span>    %CPU   CPU  Command       &lt;&lt;&lt;  5组平均值</span><br><span class="line">   Average:     1000       206    0.20    7.40    0.00    0.00    7.60     -  tmux: server</span><br><span class="line">   Average:     1000     17722    0.00    0.20    0.00    0.00    0.20     -  pidstat</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="0x03-CPU使用率过高怎么办？"><a href="#0x03-CPU使用率过高怎么办？" class="headerlink" title="0x03 CPU使用率过高怎么办？"></a>0x03 CPU使用率过高怎么办？</h2><h3 id="答：直接查找占用的函数进行优化。"><a href="#答：直接查找占用的函数进行优化。" class="headerlink" title="答：直接查找占用的函数进行优化。"></a>答：直接查找占用的函数进行优化。</h3><ul>
+<li><p>GDB（中断程序进行调试）</p>
+</li>
+<li><p>perf（不中断程序进行调试）</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">$ perf top</span><br><span class="line">Samples: 2K of event <span class="string">'cycles'</span>, 4000 Hz, Event count (approx.): 1591275795 lost: 0/0 drop: 0/0</span><br><span class="line">共2k个CPU时钟事件 总事件数1591275795</span><br><span class="line">采样率     函数共享对象/类型           函数名，符号名</span><br><span class="line">Overhead  Shared Object              Symbol</span><br><span class="line">    5.45%  [kernel]                   [k] module_get_kallsym  </span><br><span class="line">    3.84%  [kernel]                   [k] page_fault</span><br><span class="line">    3.53%  libc-2.17.so               [.] __gconv_transform_utf8_internal</span><br><span class="line">    3.19%  libc-2.17.so               [.] __mbrtowc</span><br><span class="line">    2.55%  libc-2.17.so               [.] _int_malloc</span><br><span class="line">    2.06%  [kernel]                   [k] kallsyms_expand_symbol.constprop.1</span><br><span class="line">    2.01%  libc-2.17.so               [.] __GI_____strtoull_l_internal</span><br><span class="line">    1.74%  libc-2.17.so               [.] __strcmp_sse42</span><br><span class="line">    1.64%  [kernel]                   [k] format_decode</span><br><span class="line">    1.62%  libc-2.17.so               [.] _int_free</span><br><span class="line">    1.31%  [kernel]                   [k] __memcpy</span><br><span class="line">    1.23%  perf                       [.] __dso__load_kallsyms</span><br><span class="line">    1.21%  libc-2.17.so               [.] __strcpy_sse2_unaligned</span><br><span class="line">    1.20%  perf                       [.] rb_next</span><br><span class="line">    1.09%  [kernel]                   [k] vsnprintf</span><br><span class="line">    1.05%  libc-2.17.so               [.] __strlen_sse2_pminub</span><br><span class="line">    0.95%  libc-2.17.so               [.] malloc</span><br><span class="line">    0.90%  [kernel]                   [k] acpi_processor_ffh_cstate_enter</span><br><span class="line">    0.90%  [kernel]                   [k] delay_tsc</span><br><span class="line">    0.88%  perf                       [.] 0x00000000000d67a4</span><br><span class="line">    0.87%  libc-2.17.so               [.] __memcpy_sse2</span><br><span class="line">    0.86%  [kernel]                   [k] handle_mm_fault</span><br><span class="line">    0.83%  libc-2.17.so               [.] _IO_feof</span><br><span class="line">    0.82%  [kernel]                   [k] number.isra.2</span><br><span class="line">    0.72%  [kernel]                   [k] strnlen</span><br><span class="line">    0.70%  perf                       [.] rb_insert_color</span><br><span class="line">    0.63%  [kernel]                   [k] copy_page_rep</span><br><span class="line">    0.61%  libc-2.17.so               [.] __ctype_get_mb_cur_max</span><br><span class="line">    0.59%  libc-2.17.so               [.] _dl_addr</span><br><span class="line">    0.59%  [kernel]                   [k] string.isra.7</span><br><span class="line">    0.59%  [kernel]                   [k] strnlen_user</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="第一组示范："><a href="#第一组示范：" class="headerlink" title="第一组示范："></a>第一组示范：</h3><ul>
+<li>环境准备：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker run --name nginx -p 10000:80 -itd docker.io/feisky/nginx</span><br><span class="line">$ docker run --name phpfpm -itd --network container:nginx docker.io/feisky/php-fpm</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>压测：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">这里使用其他客户端配合</span><br><span class="line">$ curl http://192.168.99.79:10000/</span><br><span class="line">It works!</span><br><span class="line">$ ab -c 10 -n 10000 http://192.168.99.79:10000/</span><br><span class="line">This is ApacheBench, Version 2.3 &lt;<span class="variable">$Revision</span>: 1879490 $&gt;</span><br><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/</span><br><span class="line">Licensed to The Apache Software Foundation, http://www.apache.org/</span><br><span class="line"></span><br><span class="line">Benchmarking 192.168.99.79 (be patient)</span><br><span class="line">Completed 1000 requests</span><br><span class="line">Completed 2000 requests</span><br><span class="line">Completed 3000 requests</span><br><span class="line">Completed 4000 requests</span><br><span class="line">Completed 5000 requests</span><br><span class="line">Completed 6000 requests</span><br><span class="line">Completed 7000 requests</span><br><span class="line">Completed 8000 requests</span><br><span class="line">Completed 9000 requests</span><br><span class="line">Completed 10000 requests</span><br><span class="line">Finished 10000 requests</span><br><span class="line"></span><br><span class="line">Server Software:        nginx/1.15.4</span><br><span class="line">Server Hostname:        192.168.99.79</span><br><span class="line">Server Port:            10000</span><br><span class="line"></span><br><span class="line">Document Path:          /</span><br><span class="line">Document Length:        9 bytes</span><br><span class="line"></span><br><span class="line">Concurrency Level:      10</span><br><span class="line">Time taken <span class="keyword">for</span> tests:   144.878 seconds</span><br><span class="line">Complete requests:      10000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Total transferred:      1720000 bytes</span><br><span class="line">HTML transferred:       90000 bytes</span><br><span class="line">Requests per second:    69.02 [<span class="comment">#/sec] (mean)</span></span><br><span class="line">Time per request:       144.878 [ms] (mean)</span><br><span class="line">Time per request:       14.488 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          11.59 [Kbytes/sec] received</span><br><span class="line"></span><br><span class="line">Connection Times (ms)</span><br><span class="line">              min  mean[+/-sd] median   max</span><br><span class="line">Connect:        0    1   1.1      1      15</span><br><span class="line">Processing:    73  144   2.7    144     172</span><br><span class="line">Waiting:       73  143   2.7    144     171</span><br><span class="line">Total:         74  145   2.4    145     173</span><br><span class="line"></span><br><span class="line">Percentage of the requests served within a certain time (ms)</span><br><span class="line">  50%    145</span><br><span class="line">  66%    145</span><br><span class="line">  75%    145</span><br><span class="line">  80%    145</span><br><span class="line">  90%    146</span><br><span class="line">  95%    147</span><br><span class="line">  98%    149</span><br><span class="line">  99%    151</span><br><span class="line"> 100%    173 (longest request)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># top</span></span><br><span class="line">top - 09:47:03 up 2 days,  8:55,  2 users,  load average: 1.85, 0.53, 0.22</span><br><span class="line">Tasks: 472 total,   6 running, 466 sleeping,   0 stopped,   0 zombie</span><br><span class="line">%Cpu(s): 25.1 us,  0.0 sy,  0.0 ni, 74.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st</span><br><span class="line">KiB Mem : 13172561+total, 12010049+free,  5040968 used,  6584148 buff/cache</span><br><span class="line">KiB Swap:  4194300 total,  4194300 free,        0 used. 12585044+avail Mem</span><br><span class="line"></span><br><span class="line">  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND</span><br><span class="line">6763 bin       20   0  336684   9364   1688 R 100.0  0.0   0:31.10 php-fpm                    </span><br><span class="line">6764 bin       20   0  336684   9360   1684 R 100.0  0.0   0:31.09 php-fpm </span><br><span class="line">6760 bin       20   0  336684   9364   1688 R  99.7  0.0   0:31.17 php-fpm</span><br><span class="line">6761 bin       20   0  336684   9364   1688 R  99.7  0.0   0:31.09 php-fpm</span><br><span class="line">6762 bin       20   0  336684   9360   1684 R  99.7  0.0   0:31.09 php-fpm</span><br></pre></td></tr></table></figure>
+
+<h3 id="第一组分析"><a href="#第一组分析" class="headerlink" title="第一组分析"></a>第一组分析</h3><ol>
+<li>初步分析：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">可以见到由于依赖路径不一，只能看到十六进制内容。</span><br><span class="line"></span><br><span class="line">Samples: 111K of event <span class="string">'cycles'</span>, 4000 Hz, Event count (approx.): 55131826469 lost: 0/0 drop: 0/0                                                                                                                </span><br><span class="line">    Children      Self  Shared Object       Symbol                                                                                                                                                                  </span><br><span class="line">+   14.35%     0.00%  [unknown]           [.] 0x6cb6258d4c544155</span><br><span class="line">+   14.35%     0.00%  libc-2.24.so        [.] 0x00007f10b557e2e1                                                                                 </span><br><span class="line">+   14.34%     0.00%  php-fpm             [.] 0x000055c8a0e6d642</span><br><span class="line">+   14.34%     0.00%  php-fpm             [.] 0x000055c8a0c1e6fc </span><br><span class="line">+   14.34%     0.00%  php-fpm             [.] 0x000055c8a0ccdf94</span><br><span class="line">+   14.34%     0.00%  php-fpm             [.] 0x000055c8a0d65323      </span><br><span class="line">+   13.50%     0.00%  php-fpm             [.] 0x000055c8a0d6496e</span><br><span class="line">+    4.71%     4.71%  libm-2.24.so        [.] 0x000000000002127e</span><br><span class="line">+    3.42%     3.42%  php-fpm             [.] 0x000000000094ede0</span><br><span class="line">+    2.61%     0.00%  php-fpm             [.] 0x000055c8a0d66a7c</span><br><span class="line">+    2.48%     2.48%  php-fpm             [.] 0x00000000008c4ae5</span><br><span class="line">+    2.24%     0.00%  php-fpm             [.] 0x000055c8a0e2fea3</span><br><span class="line">+    2.15%     2.15%  php-fpm             [.] 0x00000000008c4a6c</span><br><span class="line">+    2.03%     2.03%  php-fpm             [.] 0x00000000009513cc</span><br><span class="line">+    1.88%     1.88%  php-fpm             [.] 0x00000000008c4a64</span><br><span class="line">+    1.52%     1.52%  php-fpm             [.] 0x000000000098de23</span><br><span class="line">+    1.38%     1.38%  php-fpm             [.] 0x00000000008cda08</span><br><span class="line">+    1.06%     1.06%  php-fpm             [.] 0x00000000008c297a</span><br><span class="line">+    1.06%     1.06%  php-fpm             [.] 0x00000000008c296e</span><br><span class="line">+    1.01%     1.01%  php-fpm             [.] 0x00000000008cd720</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>保存一个进程的记录，拷贝进入容器内分析：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># perf record -g -p 6763</span></span><br><span class="line">[ perf record: Woken up 240 <span class="built_in">times</span> to write data ]</span><br><span class="line">[ perf record: Captured and wrote 59.857 MB perf.data (512079 samples) ]</span><br><span class="line">[root@rhel7 ~]<span class="comment"># docker cp perf.data phpfpm:/tmp</span></span><br><span class="line">[root@rhel7 ~]<span class="comment"># docker exec -it phpfpm bash</span></span><br><span class="line">root@d5bdfeec83b1:/app<span class="comment"># cd /tmp</span></span><br><span class="line">root@d5bdfeec83b1:/tmp<span class="comment"># apt update &amp;&amp; apt install linux-perf linux-tools procps -y</span></span><br><span class="line">Hit:1 http://security.debian.org stretch/updates InRelease</span><br><span class="line">Ign:2 http://httpredir.debian.org/debian stretch InRelease</span><br><span class="line">Hit:3 http://httpredir.debian.org/debian stretch Release</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree</span><br><span class="line">Reading state information... Done</span><br><span class="line">51 packages can be upgraded. Run <span class="string">'apt list --upgradable'</span> to see them.</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree</span><br><span class="line">Reading state information... Done</span><br><span class="line">procps is already the newest version (2:3.3.12-3+deb9u1).</span><br><span class="line">linux-perf is already the newest version (4.9+80+deb9u13).</span><br><span class="line">linux-tools is already the newest version (4.9+80+deb9u13).</span><br><span class="line">0 upgraded, 0 newly installed, 0 to remove and 51 not upgraded.</span><br><span class="line">root@d5bdfeec83b1:/tmp<span class="comment"># perf_4.9 report</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>光标选中后回车进入，逐一检视← →</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/calltrace.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/calltrace.jpg"></p>
+<ol start="4">
+<li>基本得出结果了，源码核实一下</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># docker cp phpfpm:/app .</span></span><br><span class="line">[root@rhel7 ~]<span class="comment"># grep sqrt -r app/</span></span><br><span class="line">app/index.php:  <span class="variable">$x</span> += sqrt(<span class="variable">$x</span>);</span><br><span class="line">[root@rhel7 ~]<span class="comment"># cat app/index.php</span></span><br><span class="line">&lt;?php</span><br><span class="line">// <span class="built_in">test</span> only.</span><br><span class="line"><span class="variable">$x</span> = 0.0001;</span><br><span class="line"><span class="keyword">for</span> (<span class="variable">$i</span> = 0; <span class="variable">$i</span> &lt;= 1000000; <span class="variable">$i</span>++) &#123;</span><br><span class="line">  <span class="variable">$x</span> += sqrt(<span class="variable">$x</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"It works!"</span></span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>修复</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~/app]<span class="comment"># cat index.php</span></span><br><span class="line">&lt;?php</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"It works!"</span></span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>测试一下修复结果</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># docker rm -f nginx phpfpm</span></span><br><span class="line">nginx</span><br><span class="line">phpfpm</span><br><span class="line">[root@rhel7 ~]<span class="comment"># docker run --name nginx -p 10000:80 -itd docker.io/feisky/nginx:cpu-fix</span></span><br><span class="line">Unable to find image <span class="string">'feisky/nginx:cpu-fix'</span> locally</span><br><span class="line">cpu-fix: Pulling from feisky/nginx</span><br><span class="line">a5a6f2f73cd8: Pull complete</span><br><span class="line">67da5fbcb7a0: Pull complete</span><br><span class="line">e82455fa5628: Pull complete</span><br><span class="line">97fea4312924: Pull complete</span><br><span class="line">3faf3e92e113: Pull complete</span><br><span class="line">Digest: sha256:a02d81e93c29d0196293556723cfbcb7fa94b9761b01f4fc9f1b2a6291295dd9</span><br><span class="line">Status: Downloaded newer image <span class="keyword">for</span> feisky/nginx:cpu-fix</span><br><span class="line">9027bc69836a6764847b305e2e1a826711c5736fac720cd8b8b66a9e36684a8a</span><br><span class="line">[root@rhel7 ~]<span class="comment"># docker run --name phpfpm -itd --network container:nginx docker.io/feisky/php-fpm:cpu-fix </span></span><br><span class="line">Unable to find image <span class="string">'feisky/php-fpm:cpu-fix'</span> locally</span><br><span class="line">cpu-fix: Pulling from feisky/php-fpm</span><br><span class="line">ad7b1e3e2409: Pull complete</span><br><span class="line">99184861b139: Pull complete</span><br><span class="line">e0a0d77439f2: Pull complete</span><br><span class="line">555d89a6180d: Pull complete</span><br><span class="line">189480ae9323: Pull complete</span><br><span class="line">a0fd9c448873: Pull complete</span><br><span class="line">542f27453920: Pull complete</span><br><span class="line">287f65539de5: Pull complete</span><br><span class="line">22f455c492a0: Pull complete</span><br><span class="line">14144598512d: Pull complete</span><br><span class="line">Digest: sha256:92147d37d143e2e122e8dceaa7466cd61d76b61601a82025ce6032d26d3c9a27</span><br><span class="line">Status: Downloaded newer image <span class="keyword">for</span> feisky/php-fpm:cpu-fix</span><br><span class="line">228cda70451e388447e9f5674d75ea0c80e820eec7f00152dc1a9344b67e39de</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">$ ab -c 10 -n 10000 http://192.168.99.79:10000/</span><br><span class="line">This is ApacheBench, Version 2.3 &lt;<span class="variable">$Revision</span>: 1879490 $&gt;</span><br><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/</span><br><span class="line">Licensed to The Apache Software Foundation, http://www.apache.org/</span><br><span class="line"></span><br><span class="line">Benchmarking 192.168.99.79 (be patient)</span><br><span class="line">Completed 1000 requests</span><br><span class="line">Completed 2000 requests</span><br><span class="line">Completed 3000 requests</span><br><span class="line">Completed 4000 requests</span><br><span class="line">Completed 5000 requests</span><br><span class="line">Completed 6000 requests</span><br><span class="line">Completed 7000 requests</span><br><span class="line">Completed 8000 requests</span><br><span class="line">Completed 9000 requests</span><br><span class="line">Completed 10000 requests</span><br><span class="line">Finished 10000 requests</span><br><span class="line"></span><br><span class="line">Server Software:        nginx/1.15.6</span><br><span class="line">Server Hostname:        192.168.99.79</span><br><span class="line">Server Port:            10000</span><br><span class="line"></span><br><span class="line">Document Path:          /</span><br><span class="line">Document Length:        9 bytes</span><br><span class="line"></span><br><span class="line">Concurrency Level:      10</span><br><span class="line">Time taken <span class="keyword">for</span> tests:   2.755 seconds</span><br><span class="line">Complete requests:      10000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Total transferred:      1720000 bytes</span><br><span class="line">HTML transferred:       90000 bytes</span><br><span class="line">Requests per second:    3629.69 [<span class="comment">#/sec] (mean)      &lt;-------</span></span><br><span class="line">Time per request:       2.755 [ms] (mean)</span><br><span class="line">Time per request:       0.276 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          609.68 [Kbytes/sec] received</span><br><span class="line"></span><br><span class="line">Connection Times (ms)</span><br><span class="line">              min  mean[+/-sd] median   max</span><br><span class="line">Connect:        1    1   1.0      1      17</span><br><span class="line">Processing:     0    1   1.2      1      16</span><br><span class="line">Waiting:        0    1   1.1      1      16</span><br><span class="line">Total:          1    3   1.8      2      29</span><br><span class="line"></span><br><span class="line">Percentage of the requests served within a certain time (ms)</span><br><span class="line">  50%      2</span><br><span class="line">  66%      3</span><br><span class="line">  75%      3</span><br><span class="line">  80%      3</span><br><span class="line">  90%      3</span><br><span class="line">  95%      5</span><br><span class="line">  98%      9</span><br><span class="line">  99%     13</span><br><span class="line"> 100%     29 (longest request)</span><br></pre></td></tr></table></figure>
+
+<h3 id="第二组示范"><a href="#第二组示范" class="headerlink" title="第二组示范"></a>第二组示范</h3><ul>
+<li>环境准备：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker rm -f nginx phpfpm</span><br><span class="line">$ docker run --name nginx -p 10000:80 -itd feisky/nginx:sp</span><br><span class="line">$ docker run --name phpfpm -itd --network container:nginx feisky/php-fpm:sp</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>压测：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">这里使用其他客户端配合</span><br><span class="line">$ curl http://192.168.99.40:10000/</span><br><span class="line">It works!</span><br><span class="line">$ ab -c 100 -n 1000 http://192.168.99.40:10000/        </span><br><span class="line">This is ApacheBench, Version 2.3 &lt;<span class="variable">$Revision</span>: 1879490 $&gt;</span><br><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/</span><br><span class="line">Licensed to The Apache Software Foundation, http://www.apache.org/</span><br><span class="line"></span><br><span class="line">Benchmarking 192.168.99.40 (be patient)</span><br><span class="line">Completed 100 requests</span><br><span class="line">Completed 200 requests</span><br><span class="line">Completed 300 requests</span><br><span class="line">Completed 400 requests</span><br><span class="line">Completed 500 requests</span><br><span class="line">Completed 600 requests</span><br><span class="line">Completed 700 requests</span><br><span class="line">Completed 800 requests</span><br><span class="line">Completed 900 requests</span><br><span class="line">Completed 1000 requests</span><br><span class="line">Finished 1000 requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Server Software:        nginx/1.15.4</span><br><span class="line">Server Hostname:        192.168.99.40</span><br><span class="line">Server Port:            10000</span><br><span class="line"></span><br><span class="line">Document Path:          /</span><br><span class="line">Document Length:        9 bytes</span><br><span class="line"></span><br><span class="line">Concurrency Level:      100</span><br><span class="line">Time taken <span class="keyword">for</span> tests:   9.049 seconds</span><br><span class="line">Complete requests:      1000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Total transferred:      172000 bytes</span><br><span class="line">HTML transferred:       9000 bytes</span><br><span class="line">Requests per second:    110.51 [<span class="comment">#/sec] (mean)             &lt;----- </span></span><br><span class="line">Time per request:       904.876 [ms] (mean)</span><br><span class="line">Time per request:       9.049 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          18.56 [Kbytes/sec] received</span><br><span class="line"></span><br><span class="line">Connection Times (ms)</span><br><span class="line">              min  mean[+/-sd] median   max</span><br><span class="line">Connect:        0    1   0.8      0       8</span><br><span class="line">Processing:    30  858 132.0    889    1020</span><br><span class="line">Waiting:       27  858 132.0    889    1020</span><br><span class="line">Total:         32  859 131.6    889    1023</span><br><span class="line">WARNING: The median and mean <span class="keyword">for</span> the initial connection time are not within a normal deviation</span><br><span class="line">        These results are probably not that reliable.</span><br><span class="line"></span><br><span class="line">Percentage of the requests served within a certain time (ms)</span><br><span class="line">  50%    889</span><br><span class="line">  66%    900</span><br><span class="line">  75%    905</span><br><span class="line">  80%    910</span><br><span class="line">  90%    923</span><br><span class="line">  95%    934</span><br><span class="line">  98%    954</span><br><span class="line">  99%    964</span><br><span class="line"> 100%   1023 (longest request)</span><br></pre></td></tr></table></figure>
+
+<p>换一个时间比较长的进行压测方便观察。</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ ab -c <span class="number">5</span> -t <span class="number">600</span> http:<span class="comment">//192.168.99.40:10000/</span></span><br><span class="line">This <span class="keyword">is</span> ApacheBench, Version <span class="number">2.3</span> &lt;$Revision: <span class="number">1879490</span> $&gt;</span><br><span class="line">Copyright <span class="number">1996</span> Adam Twiss, Zeus Technology Ltd, http:<span class="comment">//www.zeustech.net/</span></span><br><span class="line">Licensed to The Apache Software Foundation, http:<span class="comment">//www.apache.org/</span></span><br><span class="line"></span><br><span class="line">Benchmarking <span class="number">192.168</span><span class="number">.99</span><span class="number">.40</span> (be patient)</span><br></pre></td></tr></table></figure>
+
+<p>可以观察到处于R (Running) 的php-fpm 与 总running 数目有所出入, 而其他处于R的进程是stress</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># top</span></span><br><span class="line">top - 23:48:57 up  1:04,  3 users,  load average: 5.02, 2.00, 1.09</span><br><span class="line">Tasks: 313 total,   9 running, 303 sleeping,   0 stopped,   1 zombie</span><br><span class="line">%Cpu(s): 81.1 us, 13.8 sy,  0.0 ni,  2.2 id,  0.0 wa,  0.0 hi,  2.9 si,  0.0 st</span><br><span class="line">KiB Mem :  4026220 total,   738312 free,  1249376 used,  2038532 buff/cache</span><br><span class="line">KiB Swap:  2097148 total,  2097148 free,        0 used.  2461720 avail Mem</span><br><span class="line"></span><br><span class="line">   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND</span><br><span class="line">  3974 101       20   0   33092   2208    788 S   4.7  0.1   0:51.84 nginx</span><br><span class="line">101516 bin       20   0  336684   9608   1932 R   2.7  0.2   0:03.36 php-fpm</span><br><span class="line">101521 bin       20   0  336684   9624   1948 S   2.7  0.2   0:03.34 php-fpm</span><br><span class="line">101529 bin       20   0  336684   9604   1928 R   2.7  0.2   0:03.22 php-fpm</span><br><span class="line">101543 bin       20   0  336684   9600   1924 S   2.3  0.2   0:03.28 php-fpm</span><br><span class="line">101535 bin       20   0  336684   9600   1924 S   2.0  0.2   0:03.31 php-fpm</span><br><span class="line">  3628 root      20   0  677812  97988  31360 S   1.3  2.4   0:27.50 dockerd</span><br><span class="line">  3921 root      20   0  113364  12076   3676 S   1.0  0.3   0:13.47 containerd-shim</span><br><span class="line">     6 root      20   0       0      0      0 S   0.3  0.0   0:01.96 ksoftirqd/0</span><br><span class="line">     7 root      rt   0       0      0      0 S   0.3  0.0   0:00.29 migration/0</span><br><span class="line">     9 root      20   0       0      0      0 R   0.3  0.0   0:06.12 rcu_sched</span><br><span class="line">  3617 root      20   0  446044  44020  16136 S   0.3  1.1   0:14.64 containerd</span><br><span class="line">  4531 root      20   0  164236   2548   1612 R   0.3  0.1   0:00.08 top</span><br><span class="line"> 11479 bin       20   0    8176    864    104 R   0.3  0.0   0:00.01 stress</span><br><span class="line"> 11481 bin       20   0       0      0      0 R   0.3  0.0   0:00.01 stress</span><br></pre></td></tr></table></figure>
+
+<p>pidstat不能抓到转瞬即逝的这些进程，我们转用pstree |grep stress</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">$</span> <span class="comment">watch</span> <span class="literal">-</span><span class="comment">d</span> <span class="literal">-</span><span class="comment">n</span> <span class="comment">1</span> <span class="comment">"pstree</span> <span class="comment">|grep</span> <span class="comment">stress"</span> </span><br><span class="line">    <span class="comment">|</span><span class="literal">-</span><span class="comment">docker</span><span class="literal">-</span><span class="comment">containe</span><span class="literal">-</span><span class="literal">+</span><span class="literal">-</span><span class="comment">php</span><span class="literal">-</span><span class="comment">fpm</span><span class="literal">-</span><span class="literal">+</span><span class="literal">-</span><span class="comment">php</span><span class="literal">-</span><span class="comment">fpm</span>--<span class="literal">-</span><span class="comment">sh</span>--<span class="literal">-</span><span class="comment">stress</span></span><br><span class="line"><span class="comment"></span>    <span class="comment">|</span> <span class="comment">|</span><span class="literal">-</span><span class="comment">3*</span><span class="title">[</span><span class="comment">php</span><span class="literal">-</span><span class="comment">fpm</span>--<span class="literal">-</span><span class="comment">sh</span>--<span class="literal">-</span><span class="comment">stress</span>--<span class="literal">-</span><span class="comment">stress</span><span class="title">]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="第二组分析"><a href="#第二组分析" class="headerlink" title="第二组分析"></a>第二组分析</h3><ol>
+<li><p>查找源码</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ docker cp phpfpm:/<span class="keyword">app</span> .</span><br><span class="line">$ grep stress -r <span class="keyword">app</span></span><br><span class="line"><span class="keyword">app</span>/index.php:<span class="comment">// fake I/O with stress (via write()/unlink()).</span></span><br><span class="line"><span class="keyword">app</span>/index.php:<span class="variable">$result</span> = exec(<span class="string">"/usr/local/bin/stress -t 1 -d 1 2&gt;&amp;1"</span>, <span class="variable">$output</span>, <span class="variable">$status</span>);</span><br><span class="line">$ <span class="keyword">cat</span> <span class="keyword">app</span>/index.php</span><br><span class="line">&lt;?php</span><br><span class="line"><span class="comment">// fake I/O with stress (via write()/unlink()).</span></span><br><span class="line"><span class="variable">$result</span> = exec(<span class="string">"/usr/local/bin/stress -t 1 -d 1 2&gt;&amp;1"</span>, <span class="variable">$output</span>, <span class="variable">$status</span>);</span><br><span class="line"><span class="keyword">if</span> (isset(<span class="variable">$_GET</span>[<span class="string">"verbose"</span>]) &amp;&amp; <span class="variable">$_GET</span>[<span class="string">"verbose"</span>]==1 &amp;&amp; <span class="variable">$status</span> != 0) &#123;</span><br><span class="line">  echo <span class="string">"Server internal error: "</span>;</span><br><span class="line">  print_r(<span class="variable">$output</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  echo <span class="string">"It works!"</span>;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过源码带的接口调试结果</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">看错误消息 mkstemp failed: Permission denied ，以及 failed run completed <span class="keyword">in</span> <span class="number">0</span>s。原来 stress 命令并没有成功，它因为权限问题失败退出了</span><br><span class="line">$ curl <span class="string">"http://192.168.99.40:10000?verbose=1"</span>                                                           </span><br><span class="line">Server <span class="built_in">int</span>ernal error: Array</span><br><span class="line">(</span><br><span class="line">    [<span class="number">0</span>] =&gt; stress: info: [<span class="number">74139</span>] dispatching hogs: <span class="number">0</span> cpu, <span class="number">0</span> io, <span class="number">0</span> vm, <span class="number">1</span> hdd</span><br><span class="line">    [<span class="number">1</span>] =&gt; stress: FAIL: [<span class="number">74140</span>] (<span class="number">563</span>) mkstemp failed: Permission denied</span><br><span class="line">    [<span class="number">2</span>] =&gt; stress: FAIL: [<span class="number">74139</span>] (<span class="number">394</span>) &lt;-- worker <span class="number">74140</span> returned error <span class="number">1</span></span><br><span class="line">    [<span class="number">3</span>] =&gt; stress: WARN: [<span class="number">74139</span>] (<span class="number">396</span>) now reaping child worker processes</span><br><span class="line">    [<span class="number">4</span>] =&gt; stress: FAIL: [<span class="number">74139</span>] (<span class="number">400</span>) kill error: No such process</span><br><span class="line">    [<span class="number">5</span>] =&gt; stress: FAIL: [<span class="number">74139</span>] (<span class="number">451</span>) failed run completed <span class="keyword">in</span> <span class="number">0</span>s</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>perf分析</p>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">确保软连接开启</span><br><span class="line"><span class="meta"># sudo sysctl -w kernel.kptr_restrict=1</span></span><br><span class="line"><span class="meta"># perf record -g </span></span><br><span class="line"><span class="meta"># docker cp perf.data phpfpm:/tmp</span></span><br><span class="line"><span class="meta"># docker exec -it phpfpm bash</span></span><br><span class="line"><span class="meta"># cd /tmp</span></span><br><span class="line"><span class="meta"># apt update &amp;&amp; apt install linux-perf linux-tools procps -y</span></span><br><span class="line"><span class="meta"># perf_4.9 report</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>光标选中后回车进入，逐一检视← →</p>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/perfcalltrace.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/perfcalltrace.jpg"></p>
+<h2 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h2><ul>
+<li>从<code>/proc/stat</code>可以得知CPU使用率的类型，其排查思路如下：<ul>
+<li>CPU和Nice升高，排查用户态进程。</li>
+<li>系统CPU升高，排查内核线程或者系统调用。</li>
+<li>I / O 等待CPU升高，排查系统存储。</li>
+<li>软中断和硬中断升高，说明中断操作占用，排查内核中断服务程序。</li>
+</ul>
+</li>
+<li>pidstat和top各有所长。</li>
+<li>perf可以在不中断进程的情况下收集证据。</li>
+<li>转瞬即逝的进程，不停地崩溃重启，也有可能影响性能表现，通过perf top来搭配观察。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2021/06/20 - 01:06
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2025/12/01 - 08:12
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2021-06-20-Linux-Performance-Tuning-study-notes-IV.html" title="Linux性能調優實戰筆記IV（CPU占用率）">https://blog.madebug.net/Ops/2021-06-20-Linux-Performance-Tuning-study-notes-IV.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/Linux%E6%80%A7%E8%83%BD%E8%AA%BF%E5%84%AA%E5%AF%A6%E6%88%B0%E7%AD%86%E8%A8%98/" rel="tag"># Linux性能調優實戰筆記 </a>
+              <a href="/tags/CPU-usage/" rel="tag"># CPU usage </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part2.html" rel="prev" title="Linux性能調優實戰筆記III（CPU上下文切換-下）">
+      <i class="fa fa-chevron-left"></i> Linux性能調優實戰筆記III（CPU上下文切換-下）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2021-07-04-Use-Wireguard-to-rebuild-a-intranet-in-China.html" rel="next" title="使用Wireguard基於國内網絡異地組網實踐">
+      使用Wireguard基於國内網絡異地組網實踐 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-前言"><span class="nav-text">0x00 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-什么是CPU使用率"><span class="nav-text">0x01 什么是CPU使用率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-怎么查看CPU使用率"><span class="nav-text">0x02 怎么查看CPU使用率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-CPU使用率过高怎么办？"><span class="nav-text">0x03 CPU使用率过高怎么办？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#答：直接查找占用的函数进行优化。"><span class="nav-text">答：直接查找占用的函数进行优化。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第一组示范："><span class="nav-text">第一组示范：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第一组分析"><span class="nav-text">第一组分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二组示范"><span class="nav-text">第二组示范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二组分析"><span class="nav-text">第二组分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-总结"><span class="nav-text">0x04 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : '7654c3a9867a9dc020c683c4045f6d94',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

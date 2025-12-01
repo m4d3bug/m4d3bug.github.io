@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文將阐述從HomeLab選型購買、裝機到系統安裝的一次完整的實踐。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="抛磚引玉的一次HomeLab實踐">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2020-11-29-Prompt-for-Build-Your-HomeLab.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文將阐述從HomeLab選型購買、裝機到系統安裝的一次完整的實踐。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/funwithduck.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/HomeLabHardware.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/hothothot.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/routingwithsoul.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/boxinside.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/rhel7lab.png">
+<meta property="article:published_time" content="2020-11-29T21:00:42.000Z">
+<meta property="article:modified_time" content="2025-12-01T08:53:16.486Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="RHEL ">
+<meta property="article:tag" content="Zerotier ">
+<meta property="article:tag" content="HomeLab ">
+<meta property="article:tag" content="Cockpit ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/funwithduck.jpg">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2020-11-29-Prompt-for-Build-Your-HomeLab.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>抛磚引玉的一次HomeLab實踐 | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2020-11-29-Prompt-for-Build-Your-HomeLab.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          抛磚引玉的一次HomeLab實踐
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-11-29 21:00:42" itemprop="dateCreated datePublished" datetime="2020-11-29T21:00:42+00:00">2020-11-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-12-01 08:53:16" itemprop="dateModified" datetime="2025-12-01T08:53:16+00:00">2025-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>5.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/funwithduck.jpg" width=50% /></center>
+
+<p>本文將阐述從HomeLab選型購買、裝機到系統安裝的一次完整的實踐。</p>
+<a id="more"></a>
+
+<h2 id="0x00-需求分析"><a href="#0x00-需求分析" class="headerlink" title="0x00 需求分析"></a>0x00 需求分析</h2><p>直接上需求</p>
+<ul>
+<li>低價</li>
+<li>大内存，128 GiB起步</li>
+<li>功耗低、靜音</li>
+<li>Intel多核心CPU，滿足KVM虛擬機多開場景</li>
+<li>保留顯卡升級通道</li>
+<li>適配RHEL</li>
+</ul>
+<h2 id="0x01-硬件選購"><a href="#0x01-硬件選購" class="headerlink" title="0x01 硬件選購"></a>0x01 硬件選購</h2><p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/HomeLabHardware.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/HomeLabHardware.png"></p>
+<p>芯片：i9十代測試版QTB1，10C20T，定位是家用靜音低功耗，<br>主板：選擇了自帶wifi6的主板，搭配房間華爲wif6+ 使用，大小符合MATX大小。<br>散熱：i9 不講武德，不加散熱直接97℃，標配散熱。<br>内存：馬甲條子，容量和頻率+京東自營，要啥自行車。<br>固態：500GiB起步，本人機械硬盤絕緣體。<br>電源：500W夠用，600W合適，700W富裕。600W保留以後顯卡升級的功耗。<br>機箱：最便宜的就夠。<br>風扇：最便宜的就夠+1。</p>
+<h2 id="0x02-上手安装"><a href="#0x02-上手安装" class="headerlink" title="0x02 上手安装"></a>0x02 上手安装</h2><h3 id="i9散熱不講武德"><a href="#i9散熱不講武德" class="headerlink" title="i9散熱不講武德"></a>i9散熱不講武德</h3><p><del><font color=#808080>(拍這個照片的時候我還發著不塗硅脂免得不好退貨這種白日夢，甚至塗了還不上散熱被熱熔了差點漏到芯片針脚。)</font></del></p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/hothothot.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/hothothot.jpg"></p>
+<h3 id="靈魂走綫"><a href="#靈魂走綫" class="headerlink" title="靈魂走綫"></a>靈魂走綫</h3><p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/routingwithsoul.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/routingwithsoul.jpg"></p>
+<h3 id="正面來一張"><a href="#正面來一張" class="headerlink" title="正面來一張"></a>正面來一張</h3><p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/boxinside.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/boxinside.jpg"></p>
+<h3 id="成品"><a href="#成品" class="headerlink" title="成品"></a>成品</h3><p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/rhel7lab.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/rhel7lab.png"></p>
+<h2 id="0x03-系統安裝"><a href="#0x03-系統安裝" class="headerlink" title="0x03 系統安裝"></a>0x03 系統安裝</h2><h3 id="簡單講一下遇到的坑和解決的方法"><a href="#簡單講一下遇到的坑和解決的方法" class="headerlink" title="簡單講一下遇到的坑和解決的方法"></a>簡單講一下遇到的坑和解決的方法</h3><h4 id="官方訂閲與epel第三方倉庫"><a href="#官方訂閲與epel第三方倉庫" class="headerlink" title="官方訂閲與epel第三方倉庫"></a>官方訂閲與epel第三方倉庫</h4><pre><code><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># subscription-manager repos --enable "rhel-*-server-rpms" --enable "rhel-*-server-extras-rpms" "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"  --enable "rhel-ha-for-rhel-*-server-rpms"</span></span><br><span class="line">[root@rhel7 ~]<span class="comment"># yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm</span></span><br></pre></td></tr></table></figure></code></pre><h4 id="主板網卡驅動"><a href="#主板網卡驅動" class="headerlink" title="主板網卡驅動"></a>主板網卡驅動</h4><p>需手動配置靜態IP。</p>
+<pre><code><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># yum install https://mirror.rackspace.com/elrepo/elrepo/el7/x86_64/RPMS/kmod-r8125-9.003.05-1.el7_8.elrepo.x86_64.rpm</span></span><br><span class="line">[root@rhel7 ~]<span class="comment"># ethtool -i enp9s0</span></span><br><span class="line">driver: r8125</span><br><span class="line">version: 9.003.05-NAPI</span><br><span class="line">firmware-version:</span><br><span class="line">expansion-rom-version:</span><br><span class="line">bus-info: 0000:09:00.0</span><br><span class="line">supports-statistics: yes</span><br><span class="line">supports-test: no</span><br><span class="line">supports-eeprom-access: no</span><br><span class="line">supports-register-dump: yes</span><br><span class="line">supports-priv-flags: no</span><br></pre></td></tr></table></figure></code></pre><h4 id="安裝byobu"><a href="#安裝byobu" class="headerlink" title="安裝byobu"></a>安裝byobu</h4><p>右下角時間不顯示，更換老舊版本解決。</p>
+<pre><code><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># yum install https://rpmfind.net/linux/openmandriva/4.0/repository/x86_64/unsupported/release/byobu-5.43-2-omv4000.noarch.rpm</span></span><br></pre></td></tr></table></figure></code></pre><h4 id="硬盤識別順序"><a href="#硬盤識別順序" class="headerlink" title="硬盤識別順序"></a>硬盤識別順序</h4><p>RHEL7識別硬盤系統有固定順序而不像RHEL8，而加裝的B/M key m.2只能在特定槽位被識別。硬盤擴容流程如下：</p>
+<pre><code><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#直接用之前試裝RHEL8的操作步驟進行記錄，懶</span></span><br><span class="line"><span class="comment">#如果決定整盤擴容，分不分區都隨便。以下分區步驟僅做記錄，RHEL7上沒有分區。</span></span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># lsblk</span></span><br><span class="line">NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT</span><br><span class="line">sda             8:0    0 238.5G  0 disk </span><br><span class="line">├─sda1          8:1    0   600M  0 part /boot/efi</span><br><span class="line">├─sda2          8:2    0     1G  0 part /boot</span><br><span class="line">└─sda3          8:3    0 236.9G  0 part </span><br><span class="line">  ├─rhel-root 253:0    0 182.9G  0 lvm  /</span><br><span class="line">  ├─rhel-swap 253:1    0     4G  0 lvm  </span><br><span class="line">  └─rhel-home 253:2    0    50G  0 lvm  /home</span><br><span class="line">nvme0n1       259:0    0 465.8G  0 disk                     &lt; --- 新盤</span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># fdisk /dev/nvme0n1 </span></span><br><span class="line"></span><br><span class="line">Welcome to fdisk (util-linux 2.32.1).</span><br><span class="line">Changes will remain <span class="keyword">in</span> memory only, until you decide to write them.</span><br><span class="line">Be careful before using the write <span class="built_in">command</span>.</span><br><span class="line"></span><br><span class="line">Device does not contain a recognized partition table.</span><br><span class="line">Created a new DOS disklabel with disk identifier 0xf65c9eab.</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): n</span><br><span class="line">Partition <span class="built_in">type</span></span><br><span class="line">   p   primary (0 primary, 0 extended, 4 free)</span><br><span class="line">   e   extended (container <span class="keyword">for</span> logical partitions)</span><br><span class="line">Select (default p): </span><br><span class="line"></span><br><span class="line">Using default response p.</span><br><span class="line">Partition number (1-4, default 1): </span><br><span class="line">First sector (2048-976773167, default 2048): </span><br><span class="line">Last sector, +sectors or +size&#123;K,M,G,T,P&#125; (2048-976773167, default 976773167): </span><br><span class="line"></span><br><span class="line">Created a new partition 1 of <span class="built_in">type</span> <span class="string">'Linux'</span> and of size 465.8 GiB.</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): t</span><br><span class="line">Selected partition 1</span><br><span class="line">Hex code (<span class="built_in">type</span> L to list all codes): 8e</span><br><span class="line">Changed <span class="built_in">type</span> of partition <span class="string">'Linux'</span> to <span class="string">'Linux LVM'</span>.</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): w</span><br><span class="line">The partition table has been altered.</span><br><span class="line">Calling ioctl() to re-read partition table.</span><br><span class="line">Syncing disks.</span><br><span class="line"></span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># lsblk</span></span><br><span class="line">NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT</span><br><span class="line">sda             8:0    0 238.5G  0 disk </span><br><span class="line">├─sda1          8:1    0   600M  0 part /boot/efi</span><br><span class="line">├─sda2          8:2    0     1G  0 part /boot</span><br><span class="line">└─sda3          8:3    0 236.9G  0 part </span><br><span class="line">  ├─rhel-root 253:0    0 182.9G  0 lvm  /</span><br><span class="line">  ├─rhel-swap 253:1    0     4G  0 lvm  </span><br><span class="line">  └─rhel-home 253:2    0    50G  0 lvm  /home</span><br><span class="line">nvme0n1       259:0    0 465.8G  0 disk </span><br><span class="line">└─nvme0n1p1   259:2    0 465.8G  0 part </span><br><span class="line"></span><br><span class="line">lv在vg之上，vg在pv之上，直接pvcreate然後vgextend</span><br><span class="line"></span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># pvs</span></span><br><span class="line">  PV         VG   Fmt  Attr PSize    PFree</span><br><span class="line">  /dev/sda3  rhel lvm2 a--  &lt;236.89g    0 </span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># vgs</span></span><br><span class="line">  VG   <span class="comment">#PV #LV #SN Attr   VSize    VFree</span></span><br><span class="line">  rhel   1   3   0 wz--n- &lt;236.89g    0 </span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># lvs</span></span><br><span class="line">  LV   VG   Attr       LSize    Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  home rhel -wi-ao----   50.00g                                                    </span><br><span class="line">  root rhel -wi-ao---- &lt;182.89g                                                    </span><br><span class="line">  swap rhel -wi<span class="_">-a</span>-----    4.00g                                                    </span><br><span class="line"></span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># pvcreate /dev/nvme0n1p1 </span></span><br><span class="line">WARNING: xfs signature detected on /dev/nvme0n1p1 at offset 0. Wipe it? [y/n]: y</span><br><span class="line">  Wiping xfs signature on /dev/nvme0n1p1.</span><br><span class="line">  Physical volume <span class="string">"/dev/nvme0n1p1"</span> successfully created.</span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># pvs</span></span><br><span class="line">  PV             VG   Fmt  Attr PSize    PFree  </span><br><span class="line">  /dev/nvme0n1p1      lvm2 ---   465.76g 465.76g</span><br><span class="line">  /dev/sda3      rhel lvm2 a--  &lt;236.89g      0 </span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># vgextend rhel /dev/nvme0n1p1 </span></span><br><span class="line">  Volume group <span class="string">"rhel"</span> successfully extended</span><br><span class="line"></span><br><span class="line">完成extend后可以看到已經有所屬的vg</span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># pvs</span></span><br><span class="line">  PV             VG   Fmt  Attr PSize    PFree   </span><br><span class="line">  /dev/nvme0n1p1 rhel lvm2 a--  &lt;465.76g &lt;465.76g</span><br><span class="line">  /dev/sda3      rhel lvm2 a--  &lt;236.89g       0 </span><br><span class="line"></span><br><span class="line">rhel的vg也已經擴展成功</span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># vgs</span></span><br><span class="line">  VG   <span class="comment">#PV #LV #SN Attr   VSize   VFree   </span></span><br><span class="line">  rhel   2   3   0 wz--n- 702.64g &lt;465.76g</span><br><span class="line"></span><br><span class="line">進行lv擴展</span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># lvs</span></span><br><span class="line">  LV   VG   Attr       LSize    Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  home rhel -wi-ao----   50.00g                                                    </span><br><span class="line">  root rhel -wi-ao---- &lt;182.89g                                                    </span><br><span class="line">  swap rhel -wi<span class="_">-a</span>-----    4.00g                                                    </span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># pvs</span></span><br><span class="line">  PV             VG   Fmt  Attr PSize    PFree   </span><br><span class="line">  /dev/nvme0n1p1 rhel lvm2 a--  &lt;465.76g &lt;465.76g</span><br><span class="line">  /dev/sda3      rhel lvm2 a--  &lt;236.89g       0 </span><br><span class="line"></span><br><span class="line">將剩餘的100%加到/上</span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># lvextend -l +100%FREE /dev/rhel/root</span></span><br><span class="line">  Size of logical volume rhel/root changed from &lt;182.89 GiB (46819 extents) to 648.64 GiB (166053 extents).</span><br><span class="line">  Logical volume rhel/root successfully resized.</span><br><span class="line">[root@rhel8-m4d3bug ~]<span class="comment"># lvs</span></span><br><span class="line">  LV   VG   Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  home rhel -wi-ao----  50.00g                                                    </span><br><span class="line">  root rhel -wi-ao---- 648.64g                                                    </span><br><span class="line">  swap rhel -wi<span class="_">-a</span>-----   4.00g</span><br></pre></td></tr></table></figure></code></pre><h4 id="cockpit全家桶"><a href="#cockpit全家桶" class="headerlink" title="cockpit全家桶"></a>cockpit全家桶</h4><pre><code><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># yum install cockpit* -x cockpit-machines-ovirt</span></span><br><span class="line">[root@rhel7 ~]<span class="comment"># systemctl enable cockpit --now</span></span><br><span class="line">[root@rhel7 ~]<span class="comment"># firewall-cmd --add-services cockpit</span></span><br><span class="line">[root@rhel7 ~]<span class="comment"># firewall-cmd --reload</span></span><br></pre></td></tr></table></figure></code></pre><h4 id="v2ray客戶端"><a href="#v2ray客戶端" class="headerlink" title="v2ray客戶端"></a>v2ray客戶端</h4><pre><code><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">v2fly/fhs-install-v2ray: Bash script <span class="keyword">for</span> installing V2Ray <span class="keyword">in</span> operating systems such as Debian / CentOS / Fedora / openSUSE that support systemd</span><br><span class="line">https://github.com/v2fly/fhs-install-v2ray</span><br></pre></td></tr></table></figure></code></pre><h4 id="zerotier"><a href="#zerotier" class="headerlink" title="zerotier"></a>zerotier</h4><pre><code><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@rhel7 ~]<span class="comment"># curl -s https://install.zerotier.com/ | sudo bash</span></span><br></pre></td></tr></table></figure></code></pre><h2 id="0x04-後記"><a href="#0x04-後記" class="headerlink" title="0x04 後記"></a>0x04 後記</h2><p>後續打算：</p>
+<ul>
+<li>OCP4HA集群環境搭建。</li>
+<li>靶機搭建。</li>
+<li>K8SHA集群環境搭建。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2020/11/29 - 21:11
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2025/12/01 - 08:12
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2020-11-29-Prompt-for-Build-Your-HomeLab.html" title="抛磚引玉的一次HomeLab實踐">https://blog.madebug.net/Ops/2020-11-29-Prompt-for-Build-Your-HomeLab.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/RHEL/" rel="tag"># RHEL </a>
+              <a href="/tags/Zerotier/" rel="tag"># Zerotier </a>
+              <a href="/tags/HomeLab/" rel="tag"># HomeLab </a>
+              <a href="/tags/Cockpit/" rel="tag"># Cockpit </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2020-10-04-learning-sendmail-IV.html" rel="prev" title="sendmail的深入瞭解IV">
+      <i class="fa fa-chevron-left"></i> sendmail的深入瞭解IV
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2020-11-30-Network-Qos-for-KVM.html" rel="next" title="如何為KVM限速">
+      如何為KVM限速 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-需求分析"><span class="nav-text">0x00 需求分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-硬件選購"><span class="nav-text">0x01 硬件選購</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-上手安装"><span class="nav-text">0x02 上手安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#i9散熱不講武德"><span class="nav-text">i9散熱不講武德</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#靈魂走綫"><span class="nav-text">靈魂走綫</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正面來一張"><span class="nav-text">正面來一張</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#成品"><span class="nav-text">成品</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-系統安裝"><span class="nav-text">0x03 系統安裝</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#簡單講一下遇到的坑和解決的方法"><span class="nav-text">簡單講一下遇到的坑和解決的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#官方訂閲與epel第三方倉庫"><span class="nav-text">官方訂閲與epel第三方倉庫</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主板網卡驅動"><span class="nav-text">主板網卡驅動</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安裝byobu"><span class="nav-text">安裝byobu</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#硬盤識別順序"><span class="nav-text">硬盤識別順序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#cockpit全家桶"><span class="nav-text">cockpit全家桶</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#v2ray客戶端"><span class="nav-text">v2ray客戶端</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#zerotier"><span class="nav-text">zerotier</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-後記"><span class="nav-text">0x04 後記</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : '3e6f0b9424463093ea560571ab82be2a',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

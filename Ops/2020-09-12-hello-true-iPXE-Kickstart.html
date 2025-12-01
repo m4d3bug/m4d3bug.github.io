@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文將實踐通過燒錄iPXE到相應的VMware虛擬機中，來模擬一個無PXE的自動化安裝環境。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iPXE+Kickstart搭建無人值守自動化安裝環境">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2020-09-12-hello-true-iPXE-Kickstart.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文將實踐通過燒錄iPXE到相應的VMware虛擬機中，來模擬一個無PXE的自動化安裝環境。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXE.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlogs.jpg">
+<meta property="article:published_time" content="2020-09-12T00:37:40.000Z">
+<meta property="article:modified_time" content="2025-12-01T08:53:16.487Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="VMware ">
+<meta property="article:tag" content="Kickstart ">
+<meta property="article:tag" content="TFTP ">
+<meta property="article:tag" content="Httpd ">
+<meta property="article:tag" content="RHEL 7 ">
+<meta property="article:tag" content="BIOS ">
+<meta property="article:tag" content="UEFI ">
+<meta property="article:tag" content="Anaconda ">
+<meta property="article:tag" content="iPXE ">
+<meta property="article:tag" content="Dnsmasq ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXE.png">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2020-09-12-hello-true-iPXE-Kickstart.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>iPXE+Kickstart搭建無人值守自動化安裝環境 | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2020-09-12-hello-true-iPXE-Kickstart.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iPXE+Kickstart搭建無人值守自動化安裝環境
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-09-12 00:37:40" itemprop="dateCreated datePublished" datetime="2020-09-12T00:37:40+00:00">2020-09-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-12-01 08:53:16" itemprop="dateModified" datetime="2025-12-01T08:53:16+00:00">2025-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
+
+<p>本文將實踐通過燒錄iPXE到相應的VMware虛擬機中，來模擬一個無PXE的自動化安裝環境。</p>
+<a id="more"></a>
+<p>在閲讀本文前，請確保您有足夠瞭解<a href="https://groups.google.com/g/ustc_lug/c/P2jOQ5F4EKY?pli=1" target="_blank" rel="noopener">iPXE和PXE的<del>情情愛愛</del>恩恩怨怨。</a></p>
+<h2 id="0x00-相關背景"><a href="#0x00-相關背景" class="headerlink" title="0x00 相關背景"></a>0x00 相關背景</h2><p>iPXE有以下的使用方法，不像PXE那麽死板：</p>
+<ul>
+<li>pxe(網卡) -&gt; ipxe -&gt; pxelinux.bin -&gt; menu.c32</li>
+<li>pxe -&gt; ipxelinux.0 -&gt; menu.c32</li>
+<li>pxe -&gt; syslinux.bin -&gt; ipxe -&gt; pxelinux.bin -&gt; menu.c32</li>
+<li>pxe -&gt; syslinux.bin -&gt; ipxelinux.0 -&gt; menu.c32</li>
+<li>pxe -&gt; ipxe.lkrn(ipxe.efi/undionly.kpxe)  -&gt; boot.ipxe</li>
+<li>grub -&gt; ipxe.lkrn(ipxe.efi/undionly.kpxe) -&gt; pxelinux.bin -&gt; menu.c32</li>
+<li>grub -&gt; ipxelinux.lkrn -&gt; menu.c32</li>
+<li>ipxe(燒入網卡) -&gt; pxelinux.bin</li>
+<li>ipxe(燒入網卡) -&gt; boot.ipxe</li>
+<li>…</li>
+</ul>
+<p>本文實踐的則是最後一種方法。ipxe(燒入網卡) -&gt; boot.ipxe，相較於前文，你將會看見Dnsmasq日志的明顯區別。</p>
+<h2 id="0x01-創建VM"><a href="#0x01-創建VM" class="headerlink" title="0x01 創建VM"></a>0x01 創建VM</h2><p>VMware虛擬機的vmx文件，支持自定義rom及mrom，這些<a href="https://ipxe.org/howto/vmware" target="_blank" rel="noopener">固件的替換</a>，使其具有ipxe的功能。</p>
+<h3 id="下載並編譯"><a href="#下載並編譯" class="headerlink" title="下載並編譯"></a>下載並編譯</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># git clone git://git.ipxe.org/ipxe.git</span></span><br><span class="line"><span class="comment"># cd ipxe/</span></span><br><span class="line"><span class="comment"># make bin/8086100f.mrom bin/808610d3.mrom bin/10222000.rom bin/15ad07b0.rom</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="啓用iPXE固件"><a href="#啓用iPXE固件" class="headerlink" title="啓用iPXE固件"></a>啓用iPXE固件</h3><p>圖形化創建一個無CD的空VM，並確保其與iPXE主機相同LAN。</p>
+<p>隨後移動相關固件到該空VM目錄下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># mv bin/&#123;8086100f.mrom,808610d3.mrom,10222000.rom,15ad07b0.rom&#125; /mnt/g/Virtual Machines/iPXE-test-7</span></span><br><span class="line"><span class="comment"># ls -alt /mnt/g/Virtual Machines/iPXE-test-7                                                                                                                                                                          22:01:05</span></span><br><span class="line">total 8436196</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug 4337106944 Sep 11 22:02 iPXE-test-7.vmdk*</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug     577406 Sep 11 21:36 vmware.log*</span><br><span class="line">drwxrwxrwx 1 m4d3bug m4d3bug        512 Sep 10 22:35 ../</span><br><span class="line">drwxrwxrwx 1 m4d3bug m4d3bug        512 Sep 10 20:52 ./</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug       3035 Sep 10 20:52 iPXE-test-7.vmx*</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug       8684 Sep 10 20:52 iPXE-test-7.nvram*</span><br><span class="line">drwxrwxrwx 1 m4d3bug m4d3bug        512 Sep 10 14:04 iPXE-test-7.vmdk.lck/</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug 4294967296 Sep 10 14:04 564dc457-c101-4841-4883-ecf173ce702f.vmem*</span><br><span class="line">drwxrwxrwx 1 m4d3bug m4d3bug        512 Sep 10 14:04 564dc457-c101-4841-4883-ecf173ce702f.vmem.lck/</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug     198523 Sep 10 13:05 vmware-0.log*</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug      66560 Sep 10 11:14 15ad07b0.rom*</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug      67584 Sep 10 11:14 10222000.rom*</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug      68608 Sep 10 11:14 808610d3.mrom*</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug      68608 Sep 10 11:14 8086100f.mrom*</span><br><span class="line">drwxrwxrwx 1 m4d3bug m4d3bug        512 Sep 10 11:07 ipxe/</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug        266 Sep 10 10:51 iPXE-test-7.vmxf*</span><br><span class="line">-rwxrwxrwx 1 m4d3bug m4d3bug          0 Sep 10 10:51 iPXE-test-7.vmsd*</span><br><span class="line">drwxrwxrwx 1 m4d3bug m4d3bug        512 Sep 10 10:51 iPXE-test-7.vmx.lck/</span><br></pre></td></tr></table></figure>
+
+<p>然後修改.vmx文件增加以下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cd  /mnt/g/Virtual Machines/iPXE-test-7</span></span><br><span class="line"><span class="comment"># vim iPXE-test-7.vmx</span></span><br><span class="line">……</span><br><span class="line">ethernet0.opromsize = 262144</span><br><span class="line">e1000bios.filename = <span class="string">"8086100f.mrom"</span></span><br><span class="line">e1000ebios.filename = <span class="string">"808610d3.mrom"</span></span><br><span class="line">nbios.filename = <span class="string">"10222000.rom"</span></span><br><span class="line">nx3bios.filename = <span class="string">"15ad07b0.rom"</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-搭建iPXE环境"><a href="#0x02-搭建iPXE环境" class="headerlink" title="0x02 搭建iPXE环境"></a>0x02 搭建iPXE环境</h2><p><a href="https://blog.madebug.net/Ops/2020-08-08-hello-iPXE-over-PXE-Kickstart">不再赘述</a></p>
+<h2 id="0x03-檢查日誌"><a href="#0x03-檢查日誌" class="headerlink" title="0x03 檢查日誌"></a>0x03 檢查日誌</h2><p>從日誌中可以清晰看到僅調用了boot.ipxe，相較於上篇文章，少了iPXE引導程序的加載。</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlogs.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlogs.jpg"></p>
+<h2 id="0x04-結語"><a href="#0x04-結語" class="headerlink" title="0x04 結語"></a>0x04 結語</h2><p>本文簡單嘗試了iPXE的加載順序，模擬驗證了iPXE的硬件條件。現在是容器大行其道的時代，批量部署環境只是幾秒鐘的事。但是在與之對應的物理機時代，iPXE仍有它的地位與話語權。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2020/09/12 - 00:09
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2025/12/01 - 08:12
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2020-09-12-hello-true-iPXE-Kickstart.html" title="iPXE+Kickstart搭建無人值守自動化安裝環境">https://blog.madebug.net/Ops/2020-09-12-hello-true-iPXE-Kickstart.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/VMware/" rel="tag"># VMware </a>
+              <a href="/tags/Kickstart/" rel="tag"># Kickstart </a>
+              <a href="/tags/TFTP/" rel="tag"># TFTP </a>
+              <a href="/tags/Httpd/" rel="tag"># Httpd </a>
+              <a href="/tags/RHEL-7/" rel="tag"># RHEL 7 </a>
+              <a href="/tags/BIOS/" rel="tag"># BIOS </a>
+              <a href="/tags/UEFI/" rel="tag"># UEFI </a>
+              <a href="/tags/Anaconda/" rel="tag"># Anaconda </a>
+              <a href="/tags/iPXE/" rel="tag"># iPXE </a>
+              <a href="/tags/Dnsmasq/" rel="tag"># Dnsmasq </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2020-08-08-hello-iPXE-over-PXE-Kickstart.html" rel="prev" title="于PXE下的iPXE+Kickstart搭建無人值守自動化安裝環境">
+      <i class="fa fa-chevron-left"></i> 于PXE下的iPXE+Kickstart搭建無人值守自動化安裝環境
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Dev/2020-09-13-How-to-work-with-Unreliable-MS.html" rel="next" title="如何在Windows中正確地使用“真正的”Linux">
+      如何在Windows中正確地使用“真正的”Linux <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-相關背景"><span class="nav-text">0x00 相關背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-創建VM"><span class="nav-text">0x01 創建VM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下載並編譯"><span class="nav-text">下載並編譯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#啓用iPXE固件"><span class="nav-text">啓用iPXE固件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-搭建iPXE环境"><span class="nav-text">0x02 搭建iPXE环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-檢查日誌"><span class="nav-text">0x03 檢查日誌</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-結語"><span class="nav-text">0x04 結語</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : '733090c54fd34d13d325dded34f5b6fa',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

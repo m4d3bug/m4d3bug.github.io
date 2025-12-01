@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文旨在剖析线程的5个W和1个H。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="趣談Linux操作系統筆記II（之剖析系統綫程）">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2020-06-29-Funny-With-Linux-II-about-multi-tasks.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文旨在剖析线程的5个W和1个H。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howtaskwork.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexwork.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/summarytasks.png">
+<meta property="article:published_time" content="2020-06-29T19:03:36.000Z">
+<meta property="article:modified_time" content="2020-07-11T18:33:33.000Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="趣談Linux操作系統筆記">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2020-06-29-Funny-With-Linux-II-about-multi-tasks.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>趣談Linux操作系統筆記II（之剖析系統綫程） | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2020-06-29-Funny-With-Linux-II-about-multi-tasks.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          趣談Linux操作系統筆記II（之剖析系統綫程）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-29 19:03:36" itemprop="dateCreated datePublished" datetime="2020-06-29T19:03:36+00:00">2020-06-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-11 18:33:33" itemprop="dateModified" datetime="2020-07-11T18:33:33+00:00">2020-07-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>15k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>14 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
+
+<p>本文旨在剖析线程的5个W和1个H。</p>
+<a id="more"></a>
+
+<h2 id="0x00-什么是线程-what-and-why"><a href="#0x00-什么是线程-what-and-why" class="headerlink" title="0x00 什么是线程(what and why?)"></a>0x00 什么是线程(what and why?)</h2><hr>
+<p>线程常常与进程一起谈及，可通过以下解释它们的关系：</p>
+<blockquote>
+<p><strong>进程相当于一个项目，而线程则是为了完成项目需求，而建立的一个个开发任务。</strong></p>
+</blockquote>
+<p>因此，当开发任务间无先后次序时，拆分出支线来方便并发，可以使效率up up（科学的分工，符合<a href="https://zh.wikipedia.org/zh-tw/%E5%B8%95%E7%B4%AF%E6%89%98%E6%B3%95%E5%88%99" target="_blank" rel="noopener"><strong>宇宙法則</strong></a>）。</p>
+<h2 id="0x01-如何创建线程-how"><a href="#0x01-如何创建线程-how" class="headerlink" title="0x01 如何创建线程(how?)"></a>0x01 如何创建线程(how?)</h2><hr>
+<p>创建前，先了解调用线程的必经步骤。</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howtaskwork.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howtaskwork.jpg"></p>
+<p>根据流程图，构建与之对应的测试代码。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NUM_OF_TASKS 5</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//声明函数</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">downloadfile</span><span class="params">(<span class="keyword">void</span> *filename)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   <span class="built_in">printf</span>(<span class="string">"I am downloading the file %s!\n"</span>, (<span class="keyword">char</span> *)filename);</span><br><span class="line">   sleep(<span class="number">10</span>);</span><br><span class="line">   <span class="keyword">long</span> downloadtime = rand()%<span class="number">100</span>;</span><br><span class="line">   <span class="built_in">printf</span>(<span class="string">"I finish downloading the file within %d minutes!\n"</span>, downloadtime);</span><br><span class="line">   <span class="comment">//次线程结束并返回随机生成的downloadtime</span></span><br><span class="line">   pthread_exit((<span class="keyword">void</span> *)downloadtime); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function">   <span class="comment">//声明数组</span></span></span><br><span class="line">   char files[NUM_OF_TASKS][20]=&#123;"file1.avi","file2.rmvb","file3.mp4","file4.wmv","file5.flv"&#125;; </span><br><span class="line">   <span class="comment">//声明该数组为线程对象</span></span><br><span class="line">   <span class="keyword">pthread_t</span> threads[NUM_OF_TASKS];                                    </span><br><span class="line">   <span class="keyword">int</span> rc;</span><br><span class="line">   <span class="keyword">int</span> t;</span><br><span class="line">   <span class="keyword">int</span> downloadtime;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line">   <span class="comment">//设置线程属性</span></span><br><span class="line">   <span class="keyword">pthread_attr_t</span> thread_attr;                                         </span><br><span class="line">   <span class="comment">//初始化线程</span></span><br><span class="line">   pthread_attr_init(&amp;thread_attr);                                   </span><br><span class="line">   <span class="comment">//设置其属性为主线程等待子线程，并获取其退出状态方便调试</span></span><br><span class="line">   pthread_attr_setdetachstate(&amp;thread_attr,PTHREAD_CREATE_JOINABLE);  </span><br><span class="line"></span><br><span class="line">   <span class="keyword">for</span>(t=<span class="number">0</span>;t&lt;NUM_OF_TASKS;t++)&#123;</span><br><span class="line">     <span class="comment">//打印</span></span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">"creating thread %d, please help me to download %s\n"</span>, t+<span class="number">1</span>, files[t]);</span><br><span class="line">	 <span class="comment">//创建并开启线程 &amp;thread_attr, 然后指定子线程的函数 downloadfie</span></span><br><span class="line">     rc = pthread_create(&amp;threads[t], &amp;thread_attr, downloadfile, (<span class="keyword">void</span> *)files[t]); </span><br><span class="line">     <span class="keyword">if</span> (rc)&#123;</span><br><span class="line">       <span class="built_in">printf</span>(<span class="string">"ERROR; return code from pthread_create() is %d\n"</span>, rc);</span><br><span class="line">       <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">     &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//回收线程属性</span></span><br><span class="line">   pthread_attr_destroy(&amp;thread_attr);  </span><br><span class="line"></span><br><span class="line">   <span class="keyword">for</span>(t=<span class="number">0</span>;t&lt;NUM_OF_TASKS;t++)&#123;</span><br><span class="line">     <span class="comment">//等待线程结束，并取得返回的downloadtime数值</span></span><br><span class="line">     pthread_join(threads[t],(<span class="keyword">void</span>**)&amp;downloadtime);  </span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">"Thread %d downloads the file %s in %d minutes.\n"</span>,t+<span class="number">1</span>,files[t],downloadtime);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//主线程结束</span></span><br><span class="line">   pthread_exit(<span class="literal">NULL</span>); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对代码进行编译，多次运行观察线程的随机创建（线程创建全靠资源动态分配）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># gcc download.c -lpthread -o download.out</span></span><br><span class="line">[root@learn ~]<span class="comment"># ./download.out </span></span><br><span class="line">creating thread 1, please <span class="built_in">help</span> me to download file1.avi</span><br><span class="line">creating thread 2, please <span class="built_in">help</span> me to download file2.rmvb</span><br><span class="line">creating thread 3, please <span class="built_in">help</span> me to download file3.mp4</span><br><span class="line">creating thread 4, please <span class="built_in">help</span> me to download file4.wmv</span><br><span class="line">creating thread 5, please <span class="built_in">help</span> me to download file5.flv</span><br><span class="line">I am downloading the file file2.rmvb!</span><br><span class="line">I am downloading the file file4.wmv!</span><br><span class="line">I am downloading the file file5.flv!</span><br><span class="line">I am downloading the file file3.mp4!</span><br><span class="line">I am downloading the file file1.avi!</span><br><span class="line">I finish downloading the file within 83 minutes!</span><br><span class="line">I finish downloading the file within 86 minutes!</span><br><span class="line">I finish downloading the file within 77 minutes!</span><br><span class="line">I finish downloading the file within 15 minutes!</span><br><span class="line">I finish downloading the file within 93 minutes!</span><br><span class="line">Thread 1 downloads the file file1.avi <span class="keyword">in</span> 93 minutes.</span><br><span class="line">Thread 2 downloads the file file2.rmvb <span class="keyword">in</span> 86 minutes.</span><br><span class="line">Thread 3 downloads the file file3.mp4 <span class="keyword">in</span> 15 minutes.</span><br><span class="line">Thread 4 downloads the file file4.wmv <span class="keyword">in</span> 83 minutes.</span><br><span class="line">Thread 5 downloads the file file5.flv <span class="keyword">in</span> 77 minutes.</span><br><span class="line">[root@learn ~]<span class="comment"># ./download.out </span></span><br><span class="line">creating thread 1, please <span class="built_in">help</span> me to download file1.avi</span><br><span class="line">creating thread 2, please <span class="built_in">help</span> me to download file2.rmvb</span><br><span class="line">I am downloading the file file1.avi!</span><br><span class="line">creating thread 3, please <span class="built_in">help</span> me to download file3.mp4</span><br><span class="line">I am downloading the file file2.rmvb!</span><br><span class="line">creating thread 4, please <span class="built_in">help</span> me to download file4.wmv</span><br><span class="line">I am downloading the file file3.mp4!</span><br><span class="line">creating thread 5, please <span class="built_in">help</span> me to download file5.flv</span><br><span class="line">I am downloading the file file4.wmv!</span><br><span class="line">I am downloading the file file5.flv!</span><br><span class="line">I finish downloading the file within 83 minutes!</span><br><span class="line">I finish downloading the file within 86 minutes!</span><br><span class="line">I finish downloading the file within 77 minutes!</span><br><span class="line">I finish downloading the file within 15 minutes!</span><br><span class="line">I finish downloading the file within 93 minutes!</span><br><span class="line">Thread 1 downloads the file file1.avi <span class="keyword">in</span> 83 minutes.</span><br><span class="line">Thread 2 downloads the file file2.rmvb <span class="keyword">in</span> 86 minutes.</span><br><span class="line">Thread 3 downloads the file file3.mp4 <span class="keyword">in</span> 93 minutes.</span><br><span class="line">Thread 4 downloads the file file4.wmv <span class="keyword">in</span> 15 minutes.</span><br><span class="line">Thread 5 downloads the file file5.flv <span class="keyword">in</span> 77 minutes.</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-线程的数据-when-and-where"><a href="#0x02-线程的数据-when-and-where" class="headerlink" title="0x02 线程的数据(when and where?)"></a>0x02 线程的数据(when and where?)</h2><hr>
+<p>了解完并发多线程的运作模式和优势，接着是线程对<strong>三种不同位置类别数据</strong>的处理方式。</p>
+<h3 id="线程栈上的本地数据"><a href="#线程栈上的本地数据" class="headerlink" title="线程栈上的本地数据"></a>线程栈上的本地数据</h3><p>默认被赋予了每个线程8MB的线程栈空间，用于存储其中的局部变量。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># ulimit -a</span></span><br><span class="line">core file size          (blocks, -c) 0</span><br><span class="line">data seg size           (kbytes, -d) unlimited</span><br><span class="line">scheduling priority             (-e) 0</span><br><span class="line">file size               (blocks, -f) unlimited</span><br><span class="line">pending signals                 (-i) 7144</span><br><span class="line">max locked memory       (kbytes, -l) 64</span><br><span class="line">max memory size         (kbytes, -m) unlimited</span><br><span class="line">open files                      (-n) 1024</span><br><span class="line">pipe size            (512 bytes, -p) 8</span><br><span class="line">POSIX message queues     (bytes, -q) 819200</span><br><span class="line">real-time priority              (-r) 0</span><br><span class="line">stack size              (kbytes, -s) 8192            &lt;&lt;&lt;</span><br><span class="line">cpu time               (seconds, -t) unlimited</span><br><span class="line">max user processes              (-u) 7144</span><br><span class="line">virtual memory          (kbytes, -v) unlimited</span><br><span class="line">file locks                      (-x) unlimited</span><br></pre></td></tr></table></figure>
+
+<p>而内存中线程栈间有用小块区域来隔离各自空间，当被踏入则会引发<a href="https://baike.baidu.com/item/%E6%AE%B5%E9%94%99%E8%AF%AF" target="_blank" rel="noopener">段错误</a><strong><em><a href="https://en.wikipedia.org/wiki/Segmentation_fault" target="_blank" rel="noopener">(Segmentation fault)</a></em></strong>。</p>
+<p>可以通过函数pthread_attr_t来修改单个线程栈大小，或者通过ulimit -s来进行全局修改。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);</span><br><span class="line"></span><br><span class="line"><span class="built_in">ulimit</span> -s 16384</span><br></pre></td></tr></table></figure>
+
+<h3 id="进程中共享的全局数据"><a href="#进程中共享的全局数据" class="headerlink" title="进程中共享的全局数据"></a>进程中共享的全局数据</h3><p>线程在读取进程中共享的全局数据时，引入互斥锁<strong>Mutex(Mutual Exclusion)</strong>来避免数据不一，需要<strong>等待互斥锁[(pthread_mutex_lock()]</strong> 或<strong>尝试互斥锁[pthread_mutex_trylock()]</strong> 來保证独占。 前者需要一直等待，后者则可以根据没抢到的提示佛系抢占。</p>
+<ul>
+<li><p>无条件变量的等待互斥锁</p>
+<p>  <img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexwork.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexwork.jpg"></p>
+<p>  <strong>有无锁的情况对比，可帮助明白锁的重要性。</strong></p>
+<p>  <strong>无互斥锁</strong>，受多线程影响的全局变量<strong>(money_of_tom + money_of_jerry)</strong>：</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line">   [root@learn ~]<span class="comment"># cat mutex.c </span></span><br><span class="line">   </span><br><span class="line">   <span class="comment">#include &lt;pthread.h&gt;</span></span><br><span class="line">   <span class="comment">#include &lt;stdio.h&gt;</span></span><br><span class="line">   <span class="comment">#include &lt;stdlib.h&gt;</span></span><br><span class="line">   </span><br><span class="line">   <span class="comment">#define NUM_OF_TASKS 5</span></span><br><span class="line">   </span><br><span class="line">   int money_of_tom = 100;</span><br><span class="line">   int money_of_jerry = 100;</span><br><span class="line">   //暂不启用mutex</span><br><span class="line">   //pthread_mutex_t g_money_lock;</span><br><span class="line">   </span><br><span class="line">//创建子线程用于执行金额转账</span><br><span class="line">   void *transfer(void *notused)   </span><br><span class="line">   &#123;</span><br><span class="line">     pthread_t tid = pthread_self();</span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">"Thread %u is transfering money!\n"</span>, (unsigned int)tid);</span><br><span class="line">     //暂不启用mutex</span><br><span class="line">     //pthread_mutex_lock(&amp;g_money_lock);</span><br><span class="line">     sleep(rand()%10);</span><br><span class="line">     money_of_tom+=10;</span><br><span class="line">     sleep(rand()%10);</span><br><span class="line">     money_of_jerry-=10;</span><br><span class="line">     //暂不启用mutex</span><br><span class="line">     //pthread_mutex_unlock(&amp;g_money_lock);</span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">"Thread %u finish transfering money!\n"</span>, (unsigned int)tid);</span><br><span class="line">     pthread_exit((void *)0);</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">//主线程负责输出总额，子线程负责交易细节</span><br><span class="line">   int main(int argc, char *argv[])  </span><br><span class="line">   &#123;</span><br><span class="line">     pthread_t threads[NUM_OF_TASKS];</span><br><span class="line">     int rc;</span><br><span class="line">     int t;</span><br><span class="line">     //暂不启用mutex</span><br><span class="line">     //pthread_mutex_init(&amp;g_money_lock, NULL);</span><br><span class="line">   </span><br><span class="line">     <span class="keyword">for</span>(t=0;t&lt;NUM_OF_TASKS;t++)&#123;</span><br><span class="line">    //创建子线程开启转账</span><br><span class="line">       rc = pthread_create(&amp;threads[t], NULL, transfer, NULL); </span><br><span class="line">       <span class="keyword">if</span> (rc)&#123;</span><br><span class="line">         <span class="built_in">printf</span>(<span class="string">"ERROR; return code from pthread_create() is %d\n"</span>, rc);</span><br><span class="line">         <span class="built_in">exit</span>(-1);</span><br><span class="line">       &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     <span class="keyword">for</span>(t=0;t&lt;18;t++)&#123;</span><br><span class="line">       //暂不启用mutex</span><br><span class="line">       //pthread_mutex_lock(&amp;g_money_lock);</span><br><span class="line">       <span class="built_in">printf</span>(<span class="string">"money_of_tom + money_of_jerry = %d\n"</span>, money_of_tom + money_of_jerry);</span><br><span class="line">	//随机输出时间</span><br><span class="line">       sleep(rand()%3);  </span><br><span class="line">       //暂不启用mutex</span><br><span class="line">       //pthread_mutex_unlock(&amp;g_money_lock);</span><br><span class="line">     &#125;</span><br><span class="line">     //暂不启用mutex</span><br><span class="line">     //pthread_mutex_destroy(&amp;g_money_lock);</span><br><span class="line">     pthread_exit(NULL);</span><br><span class="line">   &#125;</span><br><span class="line">   [root@learn ~]<span class="comment"># gcc mutex.c -lpthread -o before.out</span></span><br><span class="line">   [root@learn ~]<span class="comment"># ./before.out </span></span><br><span class="line">   Thread 4143912704 is transfering money!</span><br><span class="line">   Thread 4135520000 is transfering money!</span><br><span class="line">   Thread 4152305408 is transfering money!</span><br><span class="line">   Thread 4127127296 is transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   Thread 4118734592 is transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   money_of_tom + money_of_jerry = 210</span><br><span class="line">   money_of_tom + money_of_jerry = 210</span><br><span class="line">   money_of_tom + money_of_jerry = 210</span><br><span class="line">   Thread 4118734592 finish transfering money!</span><br><span class="line">   Thread 4143912704 finish transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 220</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   Thread 4127127296 finish transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 220</span><br><span class="line">   Thread 4152305408 finish transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 210</span><br><span class="line">   money_of_tom + money_of_jerry = 210</span><br><span class="line">   money_of_tom + money_of_jerry = 210</span><br><span class="line">   Thread 4135520000 finish transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   [root@learn ~]<span class="comment"># ./before.out </span></span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   Thread 4152305408 is transfering money!</span><br><span class="line">   Thread 4135520000 is transfering money!</span><br><span class="line">   Thread 4118734592 is transfering money!</span><br><span class="line">   Thread 4143912704 is transfering money!</span><br><span class="line">   Thread 4127127296 is transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   money_of_tom + money_of_jerry = 210</span><br><span class="line">   money_of_tom + money_of_jerry = 210</span><br><span class="line">   Thread 4143912704 finish transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 240</span><br><span class="line">   Thread 4127127296 finish transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   money_of_tom + money_of_jerry = 230</span><br><span class="line">   Thread 4152305408 finish transfering money!</span><br><span class="line">   Thread 4135520000 finish transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 210</span><br><span class="line">   Thread 4118734592 finish transfering money!</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br><span class="line">   money_of_tom + money_of_jerry = 200</span><br></pre></td></tr></table></figure>
+
+<p>  <strong>有互斥锁</strong>，受多线程影响的全局变量<strong>(money_of_tom + money_of_jerry)</strong>：</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"> [root@learn ~]<span class="comment"># cat mutex.c </span></span><br><span class="line"> </span><br><span class="line"> <span class="comment">#include &lt;pthread.h&gt;</span></span><br><span class="line"> <span class="comment">#include &lt;stdio.h&gt;</span></span><br><span class="line"> <span class="comment">#include &lt;stdlib.h&gt;</span></span><br><span class="line"> </span><br><span class="line"> <span class="comment">#define NUM_OF_TASKS 5</span></span><br><span class="line"> </span><br><span class="line"> int money_of_tom = 100;</span><br><span class="line"> int money_of_jerry = 100;</span><br><span class="line"> //第一次运行去掉下面这行</span><br><span class="line"> pthread_mutex_t g_money_lock;</span><br><span class="line"> </span><br><span class="line"> void *transfer(void *notused)</span><br><span class="line"> &#123;</span><br><span class="line">   pthread_t tid = pthread_self();</span><br><span class="line">   <span class="built_in">printf</span>(<span class="string">"Thread %u is transfering money!\n"</span>, (unsigned int)tid);</span><br><span class="line">//开始转账前，等待互斥锁独占共享变量</span><br><span class="line">   pthread_mutex_lock(&amp;g_money_lock);   </span><br><span class="line">   sleep(rand()%10);</span><br><span class="line">   money_of_tom+=10;</span><br><span class="line">   sleep(rand()%10);</span><br><span class="line">   money_of_jerry-=10;</span><br><span class="line">//完成转账后，释放互斥锁</span><br><span class="line">   pthread_mutex_unlock(&amp;g_money_lock);  </span><br><span class="line">   <span class="built_in">printf</span>(<span class="string">"Thread %u finish transfering money!\n"</span>, (unsigned int)tid);</span><br><span class="line">   pthread_exit((void *)0);</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line"> int main(int argc, char *argv[])</span><br><span class="line"> &#123;</span><br><span class="line">   pthread_t threads[NUM_OF_TASKS];</span><br><span class="line">   int rc;</span><br><span class="line">   int t;</span><br><span class="line">//开始创建线程前，初始化一个互斥锁 &amp;g_money_lock</span><br><span class="line">   pthread_mutex_init(&amp;g_money_lock, NULL); </span><br><span class="line"> </span><br><span class="line">   <span class="keyword">for</span>(t=0;t&lt;NUM_OF_TASKS;t++)&#123;</span><br><span class="line">     rc = pthread_create(&amp;threads[t], NULL, transfer, NULL);</span><br><span class="line">     <span class="keyword">if</span> (rc)&#123;</span><br><span class="line">       <span class="built_in">printf</span>(<span class="string">"ERROR; return code from pthread_create() is %d\n"</span>, rc);</span><br><span class="line">       <span class="built_in">exit</span>(-1);</span><br><span class="line">     &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="keyword">for</span>(t=0;t&lt;100;t++)&#123;</span><br><span class="line">     //开始打印共享变量前，等待互斥锁独占共享变量</span><br><span class="line">     pthread_mutex_lock(&amp;g_money_lock);   </span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">"money_of_tom + money_of_jerry = %d\n"</span>, money_of_tom + money_of_jerry);</span><br><span class="line">     sleep(rand()%10);</span><br><span class="line">     //完成输出后解锁</span><br><span class="line">     pthread_mutex_unlock(&amp;g_money_lock);  </span><br><span class="line">   &#125;</span><br><span class="line">   //全部完成后，销毁锁</span><br><span class="line">   pthread_mutex_destroy(&amp;g_money_lock); </span><br><span class="line">   pthread_exit(NULL);</span><br><span class="line"> &#125;</span><br><span class="line"> [root@learn ~]<span class="comment"># gcc mutex.c -lpthread -o after.out</span></span><br><span class="line"> [root@learn ~]<span class="comment"># ./after.out </span></span><br><span class="line"> money_of_tom + money_of_jerry = 200</span><br><span class="line"> Thread 4152305408 is transfering money!</span><br><span class="line"> Thread 4143912704 is transfering money!</span><br><span class="line"> Thread 4118734592 is transfering money!</span><br><span class="line"> Thread 4135520000 is transfering money!</span><br><span class="line"> Thread 4127127296 is transfering money!</span><br><span class="line"> money_of_tom + money_of_jerry = 200</span><br><span class="line"> money_of_tom + money_of_jerry = 200</span><br><span class="line"> ...</span><br><span class="line"> money_of_tom + money_of_jerry = 200</span><br><span class="line"> Thread 4135520000 finish transfering money!</span><br><span class="line"> Thread 4152305408 finish transfering money!</span><br><span class="line"> Thread 4143912704 finish transfering money!</span><br><span class="line"> Thread 4118734592 finish transfering money!</span><br><span class="line"> money_of_tom + money_of_jerry = 200</span><br><span class="line"> money_of_tom + money_of_jerry = 200</span><br><span class="line"> ...</span><br><span class="line"> money_of_tom + money_of_jerry = 200</span><br><span class="line"> Thread 4127127296 finish transfering money!</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>有条件变量的等待互斥锁</p>
+<p>  <img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/howmutexworkwithcondtionvar.jpeg"></p>
+<p>  根据流程图，构建与之对应的测试代码。</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br></pre></td><td class="code"><pre><span class="line">[root@learn ~]<span class="comment"># cat varmutex.c</span></span><br><span class="line"><span class="comment">#include &lt;pthread.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;stdio.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;stdlib.h&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#define NUM_OF_TASKS 3</span></span><br><span class="line"><span class="comment">#define MAX_TASK_QUEUE 11</span></span><br><span class="line"></span><br><span class="line">char tasklist[MAX_TASK_QUEUE]=<span class="string">"ABCDEFGHIJ"</span>;  //声明含十个任务的数组</span><br><span class="line">int head = 0;</span><br><span class="line">int tail = 0;</span><br><span class="line"></span><br><span class="line">int quit = 0;</span><br><span class="line"></span><br><span class="line">pthread_mutex_t g_task_lock;                // 声明互斥锁 g_task_lock</span><br><span class="line">pthread_cond_t g_task_cv;                   // 声明条件变量 g_task_cv</span><br><span class="line"></span><br><span class="line">void *coder(void *notused)                  // 定义子线程工作内容</span><br><span class="line">&#123;</span><br><span class="line">  pthread_t tid = pthread_self();           // 声明子线程的tid</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span>(!quit)&#123;                            //  反运算符，≠0为假，=0则真</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;g_task_lock);       // 等待互斥锁</span><br><span class="line">    <span class="keyword">while</span>(tail == head)&#123;                    // 仅所有task完成后，tail==head</span><br><span class="line">      <span class="keyword">if</span>(quit)&#123;                             // 如果收到quit信号退出</span><br><span class="line">        pthread_mutex_unlock(&amp;g_task_lock); // 释放互斥锁</span><br><span class="line">        pthread_exit((void *)0);            // 退出线程</span><br><span class="line">      &#125;</span><br><span class="line">      // 打印等待线程</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"No task now! Thread %u is waiting!\n"</span>, (unsigned int)tid);  </span><br><span class="line">      // 一直等待条件变量和互斥锁的入参将自动抢锁。</span><br><span class="line">      pthread_cond_wait(&amp;g_task_cv, &amp;g_task_lock); </span><br><span class="line">      //线程id开始执行线程</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"Have task now! Thread %u is grabing the task !\n"</span>, (unsigned int)tid); </span><br><span class="line">    &#125;</span><br><span class="line">    char task = tasklist[head++];          // 推进已完成head</span><br><span class="line">    pthread_mutex_unlock(&amp;g_task_lock);    // 释放整个子线程的互斥锁</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Thread %u has a task %c now!\n"</span>, (unsigned int)tid, task); //  获得任务</span><br><span class="line">    sleep(5);                              // 摸鱼五秒后打印完成    </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Thread %u finish the task %c!\n"</span>, (unsigned int)tid, task);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  pthread_exit((void *)0);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[])            // 定义主线程工作内容 </span><br><span class="line">&#123;</span><br><span class="line">  pthread_t threads[NUM_OF_TASKS];          // 声明线程。其中包含十个任务数组</span><br><span class="line">  int rc;</span><br><span class="line">  int t;</span><br><span class="line"></span><br><span class="line">  pthread_mutex_init(&amp;g_task_lock, NULL);   // 初始化互斥锁</span><br><span class="line">  pthread_cond_init(&amp;g_task_cv, NULL);      // 初始化条件变量</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(t=0;t&lt;NUM_OF_TASKS;t++)&#123;  </span><br><span class="line">    // 创建无属性线程，调用coder之后就继续往下。</span><br><span class="line">    rc = pthread_create(&amp;threads[t], NULL, coder, NULL); </span><br><span class="line">    <span class="keyword">if</span> (rc)&#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"ERROR; return code from pthread_create() is %d\n"</span>, rc);</span><br><span class="line">      <span class="built_in">exit</span>(-1);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  sleep(5);  // 等待五秒避免与子进程请求互斥锁的冲突。</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(t=1;t&lt;=4;t++)&#123;</span><br><span class="line">    pthread_mutex_lock(&amp;g_task_lock);      // 等待互斥锁</span><br><span class="line">    tail+=t;                               // 标志待完成位为1开始标记，2，3，4</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"I am Boss, I assigned %d tasks, I notify all coders!\n"</span>, t); // 打印发布任务数</span><br><span class="line">    pthread_cond_broadcast(&amp;g_task_cv);    // 使用pthread_cond_broadcast通知所有线程的条件变量</span><br><span class="line">    pthread_mutex_unlock(&amp;g_task_lock);    // 吊销发布任务的互斥锁</span><br><span class="line">    sleep(20);                             // 并等待20秒后继续发布任务</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  pthread_mutex_lock(&amp;g_task_lock);        // 请求互斥锁</span><br><span class="line">  quit = 1;                                // 不为0，停止子线程创建</span><br><span class="line">  pthread_cond_broadcast(&amp;g_task_cv);      // 并通知现有线程</span><br><span class="line">  pthread_mutex_unlock(&amp;g_task_lock);      // 释放互斥锁</span><br><span class="line"></span><br><span class="line">  pthread_mutex_destroy(&amp;g_task_lock);     // 销毁互斥锁</span><br><span class="line">  pthread_cond_destroy(&amp;g_task_cv);        // 销毁条件变量</span><br><span class="line">  pthread_exit(NULL);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@learn ~]<span class="comment"># gcc varmutex.c -lpthread -o varmutex.out</span></span><br><span class="line">[root@learn ~]<span class="comment"># ./varmutex.out</span></span><br><span class="line">//招聘三个员工，一开始没有任务，大家睡大觉</span><br><span class="line">No task now! Thread 3491833600 is waiting!</span><br><span class="line">No task now! Thread 3483440896 is waiting!</span><br><span class="line">No task now! Thread 3475048192 is waiting!</span><br><span class="line">//老板开始分配任务了，第一批任务就一个，告诉三个员工醒来抢任务</span><br><span class="line">I am Boss, I assigned 1 tasks, I notify all coders!</span><br><span class="line">//员工一先发现有任务了，开始抢任务</span><br><span class="line">Have task now! Thread 3491833600 is grabing the task !</span><br><span class="line">//员工一抢到了任务A，开始干活</span><br><span class="line">Thread 3491833600 has a task A now! </span><br><span class="line">//员工二也发现有任务了，开始抢任务，不好意思，就一个任务，让人家抢走了，接着等吧</span><br><span class="line">Have task now! Thread 3483440896 is grabing the task!</span><br><span class="line">No task now! Thread 3483440896 is waiting!</span><br><span class="line">//员工三也发现有任务了，开始抢任务，你比员工二还慢，接着等吧</span><br><span class="line">Have task now! Thread 3475048192 is grabing the task !</span><br><span class="line">No task now! Thread 3475048192 is waiting!</span><br><span class="line">//员工一把任务做完了，又没有任务了，接着等待</span><br><span class="line">Thread 3491833600 finish the task A !</span><br><span class="line">No task now! Thread 3491833600 is waiting!</span><br><span class="line">//老板又有新任务了，这次是两个任务，叫醒他们</span><br><span class="line">I am Boss, I assigned 2 tasks, I notify all coders!</span><br><span class="line">//这次员工二比较积极，先开始抢，并且抢到了任务B</span><br><span class="line">Have task now! Thread 3483440896 is grabing the task !</span><br><span class="line">Thread 3483440896 has a task B now! </span><br><span class="line">//这次员工三也聪明了，赶紧抢，要不然没有年终奖了，终于抢到了任务C</span><br><span class="line">Have task now! Thread 3475048192 is grabing the task !</span><br><span class="line">Thread 3475048192 has a task C now! </span><br><span class="line">//员工一上次抢到了，这次抢的慢了，没有抢到，是不是飘了</span><br><span class="line">Have task now! Thread 3491833600 is grabing the task !</span><br><span class="line">No task now! Thread 3491833600 is waiting!</span><br><span class="line">//员工二做完了任务B，没有任务了，接着等待</span><br><span class="line">Thread 3483440896 finish the task B !</span><br><span class="line">No task now! Thread 3483440896 is waiting!</span><br><span class="line">//员工三做完了任务C，没有任务了，接着等待</span><br><span class="line">Thread 3475048192 finish the task C !</span><br><span class="line">No task now! Thread 3475048192 is waiting!</span><br><span class="line">//又来任务了，这次是三个任务，人人有份</span><br><span class="line">I am Boss, I assigned 3 tasks, I notify all coders!</span><br><span class="line">//员工一抢到了任务D，员工二抢到了任务E，员工三抢到了任务F</span><br><span class="line">Have task now! Thread 3491833600 is grabing the task !</span><br><span class="line">Thread 3491833600 has a task D now! </span><br><span class="line">Have task now! Thread 3483440896 is grabing the task !</span><br><span class="line">Thread 3483440896 has a task E now! </span><br><span class="line">Have task now! Thread 3475048192 is grabing the task !</span><br><span class="line">Thread 3475048192 has a task F now! </span><br><span class="line">//三个员工都完成了，然后都又开始等待</span><br><span class="line">Thread 3491833600 finish the task D !</span><br><span class="line">Thread 3483440896 finish the task E !</span><br><span class="line">Thread 3475048192 finish the task F !</span><br><span class="line">No task now! Thread 3491833600 is waiting!</span><br><span class="line">No task now! Thread 3483440896 is waiting!</span><br><span class="line">No task now! Thread 3475048192 is waiting!</span><br><span class="line">//公司活越来越多了，来了四个任务，赶紧干呀</span><br><span class="line">I am Boss, I assigned 4 tasks, I notify all coders!</span><br><span class="line">//员工一抢到了任务G，员工二抢到了任务H，员工三抢到了任务I</span><br><span class="line">Have task now! Thread 3491833600 is grabing the task !</span><br><span class="line">Thread 3491833600 has a task G now! </span><br><span class="line">Have task now! Thread 3483440896 is grabing the task !</span><br><span class="line">Thread 3483440896 has a task H now! </span><br><span class="line">Have task now! Thread 3475048192 is grabing the task !</span><br><span class="line">Thread 3475048192 has a task I now! </span><br><span class="line">//员工一和员工三先做完了，发现还有一个任务开始抢</span><br><span class="line">Thread 3491833600 finish the task G !</span><br><span class="line">Thread 3475048192 finish the task I !</span><br><span class="line">//员工三没抢到，接着等</span><br><span class="line">No task now! Thread 3475048192 is waiting!</span><br><span class="line">//员工一抢到了任务J，多做了一个任务</span><br><span class="line">Thread 3491833600 has a task J now! </span><br><span class="line">//员工二这才把任务H做完，黄花菜都凉了，接着等待吧</span><br><span class="line">Thread 3483440896 finish the task H !</span><br><span class="line">No task now! Thread 3483440896 is waiting!</span><br><span class="line">//员工一做完了任务J，接着等待</span><br><span class="line">Thread 3491833600 finish the task J !</span><br><span class="line">No task now! Thread 3491833600 is waiting!</span><br></pre></td></tr></table></figure>
+
+<h3 id="线程的私有数据"><a href="#线程的私有数据" class="headerlink" title="线程的私有数据"></a>线程的私有数据</h3><p>与本地数据的区别在于，前者只是局部变量，私有数据是于线程创建的全局变量，亦非进程的全局变量。</p>
+<h4 id="創建key对应的value"><a href="#創建key对应的value" class="headerlink" title="創建key对应的value"></a>創建key对应的value</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">pthread_setspecific</span><span class="params">(<span class="keyword">pthread_key_t</span> key, <span class="keyword">const</span> <span class="keyword">void</span> *value)</span></span></span><br></pre></td></tr></table></figure>
+
+<h4 id="获得key对应的value"><a href="#获得key对应的value" class="headerlink" title="获得key对应的value"></a>获得key对应的value</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">pthread_getspecific</span><span class="params">(<span class="keyword">pthread_key_t</span> key)</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-结语"><a href="#0x03-结语" class="headerlink" title="0x03 结语"></a>0x03 结语</h2><hr>
+<ol>
+<li><p>主要阐述了三部分，what and why，how，when and where 。</p>
+</li>
+<li><p>当中how通过代码样例，示范了创建线程的步骤，创建并运行了一个多线程样例随机运行的情况。</p>
+</li>
+<li><p>在when and where中，通过比较，得出互斥锁对于保护线程操作数据的必要性。</p>
+</li>
+<li><p>之后在三种不同的线程数据中，重点解剖了有无变量控制下的互斥锁工作过程。</p>
+</li>
+<li><p>以下是总结贴图。</p>
+<p> <img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/summarytasks.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/summarytasks.png"></p>
+</li>
+<li><p>个人学习笔记，欢迎斧正。</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2020/06/29 - 19:06
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2020/07/11 - 18:07
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2020-06-29-Funny-With-Linux-II-about-multi-tasks.html" title="趣談Linux操作系統筆記II（之剖析系統綫程）">https://blog.madebug.net/Ops/2020-06-29-Funny-With-Linux-II-about-multi-tasks.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/%E8%B6%A3%E8%AB%87Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%B5%B1%E7%AD%86%E8%A8%98/" rel="tag"># 趣談Linux操作系統筆記</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2020-06-25-Funny-With-firewalld-but-not-iptables.html" rel="prev" title="關於iptables與firewalld趣事">
+      <i class="fa fa-chevron-left"></i> 關於iptables與firewalld趣事
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Sec/2020-07-11-Use-Zerotier-to-build-a-honeypot.html" rel="next" title="基於Zerotier搭建NFS的TPOT蜜罐嘗試">
+      基於Zerotier搭建NFS的TPOT蜜罐嘗試 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-什么是线程-what-and-why"><span class="nav-text">0x00 什么是线程(what and why?)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-如何创建线程-how"><span class="nav-text">0x01 如何创建线程(how?)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-线程的数据-when-and-where"><span class="nav-text">0x02 线程的数据(when and where?)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#线程栈上的本地数据"><span class="nav-text">线程栈上的本地数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程中共享的全局数据"><span class="nav-text">进程中共享的全局数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程的私有数据"><span class="nav-text">线程的私有数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#創建key对应的value"><span class="nav-text">創建key对应的value</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获得key对应的value"><span class="nav-text">获得key对应的value</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-结语"><span class="nav-text">0x03 结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : '64437434c0008cfb03c02fe9f1dedfe6',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

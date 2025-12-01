@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文將簡單搭建一個基於PXE網卡分發iPXE使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中dnsmasq&amp;httpd將運行在同一個機器底下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="于PXE下的iPXE+Kickstart搭建無人值守自動化安裝環境">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2020-08-08-hello-iPXE-over-PXE-Kickstart.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文將簡單搭建一個基於PXE網卡分發iPXE使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中dnsmasq&amp;httpd將運行在同一個機器底下。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXE.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXEnetwork.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqresult.png?raw=true">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlog.png?raw=true">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png">
+<meta property="article:published_time" content="2020-08-08T21:31:13.000Z">
+<meta property="article:modified_time" content="2025-12-01T08:53:16.487Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="Kickstart ">
+<meta property="article:tag" content="TFTP ">
+<meta property="article:tag" content="Httpd ">
+<meta property="article:tag" content="RHEL 7 ">
+<meta property="article:tag" content="BIOS ">
+<meta property="article:tag" content="UEFI ">
+<meta property="article:tag" content="Anaconda ">
+<meta property="article:tag" content="iPXE ">
+<meta property="article:tag" content="Dnsmasq ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXE.png">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2020-08-08-hello-iPXE-over-PXE-Kickstart.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>于PXE下的iPXE+Kickstart搭建無人值守自動化安裝環境 | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2020-08-08-hello-iPXE-over-PXE-Kickstart.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          于PXE下的iPXE+Kickstart搭建無人值守自動化安裝環境
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-08-08 21:31:13" itemprop="dateCreated datePublished" datetime="2020-08-08T21:31:13+00:00">2020-08-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-12-01 08:53:16" itemprop="dateModified" datetime="2025-12-01T08:53:16+00:00">2025-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXE.png" width=50% /></center>
+
+<p>本文將簡單搭建一個基於PXE網卡分發<a href="https://ipxe.org/" target="_blank" rel="noopener">iPXE</a>使用Kickstart自動化安裝BIOS或UEFI架構的自動化安裝環境。其中dnsmasq&amp;httpd將運行在同一個機器底下。</p>
+<a id="more"></a>
+
+<p>采用的方式是通过已有的PXE固件来分发ipxe引导程序进行安装。<br>pxe -&gt; ipxe.lkrn(ipxe.efi/undionly.kpxe) -&gt; boot.ipxe)</p>
+<p>沒仔細看是不是以爲我一篇博客寫<del><font color=#808080>水</font></del>兩次。其實不然，iPXE作爲PXE的擴展版，在<a href="https://www.redhat.com/en/technologies/management/satellite" target="_blank" rel="noopener">Satellite</a>, <a href="https://www.redhat.com/en/technologies/linux-platforms/openstack-platform" target="_blank" rel="noopener">OpenStack</a> 乃至於<a href="https://www.redhat.com/en/technologies/cloud-computing/openshift" target="_blank" rel="noopener">Openshift</a> 之中都有應用。因此來簡單學習一下。</p>
+<h2 id="0x00-環境準備"><a href="#0x00-環境準備" class="headerlink" title="0x00 環境準備"></a>0x00 環境準備</h2><hr>
+<p>重複的東西不再贅述，谷歌商店安裝Link to Text Fragment直接跳轉<del><font color=#808080>騙點擊率</font></del>即可。</p>
+<h3 id="關閉selinux-firewalld-和-iptables"><a href="#關閉selinux-firewalld-和-iptables" class="headerlink" title="關閉selinux, firewalld 和 iptables"></a><a href="https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#關閉selinux-firewalld-和-iptables:~:text=%E9%97%9C%E9%96%89selinux%2C%20firewalld%20%E5%92%8C%20iptables,-%E6%8E%92%E9%99%A4%E4%B8%8D%E5%9C%A8%E6%9C%AC%E6%96%87%E6%B6%89%E5%8F%8A%E7%AF%84%E5%9C%8D%E5%86%85%E7%9A%84%E5%86%85%E5%AE%B9%E5%BD%B1%E9%9F%BF%E3%80%82">關閉selinux, firewalld 和 iptables</a></h3><h3 id="確保處於無DHCP服務網段"><a href="#確保處於無DHCP服務網段" class="headerlink" title="確保處於無DHCP服務網段"></a><a href="https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#確保局域網内無DHCP-服務器:~:text=%2DF-,%E7%A2%BA%E4%BF%9D%E5%B1%80%E5%9F%9F%E7%B6%B2%E5%86%85%E7%84%A1DHCP%20%E6%9C%8D%E5%8B%99%E5%99%A8">確保處於無DHCP服務網段</a></h3><h3 id="設置自定義IP"><a href="#設置自定義IP" class="headerlink" title="設置自定義IP"></a>設置自定義IP</h3><p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXEnetwork.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/iPXEnetwork.png"></p>
+<h2 id="0x01-開始"><a href="#0x01-開始" class="headerlink" title="0x01 開始"></a>0x01 開始</h2><hr>
+<h3 id="安裝必需包"><a href="#安裝必需包" class="headerlink" title="安裝必需包"></a>安裝必需包</h3><p>這次選用dnsmasq來提供ftp和dhcp功能，借此學習一波。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># yum install -y ipxe-bootimgs dnsmasq tree tcpdump wireshark</span></span><br></pre></td></tr></table></figure>
+
+<p>提取引導程序文件undionly.kpxe 和ipxe.efi ，并自建菜單boot.ipxe。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># mkdir /var/lib/tftpboot</span></span><br><span class="line"><span class="comment"># 适用于 BIOS 硬件</span></span><br><span class="line">~]<span class="comment"># cp /usr/share/ipxe/undionly.kpxe /var/lib/tftpboot</span></span><br><span class="line"><span class="comment"># 适用于 UEFI 硬件</span></span><br><span class="line">~]<span class="comment"># cp /usr/share/ipxe/ipxe.efi /var/lib/tftpboot</span></span><br><span class="line">~]<span class="comment"># mkdir /var/lib/tftpboot/menu</span></span><br><span class="line">~]<span class="comment"># cat &gt;&gt; /var/lib/tftpboot/menu/boot.ipxe &lt;&lt; EOF</span></span><br><span class="line"><span class="comment">#!ipxe</span></span><br><span class="line">menu PXE Boot Options</span><br><span class="line">item shell iPXE shell</span><br><span class="line">item <span class="built_in">exit</span>  Exit to BIOS</span><br><span class="line"></span><br><span class="line">choose --default <span class="built_in">exit</span> --timeout 10000 option &amp;&amp; goto <span class="variable">$&#123;option&#125;</span></span><br><span class="line">:shell</span><br><span class="line">shell</span><br><span class="line">:<span class="built_in">exit</span></span><br><span class="line"><span class="built_in">exit</span></span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-配置Dnsmasq服務器"><a href="#0x02-配置Dnsmasq服務器" class="headerlink" title="0x02 配置Dnsmasq服務器"></a>0x02 配置Dnsmasq服務器</h2><h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><p>參考以下行號來查找内容進行添加/修改。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># vim /etc/dnsmasq.conf</span></span><br><span class="line">    10  port=0                                               &lt;---禁用dns功能</span><br><span class="line">    106 interface=ens38                                      &lt;---对应工作的网口</span><br><span class="line">    111 listen-address=172.16.70.1                           &lt;---本机用于监听的地址</span><br><span class="line">    164 dhcp-range=172.16.70.200,172.16.70.254,255.255.255.0 &lt;---设定相关的dhcp起始地址及掩码</span><br><span class="line">    303 dhcp-vendorclass=BIOS,PXEClient:Arch:00000           &lt;---Send extra options <span class="built_in">which</span> are tagged as <span class="string">"BIOS"</span> to any machine whose DHCP vendorclass string includes the substring <span class="string">"PXEClient"</span></span><br><span class="line">    341 dhcp-option=option:router,172.16.70.1                &lt;---设置router选项为默认网关</span><br><span class="line">    351 dhcp-option=option:netmask,255.255.255.0             &lt;---设置子网掩码</span><br><span class="line">    450 dhcp-match=<span class="built_in">set</span>:ipxe,175                              &lt;---iPXE sends a 175 option.</span><br><span class="line">    451 dhcp-boot=tag:!ipxe,tag:BIOS,undionly.kpxe           &lt;---BIOS标签的引导至undionly.kpxe </span><br><span class="line">    452 dhcp-boot=tag:!ipxe,tag:!BIOS,ipxe.efi               &lt;---非BIOS标签的引导至ipxe.efi</span><br><span class="line">    453 dhcp-boot=tag:ipxe,menu/boot.ipxe                    &lt;---设置它们的菜单文件为boot.ipxe</span><br><span class="line">    499 <span class="built_in">enable</span>-tftp                                          &lt;---启用tftp</span><br><span class="line">    502 tftp-root=/var/lib/tftpboot                          &lt;---设置tftp的目录</span><br></pre></td></tr></table></figure>
+
+<h3 id="啓動服務"><a href="#啓動服務" class="headerlink" title="啓動服務"></a>啓動服務</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># systemctl enable dnsmasq</span></span><br><span class="line">Created symlink from /etc/systemd/system/multi-user.target.wants/dnsmasq.service to /usr/lib/systemd/system/dnsmasq.service.</span><br><span class="line">~]<span class="comment"># systemctl start dnsmasq</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="檢查DHCP工作情況"><a href="#檢查DHCP工作情況" class="headerlink" title="檢查DHCP工作情況"></a>檢查DHCP工作情況</h3><p>在相同LAN下啓動無盤VM用於測試DHCP，測試期間檢查：開機提示、日志和抓包。</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqresult.png?raw=true" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqresult.png?raw=true"></p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlog.png?raw=true" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/Dnsmasqlog.png?raw=true"></p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/tcpdumpDnsmasq.png"></p>
+<h2 id="0x03-配置網絡安裝源"><a href="#0x03-配置網絡安裝源" class="headerlink" title="0x03 配置網絡安裝源"></a>0x03 配置網絡安裝源</h2><hr>
+<h3 id="使用HTTP來提供repo源"><a href="#使用HTTP來提供repo源" class="headerlink" title="使用HTTP來提供repo源"></a>使用HTTP來提供repo源</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># yum -y install httpd</span></span><br><span class="line">~]<span class="comment"># rm -f /etc/httpd/conf.d/welcome.conf</span></span><br><span class="line">~]<span class="comment"># mkdir -p /var/www/html/media/rhel7/7.6</span></span><br><span class="line">~]<span class="comment"># mount -o loop /dev/sr0 /var/www/html/media/rhel7/7.6</span></span><br><span class="line">~]<span class="comment"># df -TH</span></span><br><span class="line">Filesystem            Type      Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/rhel-root xfs        54G  8.4G   46G  16% /</span><br><span class="line">devtmpfs              devtmpfs  937M     0  937M   0% /dev</span><br><span class="line">tmpfs                 tmpfs     954M     0  954M   0% /dev/shm</span><br><span class="line">tmpfs                 tmpfs     954M   11M  944M   2% /run</span><br><span class="line">tmpfs                 tmpfs     954M     0  954M   0% /sys/fs/cgroup</span><br><span class="line">/dev/sda1             xfs       1.1G  186M  878M  18% /boot</span><br><span class="line">/dev/mapper/rhel-home xfs        50G   34M   50G   1% /home</span><br><span class="line">tmpfs                 tmpfs     191M   50k  191M   1% /run/user/0</span><br><span class="line">/dev/sr0              iso9660   4.5G  4.5G     0 100% /run/media/root/RHEL-7.6 Server.x86_64</span><br><span class="line">/dev/loop0            iso9660   4.5G  4.5G     0 100% /var/www/html/media/rhel7/7.6</span><br><span class="line">~]<span class="comment"># systemctl enable httpd</span></span><br><span class="line">Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service.</span><br><span class="line">~]<span class="comment"># systemctl restart httpd </span></span><br><span class="line">~]<span class="comment"># curl -SsLv http://172.16.70.1/media/rhel7/7.6</span></span><br><span class="line">* About to connect() to 172.16.70.1 port 80 (<span class="comment">#0)</span></span><br><span class="line">*   Trying 172.16.70.1...</span><br><span class="line">* Connected to 172.16.70.1 (172.16.70.1) port 80 (<span class="comment">#0)</span></span><br><span class="line">&gt; GET /media/rhel7/7.6 HTTP/1.1</span><br><span class="line">&gt; User-Agent: curl/7.29.0</span><br><span class="line">&gt; Host: 172.16.70.1</span><br><span class="line">&gt; Accept: */*</span><br><span class="line">&gt;</span><br><span class="line">&lt; HTTP/1.1 301 Moved Permanently</span><br><span class="line">&lt; Date: Sat, 08 Aug 2020 11:53:20 GMT</span><br><span class="line">&lt; Server: Apache/2.4.6 (Red Hat Enterprise Linux)</span><br><span class="line">&lt; Location: http://172.16.70.1/media/rhel7/7.6/</span><br><span class="line">&lt; Content-Length: 243</span><br><span class="line">&lt; Content-Type: text/html; charset=iso-8859-1</span><br><span class="line">&lt;</span><br><span class="line">* Ignoring the response-body</span><br><span class="line">* Connection <span class="comment">#0 to host 172.16.70.1 left intact</span></span><br><span class="line">* Issue another request to this URL: <span class="string">'http://172.16.70.1/media/rhel7/7.6/'</span></span><br><span class="line">* Found bundle <span class="keyword">for</span> host 172.16.70.1: 0x2648e90</span><br><span class="line">* Re-using existing connection! (<span class="comment">#0) with host 172.16.70.1</span></span><br><span class="line">* Connected to 172.16.70.1 (172.16.70.1) port 80 (<span class="comment">#0)</span></span><br><span class="line">&gt; GET /media/rhel7/7.6/ HTTP/1.1</span><br><span class="line">&gt; User-Agent: curl/7.29.0</span><br><span class="line">&gt; Host: 172.16.70.1</span><br><span class="line">&gt; Accept: */*</span><br><span class="line">&gt;</span><br><span class="line">&lt; HTTP/1.1 200 OK</span><br><span class="line">&lt; Date: Sat, 08 Aug 2020 11:53:20 GMT</span><br><span class="line">&lt; Server: Apache/2.4.6 (Red Hat Enterprise Linux)</span><br><span class="line">&lt; Content-Length: 3691</span><br><span class="line">&lt; Content-Type: text/html;charset=ISO-8859-1</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="comment"># TROUBLESHOOTING的方法如下</span></span><br><span class="line">~]<span class="comment"># tail -f /var/log/httpd/error_log</span></span><br><span class="line">~]<span class="comment"># journalctl -xefu httpd</span></span><br><span class="line">~]<span class="comment"># tcpdump -i ens38 port 80 and host 172.16.70.1 -vvv &gt;&gt; tcpdump.out</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="菜單加入HTTP鏈接"><a href="#菜單加入HTTP鏈接" class="headerlink" title="菜單加入HTTP鏈接"></a>菜單加入HTTP鏈接</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># cat /var/lib/tftpboot/menu/boot.ipxe</span></span><br><span class="line"><span class="comment">#!ipxe</span></span><br><span class="line">:start</span><br><span class="line">menu PXE Boot Options</span><br><span class="line">item shell iPXE shell</span><br><span class="line"><span class="comment"># 增加菜单选项及其内容。</span></span><br><span class="line">item rhel7-net RHEL 7 installation  </span><br><span class="line">item <span class="built_in">exit</span>  Exit to BIOS</span><br><span class="line"><span class="comment"># 设定安装选项为10s后默认启动项。</span></span><br><span class="line">choose --default rhel7-net --timeout 10000 option &amp;&amp; goto <span class="variable">$&#123;option&#125;</span> </span><br><span class="line">:shell</span><br><span class="line">shell</span><br><span class="line">:rhel7-net</span><br><span class="line"><span class="comment"># 设置server_root变量为网络源根目录</span></span><br><span class="line"><span class="built_in">set</span> server_root http://172.16.70.1/media/rhel7/7.6</span><br><span class="line"><span class="comment"># 指定启动镜像的网络地址        </span></span><br><span class="line">initrd <span class="variable">$&#123;server_root&#125;</span>/images/pxeboot/initrd.images</span><br><span class="line"><span class="comment"># 指定相关kernel文件，源仓库根目录，kickstart的文件目录（按需加入，已略去新建存放该文件步骤）</span></span><br><span class="line">kernel <span class="variable">$&#123;server_root&#125;</span>/images/pxeboot/vmlinuz inst.repo=<span class="variable">$&#123;server_root&#125;</span> inst.ks=http://172.16.70.1/ks/bios-ks.cfg ip=dhcp ipv6.disable inst.geoloc=0 devfs=nomount</span><br><span class="line">boot</span><br><span class="line">:<span class="built_in">exit</span></span><br><span class="line"><span class="built_in">exit</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="0x04-Kickstart文件編寫"><a href="#0x04-Kickstart文件編寫" class="headerlink" title="0x04 Kickstart文件編寫"></a>0x04 Kickstart文件編寫</h2><hr>
+<p><a href="https://blog.madebug.net/ops/2020-08-01-hello-pxe-kickstart#%E8%A8%AD%E5%AE%9AKickstart%E9%85%8D%E7%BD%AE">不再贅述</a></p>
+<h2 id="0x05-結語"><a href="#0x05-結語" class="headerlink" title="0x05 結語"></a>0x05 結語</h2><hr>
+<p>本文簡單嘗試在PXE的網卡環境下調用iPXE固件，除了本文的方法之外，還有以下有趣实现<del><font color=#808080>水貼方向</font></del>：</p>
+<ul>
+<li><p><a href="https://www.codenong.com/cs105547860/" target="_blank" rel="noopener">基於iSCSI的無盤工作站環境搭建</a></p>
+</li>
+<li><p><a href="https://lala.im/4524.html" target="_blank" rel="noopener">在支持iPXE的KVM上安裝你想要的系統</a><del><font color=#808080>例如kali</font></del>，支持iPXE 的<a href="https://zhuanlan.zhihu.com/p/111206825" target="_blank" rel="noopener">vps</a>:</p>
+</li>
+</ul>
+<blockquote>
+<p>   这里特别说明下一项关键技术iPXE，iPXE是预引导执行环境（PXE）客户端固件和引导程序的开源实现，可用于启用没有内置PXE支持的计算机从网络引导。虽然标准化PXE客户端使用TFTP传输数据，但非标准化iPXE客户端固件增加了通过其他协议检索数据的功能，包括HTTP，iSCSI，以太网ATA（AoE）和以太网光纤通道（FCoE）。</p>
+</blockquote>
+<blockquote>
+<p>   为什么在有的云厂商裸金属云服务介绍上，能看到分钟级的裸金属服务器交付，就是使用了iPXE的技术，服务器启动，通过iPXE引导已经制作好的iSCSI系统镜像，这样就免去了安装操作系统的过程，并且服务器也不需要系统硬盘，节省了成本。并且这样更为灵活，通过这样的技术，可以实现用户根据需要制定自己的系统镜像，而且方便镜像虚实转换，镜像机可以用于启动云主机，也可以启动物理机！</p>
+</blockquote>
+<p>另外以下是關於iPXE與PXE較爲<a href="https://groups.google.com/g/ustc_lug/c/P2jOQ5F4EKY?pli=1#c39:~:text=%E9%A6%96%E5%85%88%E9%9C%80%E8%A6%81%E7%90%86%E6%B8%85%E6%A5%9A%E5%87%A0%E4%B8%AA%E6%A6%82%E5%BF%B5%EF%BC%9Apxe%2C%20ipxe%2C%20pxelinux%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%87%A0%E4%B8%AA%E5%90%8D%E8%AF%8D%EF%BC%9Apxelinux.0%2C%20ipxelinux.0,%E7%94%B1%E4%BA%8Epxe%E4%BB%A3%E7%A0%81%E6%98%AF%E4%B8%BB%E6%9D%BF%E3%80%81%E7%BD%91%E5%8D%A1%E8%87%AA%E5%B8%A6%E7%9A%84%EF%BC%8C%E6%89%80%E4%BB%A5%E5%85%BC%E5%AE%B9%E6%80%A7%E6%9C%80%E5%A5%BD%EF%BC%88%E8%87%B3%E5%B0%91%E6%9C%AC%E6%9C%BA%E7%9A%84%E4%BB%A3%E7%A0%81%E5%85%BC%E5%AE%B9%E6%9C%AC%E6%9C%BA%E7%9A%84%E8%AE%BE%E5%A4%87%EF%BC%89%E3%80%82%E8%80%8Cipxe%E5%85%BC%E5%AE%B9%E6%80%A7%E7%95%A5%E5%B7%AE%EF%BC%88%E5%8F%AA%E6%98%AF%E7%9B%B8%E5%AF%B9%E6%9D%A5%E8%AF%B4%EF%BC%8C%E5%9B%A0%E4%B8%BA%E6%88%91%E4%BB%AC%E7%BC%96%E8%AF%91%E6%97%B6%E5%8F%AF%E8%83%BD%E4%BC%9A%E6%BC%8F%E6%8E%89%E4%B8%80%E4%BA%9B%E7%BD%91%E5%8D%A1%EF%BC%8C%E6%88%96%E8%80%85%E4%B8%80%E4%BA%9B%E7%89%B9%E6%AE%8A%E9%97%AE%E9%A2%98%E4%B8%8D%E5%A5%BD%E8%A7%A3%E5%86%B3%EF%BC%89%EF%BC%8C%E6%9B%BE%E7%BB%8F%E5%B0%9D%E8%AF%95%E8%BF%87%E7%9B%B4%E6%8E%A5%E4%B8%80%E6%AD%A5%20pxe%20%2D%3E%20ipxelinux.0%EF%BC%8C%E4%BD%86%E6%98%AF%E5%8F%91%E7%8E%B0%E6%9C%89%E4%B8%80%E4%BA%9B%E6%9C%BA%E5%99%A8%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%EF%BC%8C%E5%8A%A0%E8%BD%BDipxe%E4%B9%8B%E5%90%8E%E5%B0%B1%E5%81%9C%E4%BD%8F%E4%BA%86%E3%80%82%E6%89%80%E4%BB%A5%E5%90%8E%E6%9D%A5%E9%80%80%E8%80%8C%E6%B1%82%E5%85%B6%E6%AC%A1%EF%BC%8C%E7%94%A8%E4%B8%A4%E6%AD%A5%E5%8A%A0%E8%BD%BD%EF%BC%8C%E5%AF%B9%E4%BA%8Eipxe%E4%B8%8D%E6%94%AF%E6%8C%81%E7%9A%84%E8%AE%BE%E5%A4%87%EF%BC%8C%E5%8F%AF%E4%BB%A5%E5%9C%A8%E7%AC%AC%E4%B8%80%E6%AD%A5pxe%2D%3Epxelinux.bin%E4%B9%8B%E5%90%8E%E6%89%8B%E5%BF%AB%E4%B8%80%E4%BA%9B%E6%8C%89%E4%BB%BB%E6%84%8F%E9%94%AE%E4%B8%AD%E6%96%AD%EF%BC%8C%E7%84%B6%E5%90%8E%E4%BB%8D%E7%84%B6%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8pxe%EF%BC%8C%E4%B8%8D%E8%BF%87%E4%B9%8B%E5%90%8E%E6%88%91%E4%BB%AC%E4%B8%80%E7%9B%B4%E6%B2%A1%E6%9C%89%E7%BB%B4%E6%8A%A4%E9%80%9A%E8%BF%87tftp%E5%8A%A0%E8%BD%BD%E7%9A%84pxelinux%E4%BB%A5%E5%8F%8A%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%EF%BC%8C%E6%89%80%E4%BB%A5%E9%82%A3%E9%83%A8%E5%88%86%E5%86%85%E5%AE%B9%E5%85%B6%E5%AE%9E%E7%8E%B0%E5%9C%A8%E9%83%BD%E5%B7%B2%E7%BB%8F%E4%B8%A5%E9%87%8D%E8%BF%87%E6%97%B6%E4%BA%86%E3%80%82" target="_blank" rel="noopener">準確的解釋</a>：</p>
+<blockquote>
+<ul>
+<li>pxe是一个协议，跟mbr是一个性质的东西，它规定了CPU启动后通过什么方式获取引导代码并执行。</li>
+<li>pxe的实现有许多，不同的厂商有不同的实现。并且pxe的实现代码主要有两种存放位置，一种是存在主板上，一种是存在网卡里，现在新的网卡一般都自带了pxe的实现代码。（去mbr查找引导代码的实现是在主板上的。）</li>
+<li>由于pxe协议比较“落后”，仅支持tftp传输数据，性能差，灵活性也差，于是有了gpxe这个项目。gpxe是一种兼容pxe的实现，并且在pxe之上增加了许多特性，例如通过http/ftp等协议传输数据。</li>
+<li>gpxe原先使用的域名的拥有者突然收回了该域名的使用权，于是这些人fork出去做了ipxe，gpxe现在已经不再开发，ipxe开发非常活跃。</li>
+<li>一些较新的intel的网卡里都带了gpxe的实现代码，最新的可能会带ipxe代码。</li>
+<li>pxelinux是syslinux项目的一个部分，syslinux主要有三个产出，syslinux、isolinux、pxelinux，分别用于硬盘、光盘、网络启动，它的角色与grub相同。</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>*.bin 和 *.0 文件一般是一样的，不过使用上有一些区别，下面解释</li>
+<li>pxelinux.bin 是 pxelinux 编译后生成的文件</li>
+<li>由于大多数网卡、主板都不自带gpxe/ipxe的代码，所以通常引导时需要这样的途径： pxe -&gt; ipxe -&gt; pxelinux.bin，后面这两步可以合并，于是大家就把ipxe与pxelinux.bin​的代码合体，做成了 ipxelinux.0 （gpxe+pxelinux.bin = gpxelinux.0）。一般习惯上裸的pxelinux镜像用.bin后缀，加上gpxe/ipxe之后用.0后缀。此外还会有.lkrn后缀，这是ipxe的东西，ipxe的代码默认只能通过pxe协议的方式加载，他们搞了另外一个代码入口，使得可以通过像linux kernel的方式一样加载（就是可以通过grub引导），这种镜像的后缀是lkrn.</li>
+<li>所以可行的引导过程可以有这些：<ul>
+<li>pxe(网卡) -&gt; ipxe -&gt; pxelinux.bin -&gt; menu.c32</li>
+<li>pxe      -&gt; ipxelinux.0 -&gt; menu.c32</li>
+<li>pxe -&gt; syslinux.bin -&gt; ipxe -&gt; pxelinux.bin -&gt; menu.c32</li>
+<li>pxe -&gt; syslinux.bin -&gt; ipxelinux.0 -&gt; menu.c32</li>
+<li>grub -&gt; ipxe.lkrn -&gt; pxelinux.bin -&gt; menu.c32</li>
+<li>grub -&gt; ipxelinux.lkrn -&gt; menu.c32</li>
+<li>ipxe(烧入网卡) -&gt; pxelinux.bin</li>
+<li>…</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>由于pxe代码是主板、网卡自带的，所以兼容性最好（至少本机的代码兼容本机的设备）。而ipxe兼容性略差（只是相对来说，因为我们编译时可能会漏掉一些网卡，或者一些特殊问题不好解决），曾经尝试过直接一步 pxe -&gt; ipxelinux.0，但是发现有一些机器无法启动，加载ipxe之后就停住了。所以后来退而求其次，用两步加载，对于ipxe不支持的设备，可以在第一步pxe-&gt;pxelinux.bin之后手快一些按任意键中断，然后仍然可以使用pxe，不过之后我们一直没有维护通过tftp加载的pxelinux以及配置文件，所以那部分内容其实现在都已经严重过时了。</p>
+</blockquote>
+<blockquote>
+</blockquote>
+<h2 id="0x06-鸣谢"><a href="#0x06-鸣谢" class="headerlink" title="0x06 鸣谢"></a>0x06 鸣谢</h2><hr>
+<ul>
+<li><a href="https://yangfeiffei.github.io/public/2019/08/12/net-install-centos7-with-ipxe.html" target="_blank" rel="noopener">使用ipxe安装centos7</a></li>
+<li><a href="https://blog.hcl.moe/archives/2177" target="_blank" rel="noopener">gPXE/iPXE 初探 – HydricAcid</a></li>
+<li><a href="https://lala.im/4524.html" target="_blank" rel="noopener">CentOS7配置GRUB2+iPXE进行网络重装-荒岛</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/111206825" target="_blank" rel="noopener">一文读懂裸金属云 - 知乎</a></li>
+<li><a href="https://groups.google.com/g/ustc_lug/c/P2jOQ5F4EKY?pli=1" target="_blank" rel="noopener">原先的 PXE 引导中，两阶段的 PXELINUX 的区别，以及 iPXE 的用途？</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2020/08/08 - 21:08
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2025/12/01 - 08:12
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2020-08-08-hello-iPXE-over-PXE-Kickstart.html" title="于PXE下的iPXE+Kickstart搭建無人值守自動化安裝環境">https://blog.madebug.net/Ops/2020-08-08-hello-iPXE-over-PXE-Kickstart.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/Kickstart/" rel="tag"># Kickstart </a>
+              <a href="/tags/TFTP/" rel="tag"># TFTP </a>
+              <a href="/tags/Httpd/" rel="tag"># Httpd </a>
+              <a href="/tags/RHEL-7/" rel="tag"># RHEL 7 </a>
+              <a href="/tags/BIOS/" rel="tag"># BIOS </a>
+              <a href="/tags/UEFI/" rel="tag"># UEFI </a>
+              <a href="/tags/Anaconda/" rel="tag"># Anaconda </a>
+              <a href="/tags/iPXE/" rel="tag"># iPXE </a>
+              <a href="/tags/Dnsmasq/" rel="tag"># Dnsmasq </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2020-08-01-hello-pxe-kickstart.html" rel="prev" title="PXE+Kickstart搭建無人值守自動化安裝環境">
+      <i class="fa fa-chevron-left"></i> PXE+Kickstart搭建無人值守自動化安裝環境
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2020-09-12-hello-true-iPXE-Kickstart.html" rel="next" title="iPXE+Kickstart搭建無人值守自動化安裝環境">
+      iPXE+Kickstart搭建無人值守自動化安裝環境 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-環境準備"><span class="nav-text">0x00 環境準備</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#關閉selinux-firewalld-和-iptables"><span class="nav-text">關閉selinux, firewalld 和 iptables</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#確保處於無DHCP服務網段"><span class="nav-text">確保處於無DHCP服務網段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#設置自定義IP"><span class="nav-text">設置自定義IP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-開始"><span class="nav-text">0x01 開始</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安裝必需包"><span class="nav-text">安裝必需包</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-配置Dnsmasq服務器"><span class="nav-text">0x02 配置Dnsmasq服務器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改配置"><span class="nav-text">修改配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#啓動服務"><span class="nav-text">啓動服務</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#檢查DHCP工作情況"><span class="nav-text">檢查DHCP工作情況</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-配置網絡安裝源"><span class="nav-text">0x03 配置網絡安裝源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用HTTP來提供repo源"><span class="nav-text">使用HTTP來提供repo源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#菜單加入HTTP鏈接"><span class="nav-text">菜單加入HTTP鏈接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-Kickstart文件編寫"><span class="nav-text">0x04 Kickstart文件編寫</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-結語"><span class="nav-text">0x05 結語</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06-鸣谢"><span class="nav-text">0x06 鸣谢</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : '777d107c45103af22674cdd2471f79ea',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

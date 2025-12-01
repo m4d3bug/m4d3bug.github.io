@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文簡單記錄sendmail的工作模式模型閱讀筆記。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sendmail的深入瞭解I">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2020-10-01-learning-sendmail-I.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文簡單記錄sendmail的工作模式模型閱讀筆記。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/emailsystem.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/authmail.jpg">
+<meta property="article:published_time" content="2020-10-01T21:21:06.000Z">
+<meta property="article:modified_time" content="2025-12-01T08:53:16.487Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="sendmail ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2020-10-01-learning-sendmail-I.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>sendmail的深入瞭解I | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2020-10-01-learning-sendmail-I.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sendmail的深入瞭解I
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-10-01 21:21:06" itemprop="dateCreated datePublished" datetime="2020-10-01T21:21:06+00:00">2020-10-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-12-01 08:53:16" itemprop="dateModified" datetime="2025-12-01T08:53:16+00:00">2025-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>2.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/LinuxAdministrationHandbook.jpg" width=50% /></center>
+
+<p>本文簡單記錄sendmail的工作模式模型閱讀筆記。</p>
+<a id="more"></a>
+<h2 id="0x00-什麼是郵件系統"><a href="#0x00-什麼是郵件系統" class="headerlink" title="0x00 什麼是郵件系統"></a>0x00 什麼是郵件系統</h2><p>有以下五部分：</p>
+<ul>
+<li>让用户阅读和撰写邮件的“邮件用户代理”（mail user agent，MUA）</li>
+<li>在机器之间发送消息的“邮件传输代理”（mail transport agent，MTA）</li>
+<li>把消息放到本地消息库 中的“投递代理（delivery agent，DA）”；它有时叫做本地投递代理（Local Delivery Agent，LDA）</li>
+<li>可有可无的“访问代理（access agent）”，它可以把用户代理连接到消息库（例如，通过IMAP或POP协议）</li>
+<li>邮件提交代理（mail submission agent，MSA），这种代理使用SMTP（simple mail transport protocol，简单邮件传输协议），并完成传输代理的一些工作。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/emailsystem.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/emailsystem.jpg"></p>
+<h2 id="0x01-用戶代理-MUA-UA"><a href="#0x01-用戶代理-MUA-UA" class="headerlink" title="0x01 用戶代理(MUA/UA)"></a>0x01 用戶代理(MUA/UA)</h2><ul>
+<li>用户代理的一项工作是确保在邮件消息的内容中嵌入的任何可能被邮件系统误解的文字得到保护。用作消息之间记录分隔符的字符串“From”就是一个例子。</li>
+<li>一个用户代理不必和邮件系统的其余部分运行在相同的系统，乃至相同的平台上。</li>
+<li>/bin/mail是最初的用户代理</li>
+</ul>
+<blockquote>
+<p>Red Hat和Fedora上的/bin/mail是原UNIX命令mail的BSD版本；在SUSE、Debian和Ubuntu上，它变成了/usr/bin/mail 。这个用户代理只支持文本，并且需要在本地保存邮件。<br>Mozilla的Thunderbird，有Linux、Windows和Mac OS的版本。<br>Evolution（也叫做Novell Evolution，以前叫Ximian Evolution），有Linux、Windows和Mac OS的版本。<br>华盛顿大学（University of Washington）的pine，<a href="http://www.washington.edu/pine%E3%80%82" target="_blank" rel="noopener">www.washington.edu/pine。</a><br>Qualcomm的Eudora，用于Mac机或者运行Windows的PC。<br>微软的Outlook，也用于Windows。</p>
+</blockquote>
+<h2 id="0x02-傳輸代理-MTA"><a href="#0x02-傳輸代理-MTA" class="headerlink" title="0x02 傳輸代理(MTA)"></a>0x02 傳輸代理(MTA)</h2><ul>
+<li>必须接受从MUA那里来的邮件，读懂目的地，并设法把邮件交给正确的主机进行投递。</li>
+<li>大多数传输代理还担当消息提交代理(MSA)，完成把新消息发送到邮件系统的功能。</li>
+<li>传输代理使用RFC821中定义的SMTP协议（Simple Mail Transport Protocol，简单邮件传输协议），或者使用RFC1869、RFC1870、RFC1891和RFC1985中定义的ESMTP协议（Extended SMTP，扩展的SMTP协议）。</li>
+</ul>
+<blockquote>
+<p>Red Hat、Fedora和SUSE Linux自带装好的sendmail。Debian表面上好像是带了sendmail，但是如果您仔细一看，会发现sendmail实际上是到Exim这个邮件传输代理的链接。Exim经过仔细地调整开发，已经能够理解sendmail的命令行标志。直接调用“sendmail”的用户代理应该是不知情的。Ubuntu默认带Exim。</p>
+</blockquote>
+<h2 id="0x03-郵件提交代理-MSA"><a href="#0x03-郵件提交代理-MSA" class="headerlink" title="0x03 郵件提交代理(MSA)"></a>0x03 郵件提交代理(MSA)</h2><blockquote>
+<p>在繁忙的主邮件枢纽上的传输代理要花费大量时间进行邮件消息的预处理：确保所有主机名是完整的，修改从已损坏的邮件用户代理（MUA）那里得到的信头、日志记录错误、重写信头等。RFC2476引入的思路是：将邮件提交代理（MSA）从邮件传输代理（MTA）中分离出来，以便分担工作负荷并获得最佳性能。</p>
+</blockquote>
+<ul>
+<li>MSA负责消息由传输代理发送之前必须完成的所有预备工作和错误检验。它有点像在MUA和MTA之间插入一个头脑清楚的检验员。</li>
+<li>如果用户代理不能识别端口587，您仍然可以在端口25上运行MSA，但是得在和MTA不同的另一台服务器。(直接打开SMTP连接的用户代理必须进行修改，使用587端口来调用MSA。)</li>
+<li>MSA，587端口，用-bs或者-bm标志调用。</li>
+<li>MTA，25端口，用-bd标志调用。</li>
+</ul>
+<h2 id="0x04-投遞代理-DA"><a href="#0x04-投遞代理-DA" class="headerlink" title="0x04 投遞代理(DA)"></a>0x04 投遞代理(DA)</h2><ul>
+<li>從MTA接受郵件，並把它真正投递给适当的本地收件人。可以是人、一个邮递列表、文件或一个程序。</li>
+</ul>
+<blockquote>
+<p>每种类型的收件人可能需要一个不同的代理。/bin/mail是用于本地用户的投递代理。/bin/sh是发给文件或程序的邮件最初的投递代理，投递到文件则在内部处理。sendmail的新近版本附带了更安全的本地投递代理，名为mail.local和smrsh（念做“smursh”）。<a href="http://www.procmail.org的procmail也可以用作本地投递代理，参见18.9.16节。类似地，如果您运行Cyrus" target="_blank" rel="noopener">www.procmail.org的procmail也可以用作本地投递代理，参见18.9.16节。类似地，如果您运行Cyrus</a> imapd作为AA（访问代理），它还包括自己的本地投递代理。</p>
+</blockquote>
+<h2 id="0x05-消息庫"><a href="#0x05-消息庫" class="headerlink" title="0x05 消息庫"></a>0x05 消息庫</h2><ul>
+<li><p>本地计算机上保存电子邮件的地方。/var/spool/mail或/var/mail。</p>
+</li>
+<li><p>不同OS權限如下：</p>
+<p>  <img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/authmail.jpg" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/authmail.jpg"></p>
+</li>
+<li><p>SUSE的权限要宽松一点儿，但是在邮件缓存目录中的文件模式为660，属组为root。设置了粘附位的目录（在权限位中的t）不允许用户彼此删除对方的文件，即便他们有这个目录的写权限也不行。不过，恶意的用户可以填满邮件缓存目录，把它当作一个乱写乱画的分区，或者创建另一个用户的邮箱。</p>
+</li>
+</ul>
+<h2 id="0x06-訪問代理-AA"><a href="#0x06-訪問代理-AA" class="headerlink" title="0x06 訪問代理(AA)"></a>0x06 訪問代理(AA)</h2><ul>
+<li>協助用戶下載，通過IMAP（Internet Message Access Protocol，Internet消息访问协议）或者POP（Post Office Protocol，邮局协议）</li>
+</ul>
+<h2 id="0x07-結語"><a href="#0x07-結語" class="headerlink" title="0x07 結語"></a>0x07 結語</h2><p>重新整理了一下閱讀筆記，未完待續。</p>
+<h2 id="0x08-鳴謝"><a href="#0x08-鳴謝" class="headerlink" title="0x08 鳴謝"></a>0x08 鳴謝</h2><ul>
+<li><a href="http://www.5dmail.net/html/2008-4-27/200842725823.htm" target="_blank" rel="noopener">18.1 邮件系统</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2020/10/01 - 21:10
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2025/12/01 - 08:12
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2020-10-01-learning-sendmail-I.html" title="sendmail的深入瞭解I">https://blog.madebug.net/Ops/2020-10-01-learning-sendmail-I.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/sendmail/" rel="tag"># sendmail </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Dev/2020-09-13-How-to-work-with-Unreliable-MS.html" rel="prev" title="如何在Windows中正確地使用“真正的”Linux">
+      <i class="fa fa-chevron-left"></i> 如何在Windows中正確地使用“真正的”Linux
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2020-10-02-learning-sendmail-II.html" rel="next" title="sendmail的深入瞭解II">
+      sendmail的深入瞭解II <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-什麼是郵件系統"><span class="nav-text">0x00 什麼是郵件系統</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-用戶代理-MUA-UA"><span class="nav-text">0x01 用戶代理(MUA&#x2F;UA)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-傳輸代理-MTA"><span class="nav-text">0x02 傳輸代理(MTA)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-郵件提交代理-MSA"><span class="nav-text">0x03 郵件提交代理(MSA)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-投遞代理-DA"><span class="nav-text">0x04 投遞代理(DA)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-消息庫"><span class="nav-text">0x05 消息庫</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06-訪問代理-AA"><span class="nav-text">0x06 訪問代理(AA)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x07-結語"><span class="nav-text">0x07 結語</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x08-鳴謝"><span class="nav-text">0x08 鳴謝</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : 'bdc94b36d1435c022ba5fd6936718ca0',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

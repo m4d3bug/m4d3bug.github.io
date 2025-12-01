@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文旨在剖析CPU上下文切换的一个H。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux性能調優實戰筆記III（CPU上下文切換-下）">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part2.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文旨在剖析CPU上下文切换的一个H。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg">
+<meta property="article:published_time" content="2021-03-16T22:11:05.000Z">
+<meta property="article:modified_time" content="2025-12-01T08:53:16.486Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="Linux性能調優實戰筆記 ">
+<meta property="article:tag" content="CPU Content Switch ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part2.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Linux性能調優實戰筆記III（CPU上下文切換-下） | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part2.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux性能調優實戰筆記III（CPU上下文切換-下）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-16 22:11:05" itemprop="dateCreated datePublished" datetime="2021-03-16T22:11:05+00:00">2021-03-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-12-01 08:53:16" itemprop="dateModified" datetime="2025-12-01T08:53:16+00:00">2025-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>5.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/linux-tux-minimalism-4k-42-1280x800.jpg" width=50% /></center>
+
+<p>本文旨在剖析CPU上下文切换的一个H。</p>
+<a id="more"></a>
+
+<h2 id="0x00-工具准备"><a href="#0x00-工具准备" class="headerlink" title="0x00 工具准备"></a>0x00 工具准备</h2><hr>
+<ul>
+<li><p>分析：vmstat、pidstat、watch</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># yum install procps-ng sysstat -y</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>压测：sysbench</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># yum-config-manager --enable epel</span></span><br><span class="line"><span class="comment"># yum install sysbench -y </span></span><br><span class="line"><span class="comment"># yum-config-manager --disable epel</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>监控对象：进程、线程、in列</p>
+</li>
+</ul>
+<h2 id="0x01-如何分析-how"><a href="#0x01-如何分析-how" class="headerlink" title="0x01 如何分析(how?)"></a>0x01 如何分析(how?)</h2><hr>
+<h3 id="事前介紹"><a href="#事前介紹" class="headerlink" title="事前介紹"></a>事前介紹</h3><ul>
+<li><p><strong>vmstat</strong>（系统总体の上下文切换情况）</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># vmstat -wSm 1 6</span></span><br><span class="line">procs -----------------------memory---------------------- ---swap-- -----io---- -system-- --------cpu--------</span><br><span class="line"> r  b         swpd         free         buff        cache   si   so    bi    bo   <span class="keyword">in</span>   cs  us  sy  id  wa  st</span><br><span class="line"> 3  0            0         3697            2         2732    0    0    10    12   43   87   0   0 100   0   0</span><br><span class="line"> 1  0            0         3684            2         2745    0    0     0     0 4518  717  26  21  53   0   0</span><br><span class="line"> 1  0            0         3673            2         2757    0    0     0     0 4041  553  27  18  55   0   0</span><br><span class="line"> 0  0            0         3659            2         2769    0    0     0     0 4605  609  27  19  54   0   0</span><br><span class="line"> 1  0            0         3640            2         2785    0    0     0     0 1552  308  39  12  48   0   0</span><br><span class="line"> 1  0            0         3603            2         2822    0    0     0     0 1182  273  43   9  48   0   0</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>r列：就绪队列，<strong>运行&amp;等待的CPU</strong>进程数。</li>
+<li>b列：不可中斷睡眠狀態的進程數。</li>
+<li>in列：每秒中断次数。</li>
+<li>cs列：每秒content switch次数变化。</li>
+<li>us列、sy列：user及system层面的系统CPU使用率。</li>
+</ul>
+</li>
+<li><p><strong>pidstat</strong>（进程の上下文切换情况）</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># pidstat -w -u 5</span></span><br><span class="line">Average:      UID       PID    %usr %system  %guest    %CPU   CPU  Command</span><br><span class="line">Average:        0       845    0.00    0.20    0.00    0.20     -  vmtoolsd</span><br><span class="line">Average:        0      1053    0.20    0.20    0.00    0.40     -  NetworkManager</span><br><span class="line">Average:        0      1366    0.00    0.20    0.00    0.20     -  rsyslogd</span><br><span class="line">Average:        0     20518    0.00    0.20    0.00    0.20     -  pidstat</span><br><span class="line">Average:        0     76678    0.20    0.20    0.00    0.40     -  tmux</span><br><span class="line"></span><br><span class="line">Average:      UID       PID   cswch/s nvcswch/s  Command</span><br><span class="line">Average:        0         1      1.00      0.00  systemd</span><br><span class="line">Average:        0         6      1.79      0.00  ksoftirqd/0</span><br><span class="line">Average:        0         7      1.59      0.00  migration/0</span><br><span class="line">Average:        0         9     33.86      0.00  rcu_sched</span><br><span class="line">Average:        0        11      0.40      0.00  watchdog/0</span><br><span class="line">Average:        0        12      0.40      0.00  watchdog/1</span><br><span class="line">Average:        0        13      2.59      0.00  migration/1</span><br><span class="line">Average:        0        14      2.79      0.00  ksoftirqd/1</span><br><span class="line">Average:        0        37      0.20      0.00  khugepaged</span><br><span class="line">Average:        0       511     19.92      0.00  xfsaild/dm-0</span><br><span class="line">Average:        0       595      0.20      0.00  systemd-journal</span><br><span class="line">Average:        0       845     11.95      0.00  vmtoolsd</span><br><span class="line">Average:        0       848      1.59      0.00  rngd</span><br><span class="line">Average:        0      1053      4.18      0.00  NetworkManager</span><br><span class="line">Average:        0      9445      0.20      0.00  goa-identity-se</span><br><span class="line">Average:        0      9535      1.00      0.00  gsd-color</span><br><span class="line">Average:        0      9670     10.16      0.00  vmtoolsd</span><br><span class="line">Average:        0      9766      0.20      0.00  fwupd</span><br><span class="line">Average:        0     16537      1.59      0.00  kworker/1:1</span><br><span class="line">Average:        0     20518      0.20      0.20  pidstat</span><br><span class="line">Average:        0     76190      1.20      0.00  kworker/u256:2</span><br><span class="line">Average:        0     76678      9.36      0.00  tmux</span><br><span class="line">Average:        0    107281      1.79      0.00  kworker/0:1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>cswch/s：每秒自愿上下文切换，进程（资源耗尽）自愿进而上下文切换。</li>
+<li>nvcswch/s：每秒非自愿上下文切换，进程因（优先级、时间片）因素被强制调度进而上下文切换。</li>
+</ul>
+</li>
+<li><p><strong>watch</strong>（监控interrupts详情）</p>
+</li>
+<li><p><strong>sysbench</strong>（以10个线程运行5分钟的基准测试，模拟多线程切换的问题）</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># sysbench --threads=10 --max-time=300 threads run</span></span><br><span class="line">WARNING: --max-time is deprecated, use --time instead</span><br><span class="line">sysbench 1.0.17 (using system LuaJIT 2.0.4)</span><br><span class="line"></span><br><span class="line">Running the <span class="built_in">test</span> with following options:</span><br><span class="line">Number of threads: 10</span><br><span class="line">Initializing random number generator from current time</span><br><span class="line"></span><br><span class="line">Initializing worker threads...</span><br><span class="line"></span><br><span class="line">Threads started!</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="开始分析"><a href="#开始分析" class="headerlink" title="开始分析"></a>开始分析</h3><ul>
+<li><p><strong>vmstat</strong></p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">-w, --wide</span><br><span class="line">   Wide  output mode (useful <span class="keyword">for</span> systems with higher amount of memory, <span class="built_in">where</span> the default output mode suffers from unwanted column breakage).  The output is wider than 80 characters per</span><br><span class="line">   line.</span><br><span class="line">-S, --unit character</span><br><span class="line">   Switches outputs between 1000 (k), 1024 (K), 1000000 (m), or 1048576 (M) bytes.  Note this does not change the swap (si/so) or block (bi/bo) fields.</span><br><span class="line">-m, --slabs</span><br><span class="line">   Displays slabinfo.</span><br><span class="line"></span><br><span class="line"><span class="comment"># vmstat -wSm 1 6</span></span><br><span class="line">procs -----------------------memory---------------------- ---swap-- -----io---- -system-- --------cpu--------</span><br><span class="line"> r  b         swpd         free         buff        cache   si   so    bi    bo   <span class="keyword">in</span>   cs  us  sy  id  wa  st</span><br><span class="line"> 7  0            0          302            2         6118    0    0    10    36   44  103   0   0 100   0   0</span><br><span class="line">11  0            0          282            2         6138    0    0     0     0 2475 2262933  27  73   0   0   0</span><br><span class="line"> 8  0            0          266            2         6159    0    0     0     0 2173 1915515  35  65   1   0   0</span><br><span class="line"> 5  0            0          266            2         6159    0    0     0     0 2264 1983326  37  63   0   0   0</span><br><span class="line"> 6  0            0          265            2         6159    0    0     0     0 2284 1899297  33  67   1   0   0</span><br><span class="line"> 7  0            0          266            2         6159    0    0     0     0 2342 2126275  33  68   0   0   0</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>r列：远超实际CPU个数。</p>
+</li>
+<li><p>cs列：上升。</p>
+</li>
+<li><p>us列、sy列：系統cpu使用率飙升，user的cpu使用率无变化。</p>
+</li>
+<li><p>in列：同样飙升（本节最后分析）</p>
+<p>結論：r↑ 就绪越多，cs↑上下文切换频繁，所以sy↑，CPU使用率飙升。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>pidstat</strong></p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">-u     Report CPU utilization.</span><br><span class="line">-w     Report task switching activity (kernels 2.6.23 and later only).  </span><br><span class="line">-t     Also display statistics <span class="keyword">for</span> threads associated with selected tasks.</span><br><span class="line"></span><br><span class="line"><span class="comment"># pidstat -w -u 1</span></span><br><span class="line">Linux 3.10.0-1160.el7.x86_64 (learning79.madebug.net) 03/14/2021 _x86_64_ (2 CPU)</span><br><span class="line"></span><br><span class="line">10:10:58 AM   UID       PID    %usr %system  %guest    %CPU   CPU  Command</span><br><span class="line">10:10:59 AM     0       845    0.00    1.00    0.00    1.00     1  vmtoolsd</span><br><span class="line">10:10:59 AM     0    114598   19.00  100.00    0.00  100.00     1  sysbench</span><br><span class="line">10:10:59 AM     0    114613    0.00    1.00    0.00    1.00     0  pidstat</span><br><span class="line"></span><br><span class="line">10:10:58 AM   UID       PID   cswch/s nvcswch/s  Command</span><br><span class="line">10:10:59 AM     0         1      1.00      0.00  systemd</span><br><span class="line">10:10:59 AM     0         6      2.00      0.00  ksoftirqd/0</span><br><span class="line">10:10:59 AM     0         7      1.00      0.00  migration/0</span><br><span class="line">10:10:59 AM     0         9     60.00      0.00  rcu_sched</span><br><span class="line">10:10:59 AM     0        13      1.00      0.00  migration/1</span><br><span class="line">10:10:59 AM     0       511     20.00      0.00  xfsaild/dm-0</span><br><span class="line">10:10:59 AM     0       845     11.00      0.00  vmtoolsd</span><br><span class="line">10:10:59 AM     0       848      1.00      0.00  rngd</span><br><span class="line">10:10:59 AM     0      1053      5.00      0.00  NetworkManager</span><br><span class="line">10:10:59 AM     0      9025      1.00      0.00  wpa_supplicant</span><br><span class="line">10:10:59 AM     0      9445      1.00      0.00  goa-identity-se</span><br><span class="line">10:10:59 AM     0      9535      1.00      0.00  gsd-color</span><br><span class="line">10:10:59 AM     0      9670      9.00      0.00  vmtoolsd</span><br><span class="line">10:10:59 AM     0     76190      1.00      0.00  kworker/u256:2</span><br><span class="line">10:10:59 AM     0     76483      6.00      0.00  sshd</span><br><span class="line">10:10:59 AM     0     76678     24.00      0.00  tmux</span><br><span class="line">10:10:59 AM     0    107281    157.00      0.00  kworker/0:1</span><br><span class="line">10:10:59 AM     0    112877      1.00      0.00  kworker/1:1</span><br><span class="line">10:10:59 AM     0    114613      1.00    143.00  pidstat</span><br><span class="line">10:10:59 AM     0    114627      3.00      1.00  byobu-status</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>sysbench的CPU使用率100%</p>
+</li>
+<li><p>pidstat的非自愿上下文切换频率到143</p>
+</li>
+<li><p>kworker/0:1的自愿上下文切换去到了157</p>
+<ul>
+<li><p>加上-t参数输出进程下线程的数据</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">10:44:12 PM     0     58152         -      6.00      0.00  kworker/1:0</span><br><span class="line">10:44:12 PM     0         -     58152      6.00      0.00  |__kworker/1:0</span><br><span class="line">10:44:12 PM     0         -     59224  67134.00 218954.00  |__sysbench</span><br><span class="line">10:44:12 PM     0         -     59225  54921.00 227870.00  |__sysbench</span><br><span class="line">10:44:12 PM     0         -     59226  60706.00 217821.00  |__sysbench</span><br><span class="line">10:44:12 PM     0         -     59227  52608.00 237218.00  |__sysbench</span><br><span class="line">10:44:12 PM     0         -     59228  45081.00 224735.00  |__sysbench</span><br><span class="line">10:44:12 PM     0         -     59229  48077.00 232958.00  |__sysbench</span><br><span class="line">10:44:12 PM     0         -     59230  64332.00 212784.00  |__sysbench</span><br><span class="line">10:44:12 PM     0         -     59231  40541.00 234529.00  |__sysbench</span><br><span class="line">10:44:12 PM     0         -     59232  54334.00 223209.00  |__sysbench</span><br><span class="line">10:44:12 PM     0         -     59233  47245.00 246611.00  |__sysbench</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>watch</strong></p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># watch -d cat /proc/interrupts</span></span><br><span class="line">Every 2.0s: cat /proc/interrupts      </span><br><span class="line">            CPU0       CPU1</span><br><span class="line">...</span><br><span class="line">RES:     976811    1022850   Rescheduling interrupts</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>从/proc/interrupts中读取中断内容。</li>
+<li>/proc是虚拟文件系统，用于内核空间与用户空间之间的通信。</li>
+<li>重调度中断（RES）占据极大份额，正在因为多任务频繁唤醒空闲CPU调度新任务执行。</li>
+</ul>
+</li>
+</ul>
+<h2 id="0x02-总结"><a href="#0x02-总结" class="headerlink" title="0x02 总结"></a>0x02 总结</h2><ul>
+<li>上下文切换正常值取决于CPU性能。</li>
+<li>10000≥x ≥100+算正常，＞10000或切换次数跨度很大，则可能出现性能问题。</li>
+<li>cswch/s变大，进程等待资源，I /O问题。</li>
+<li>nvcswch/s变大，进程被强制调度，CPU争抢，CPU问题。</li>
+<li>in变大，CPU被中断处理程序占用，需查看/proc/interrupts来确定中断类型。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2021/03/16 - 22:03
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2025/12/01 - 08:12
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part2.html" title="Linux性能調優實戰筆記III（CPU上下文切換-下）">https://blog.madebug.net/Ops/2021-03-16-Linux-Performance-Tuning-study-notes-III-part2.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/Linux%E6%80%A7%E8%83%BD%E8%AA%BF%E5%84%AA%E5%AF%A6%E6%88%B0%E7%AD%86%E8%A8%98/" rel="tag"># Linux性能調優實戰筆記 </a>
+              <a href="/tags/CPU-Content-Switch/" rel="tag"># CPU Content Switch </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2021-02-22-Linux-Performance-Tuning-study-notes-III-part1.html" rel="prev" title="Linux性能調優實戰筆記III（CPU上下文切換-上）">
+      <i class="fa fa-chevron-left"></i> Linux性能調優實戰筆記III（CPU上下文切換-上）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2021-06-20-Linux-Performance-Tuning-study-notes-IV.html" rel="next" title="Linux性能調優實戰筆記IV（CPU占用率）">
+      Linux性能調優實戰筆記IV（CPU占用率） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-工具准备"><span class="nav-text">0x00 工具准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-如何分析-how"><span class="nav-text">0x01 如何分析(how?)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#事前介紹"><span class="nav-text">事前介紹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开始分析"><span class="nav-text">开始分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-总结"><span class="nav-text">0x02 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : 'f55cd33905372ebe2d2613006402863b',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

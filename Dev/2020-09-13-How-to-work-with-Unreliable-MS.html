@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文简单介绍我的环境setup，随缘更新。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何在Windows中正確地使用“真正的”Linux">
+<meta property="og:url" content="https://blog.madebug.net/Dev/2020-09-13-How-to-work-with-Unreliable-MS.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文简单介绍我的环境setup，随缘更新。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/terminalworkstation.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/sharewithVM.png">
+<meta property="article:published_time" content="2020-09-13T20:32:05.000Z">
+<meta property="article:modified_time" content="2025-12-01T08:53:16.486Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Ubuntu ">
+<meta property="article:tag" content="fish ">
+<meta property="article:tag" content="MicroSoft">
+<meta property="article:tag" content="WSL ">
+<meta property="article:tag" content="Proxy ">
+<meta property="article:tag" content="VMware ">
+<meta property="article:tag" content="Nodejs ">
+<meta property="article:tag" content="npm ">
+<meta property="article:tag" content="Windows ">
+<meta property="article:tag" content="byobu ">
+<meta property="article:tag" content="apt ">
+<meta property="article:tag" content="bash ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/terminalworkstation.png">
+
+<link rel="canonical" href="https://blog.madebug.net/Dev/2020-09-13-How-to-work-with-Unreliable-MS.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>如何在Windows中正確地使用“真正的”Linux | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Dev/2020-09-13-How-to-work-with-Unreliable-MS.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何在Windows中正確地使用“真正的”Linux
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-09-13 20:32:05" itemprop="dateCreated datePublished" datetime="2020-09-13T20:32:05+00:00">2020-09-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-12-01 08:53:16" itemprop="dateModified" datetime="2025-12-01T08:53:16+00:00">2025-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Dev/" itemprop="url" rel="index"><span itemprop="name">Dev </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>8.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/terminalworkstation.png" width=50% /></center>
+
+<p>本文简单介绍我的环境setup，随缘更新。</p>
+<a id="more"></a>
+<h2 id="0x00-初衷"><a href="#0x00-初衷" class="headerlink" title="0x00 初衷"></a>0x00 初衷</h2><p>出于种种原因，需要在Win10中的terminal中使用一個“完整版”的Linux。众所周知，WSL就是个残废，于是有了本文。</p>
+<p>本文采用的方案則是：Windows Terminal  + Terminal settings + wsl + VMware VM + VMware自启脚本，实现开机自启no gui的ubuntu 18.04，其后运行terminal的時候无感知对该vm发起ssh。</p>
+<h2 id="0x01-设置VMware虚拟机"><a href="#0x01-设置VMware虚拟机" class="headerlink" title="0x01 设置VMware虚拟机"></a>0x01 设置VMware虚拟机</h2><ul>
+<li>我下载的是Desktop版，安装时选择Mini版本，时区选择HongKong，最后skip。</li>
+</ul>
+<p>（可以选中国时区，可以裝完，没想到还是有147个包，所以还是skip吧。</p>
+<ul>
+<li>配置桥接网络静态IP 192.168.99.96。</li>
+</ul>
+<h2 id="0x02-设置WSL"><a href="#0x02-设置WSL" class="headerlink" title="0x02 设置WSL"></a>0x02 设置WSL</h2><p>其实这一步不是必须，但是经过测试，powershell或者cmd在结束连接后，会在下一次连接时出現令人菲姐的[?1;0c符号，因<del>强迫症</del>而改用wsl.exe进行跳板连接。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Win10安装Ubuntu子系统教程（附安装图形化界面） - Windows10.Pro</span><br><span class="line">https:&#x2F;&#x2F;windows10.pro&#x2F;bash-on-ubuntu-on-windows&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>之后在wsl中生成wsl公私钥并传送給VMware.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ssh-keygen -t rsa -b 2048 -C "m4d3bug@wsl"</span></span><br><span class="line"><span class="comment"># ssh-copy-id m4d3bug@192.168.99.96</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-设置Windows-Terminal"><a href="#0x03-设置Windows-Terminal" class="headerlink" title="0x03 设置Windows Terminal"></a>0x03 设置Windows Terminal</h2><ul>
+<li><p><a href="https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701" target="_blank" rel="noopener">下载</a>，安裝。下面是它的配置文件。（ctrl + ,）</p>
+</li>
+<li><p>由于Terminal默认启动powershell，需要修改default的guid，使其自动连接。</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line">// This file was initially generated by Windows Terminal 1.0.1401.0</span><br><span class="line">// It should still be usable <span class="keyword">in</span> newer versions, but newer versions might have additional</span><br><span class="line">// settings, <span class="built_in">help</span> text, or changes that you will not see unless you clear this file</span><br><span class="line">// and <span class="built_in">let</span> us generate a new one <span class="keyword">for</span> you.</span><br><span class="line"></span><br><span class="line">// To view the default settings, hold <span class="string">"alt"</span> <span class="keyword">while</span> clicking on the <span class="string">"Settings"</span> button.</span><br><span class="line">// For documentation on these settings, see: https://aka.ms/terminal-documentation</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"<span class="variable">$schema</span>"</span>: <span class="string">"https://aka.ms/terminal-profiles-schema"</span>,</span><br><span class="line"></span><br><span class="line">    <span class="string">"defaultProfile"</span>: <span class="string">"&#123;c6eaf9f4-32a7-5fdc-b5cf-066e8a4b1e40&#125;"</span>,</span><br><span class="line"></span><br><span class="line">    // You can add more global application settings here.</span><br><span class="line">    // To learn more about global settings, visit https://aka.ms/terminal-global-settings</span><br><span class="line"></span><br><span class="line">    // If enabled, selections are automatically copied to your clipboard.</span><br><span class="line">    <span class="string">"copyOnSelect"</span>: <span class="literal">false</span>,</span><br><span class="line"></span><br><span class="line">    // If enabled, formatted data is also copied to your clipboard</span><br><span class="line">    <span class="string">"copyFormatting"</span>: <span class="literal">false</span>,</span><br><span class="line"></span><br><span class="line">    // A profile specifies a <span class="built_in">command</span> to execute paired with information about how it should look and feel.</span><br><span class="line">    // Each one of them will appear <span class="keyword">in</span> the <span class="string">'New Tab'</span> dropdown,</span><br><span class="line">    //   and can be invoked from the commandline with `wt.exe -p xxx`</span><br><span class="line">    // To learn more about profiles, visit https://aka.ms/terminal-profile-settings</span><br><span class="line">    <span class="string">"profiles"</span>:</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">"defaults"</span>:</span><br><span class="line">        &#123;</span><br><span class="line">            // Put settings here that you want to apply to all profiles.</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"list"</span>:</span><br><span class="line">        [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">"guid"</span>: <span class="string">"&#123;c6eaf9f4-32a7-5fdc-b5cf-066e8a4b1e40&#125;"</span>,</span><br><span class="line">                <span class="string">"hidden"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="string">"name"</span>: <span class="string">"Ubuntu-18.04"</span>,</span><br><span class="line">                <span class="string">"source"</span>: <span class="string">"Windows.Terminal.Wsl"</span>,</span><br><span class="line">                <span class="string">"commandline"</span>: <span class="string">"wsl.exe ssh -X m4d3bug@192.168.99.96"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">"guid"</span>: <span class="string">"&#123;a8202b0e-781a-5dab-98e2-e9d469a63619&#125;"</span>,</span><br><span class="line">                <span class="string">"hidden"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="string">"name"</span>: <span class="string">"CentOS8"</span>,</span><br><span class="line">                <span class="string">"source"</span>: <span class="string">"Windows.Terminal.Wsl"</span>,</span><br><span class="line">                <span class="string">"commandline"</span>: <span class="string">"wsl.exe ssh -X m4d3bug@192.168.99.93"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                // Make changes here to the powershell.exe profile.</span><br><span class="line">                <span class="string">"guid"</span>: <span class="string">"&#123;61c54bbd-c2c6-5271-96e7-009a87ff44bf&#125;"</span>,</span><br><span class="line">                <span class="string">"name"</span>: <span class="string">"WSL"</span>,</span><br><span class="line">                //<span class="string">"commandline"</span>: <span class="string">"powershell.exe wsl.exe ssh -X m4d3bug@192.168.99.96"</span>,</span><br><span class="line">                <span class="string">"commandline"</span>: <span class="string">"powershell.exe wsl.exe"</span>,</span><br><span class="line">                <span class="string">"hidden"</span>: <span class="literal">false</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                // Make changes here to the cmd.exe profi le.</span><br><span class="line">                <span class="string">"guid"</span>: <span class="string">"&#123;0caa0dad-35be-5f56-a8ff-afceeeaa6101&#125;"</span>,</span><br><span class="line">                <span class="string">"name"</span>: <span class="string">"CMD"</span>,</span><br><span class="line">                <span class="string">"commandline"</span>: <span class="string">"cmd.exe"</span>,</span><br><span class="line">                <span class="string">"hidden"</span>: <span class="literal">false</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">"guid"</span>: <span class="string">"&#123;b453ae62-4e3d-5e58-b989-0a998ec441b8&#125;"</span>,</span><br><span class="line">                <span class="string">"hidden"</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="string">"name"</span>: <span class="string">"Azure Cloud Shell"</span>,</span><br><span class="line">                <span class="string">"source"</span>: <span class="string">"Windows.Terminal.Azure"</span></span><br><span class="line">        &#125;,</span><br><span class="line">            </span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    // Add custom color schemes to this array.</span><br><span class="line">    // To learn more about color schemes, visit https://aka.ms/terminal-color-schemes</span><br><span class="line">    <span class="string">"schemes"</span>: [],</span><br><span class="line"></span><br><span class="line">    // Add custom keybindings to this array.</span><br><span class="line">    // To unbind a key combination from your defaults.json, <span class="built_in">set</span> the <span class="built_in">command</span> to <span class="string">"unbound"</span>.</span><br><span class="line">    // To learn more about keybindings, visit https://aka.ms/terminal-keybindings</span><br><span class="line">    <span class="string">"keybindings"</span>:</span><br><span class="line">    [</span><br><span class="line">        // Copy and paste are bound to Ctrl+Shift+C and Ctrl+Shift+V <span class="keyword">in</span> your defaults.json.</span><br><span class="line">    // These two lines additionally <span class="built_in">bind</span> them to Ctrl+C and Ctrl+V.</span><br><span class="line">        // To learn more about selection, visit https://aka.ms/terminal-selection</span><br><span class="line">        &#123; <span class="string">"command"</span>: &#123;<span class="string">"action"</span>: <span class="string">"copy"</span>, <span class="string">"singleLine"</span>: <span class="literal">false</span> &#125;, <span class="string">"keys"</span>: <span class="string">"ctrl+c"</span> &#125;,</span><br><span class="line">    &#123; <span class="string">"command"</span>: <span class="string">"paste"</span>, <span class="string">"keys"</span>: <span class="string">"ctrl+v"</span> &#125;,</span><br><span class="line"></span><br><span class="line">        // Press Ctrl+Shift+F to open the search box</span><br><span class="line">        &#123; <span class="string">"command"</span>: <span class="string">"find"</span>, <span class="string">"keys"</span>: <span class="string">"ctrl+shift+f"</span> &#125;,</span><br><span class="line"></span><br><span class="line">        // Press Alt+Shift+D to open a new pane.</span><br><span class="line">        // - <span class="string">"split"</span>: <span class="string">"auto"</span> makes this pane open <span class="keyword">in</span> the direction that provides the most surface area.</span><br><span class="line">        // - <span class="string">"splitMode"</span>: <span class="string">"duplicate"</span> makes the new pane use the focused pane<span class="string">'s profile.</span></span><br><span class="line"><span class="string">        // To learn more about panes, visit https://aka.ms/terminal-panes</span></span><br><span class="line"><span class="string">        &#123; "command": &#123; "action": "splitPane", "split": "auto", "splitMode": "duplicate" &#125;, "keys": "alt+shift+d" &#125;</span></span><br><span class="line"><span class="string">    ]</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="0x04-VMware-VM开机自启"><a href="#0x04-VMware-VM开机自启" class="headerlink" title="0x04 VMware VM开机自启"></a>0x04 VMware VM开机自启</h2><ul>
+<li><p>创建脚本，注意替换自己的路径以及双引号</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;D:\Program Files (x86)\VMware\VMware Workstation\vmrun.exe&quot; start &quot;G:\Virtual Machines\ubuntu18.madebug.net\ubuntu18.madebug.net.vmx&quot; nogui</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>之后保存在以下路径：</p>
+  <figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:<span class="symbol">\P</span>rogramData<span class="symbol">\M</span>icrosoft<span class="symbol">\W</span>indows<span class="symbol">\S</span>tart Menu<span class="symbol">\P</span>rograms<span class="symbol">\S</span>tartUp</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="0x05-个人Ubuntu的使用设置"><a href="#0x05-个人Ubuntu的使用设置" class="headerlink" title="0x05 个人Ubuntu的使用设置"></a>0x05 个人Ubuntu的使用设置</h2><ul>
+<li><p>关闭sudo的密码验证</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ sudo visudo </span><br><span class="line">26 %sudo   ALL=(ALL:ALL) NOPASSWD:ALL</span><br><span class="line">$ sudo hostnamectl <span class="built_in">set</span>-hostname ubuntu18.madebug.net</span><br><span class="line">$ sudo vim /etc/hosts</span><br><span class="line">127.0.0.1       localhost</span><br><span class="line">127.0.0.1       ubuntu18</span><br><span class="line">127.0.0.1       ubuntu18.madebug.net</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安裝fish</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt install fish</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安裝omf</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -x http://192.168.99.99:1081 -L https://get.oh-my.fish | fish</span><br><span class="line">$ chsh -s /usr/bin/fish</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>为m4d3bug的fish shell和root的bash shell设置proxy</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">   $ cat /etc/profile.d/bash_proxy.sh</span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">   <span class="keyword">function</span> <span class="function"><span class="title">proxy_off</span></span>() &#123;</span><br><span class="line">        <span class="built_in">unset</span> HTTP_PROXY</span><br><span class="line">        <span class="built_in">unset</span> HTTPS_PROXY</span><br><span class="line">        <span class="built_in">unset</span> FTP_PROXY</span><br><span class="line">        <span class="built_in">unset</span> SOCKS5_PORXY</span><br><span class="line">        <span class="built_in">unset</span> http_proxy</span><br><span class="line">        <span class="built_in">unset</span> https_proxy</span><br><span class="line">        <span class="built_in">unset</span> ftp_proxy</span><br><span class="line">        <span class="built_in">unset</span> socks5_proxy</span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"已关闭代理"</span></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">function</span> <span class="function"><span class="title">proxy_on</span></span>() &#123;</span><br><span class="line">        <span class="built_in">export</span> no_proxy=<span class="string">"localhost,127.0.0.1,localaddress,.localdomain.com"</span></span><br><span class="line">        <span class="built_in">export</span> MY_PROXY_URL=<span class="string">"http://192.168.99.99:1081"</span></span><br><span class="line">        <span class="built_in">export</span> HTTP_PROXY=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> HTTPS_PROXY=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> FTP_PROXY=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> SOCKS5_PORXY=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> http_proxy=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> https_proxy=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> ftp_proxy=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> socks5_proxy=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"已开启代理"</span></span><br><span class="line">   &#125;</span><br><span class="line">   $ cat /etc/fish/conf.d/proxy.fish</span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">   <span class="keyword">function</span> proxy_off</span><br><span class="line">        <span class="built_in">set</span> -e HTTP_PROXY</span><br><span class="line">        <span class="built_in">set</span> -e HTTPS_PROXY</span><br><span class="line">        <span class="built_in">set</span> -e FTP_PROXY</span><br><span class="line">        <span class="built_in">set</span> -e SOCKS5_PORXY</span><br><span class="line">        <span class="built_in">set</span> -e http_proxy</span><br><span class="line">        <span class="built_in">set</span> -e https_proxy</span><br><span class="line">        <span class="built_in">set</span> -e ftp_proxy</span><br><span class="line">        <span class="built_in">set</span> -e socks5_proxy</span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"已关闭代理"</span></span><br><span class="line">   end</span><br><span class="line"></span><br><span class="line">   <span class="keyword">function</span> proxy_on</span><br><span class="line">        <span class="built_in">export</span> no_proxy=<span class="string">"localhost,127.0.0.1,localaddress,.localdomain.com"</span></span><br><span class="line">        <span class="built_in">export</span> MY_PROXY_URL=<span class="string">"http://192.168.99.99:1081"</span></span><br><span class="line">        <span class="built_in">export</span> HTTP_PROXY=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> HTTPS_PROXY=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> FTP_PROXY=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> SOCKS5_PORXY=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> http_proxy=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> https_proxy=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> ftp_proxy=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">export</span> socks5_proxy=<span class="variable">$MY_PROXY_URL</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"已开启代理"</span></span><br><span class="line">   end</span><br><span class="line">   $ npm config <span class="built_in">set</span> proxy http://192.168.99.99:1081</span><br><span class="line">   $ npm config <span class="built_in">set</span> https-proxy http://192.168.99.99:1081</span><br><span class="line">   $ git config --global http.proxy http://192.168.99.99:1081</span><br><span class="line">   $ git config --global https.proxy http://192.168.99.99:1081</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>设置bash prompt，root用红色提示</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">Ubuntu</span><br><span class="line"><span class="comment"># cat &gt;&gt; .profile &lt;&lt; EOF</span></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">prompt_color_on</span></span> ()&#123;</span><br><span class="line">        <span class="keyword">if</span> [ $(id -u) -eq 0 ]; <span class="keyword">then</span></span><br><span class="line"><span class="comment">#               export PROMPT='%F&#123;10&#125;%n@%m%f:%F&#123;12&#125;%~%f%# '</span></span><br><span class="line">                <span class="built_in">export</span> PROMPT=<span class="string">"%F&#123;135&#125;%n%f@%F&#123;166&#125;%m%f %F&#123;118&#125;%~%f %# "</span></span><br><span class="line">                <span class="built_in">export</span> PS1=<span class="string">'\[\e[01;31m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\# '</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line"><span class="comment">#               export PROMPT='%F&#123;10&#125;%n@%m%f:%F&#123;12&#125;%~%f\$ '</span></span><br><span class="line">                <span class="built_in">export</span> PROMPT=<span class="string">"%F&#123;135&#125;%n%f@%F&#123;166&#125;%m%f %F&#123;118&#125;%~%f %$ "</span></span><br><span class="line">                <span class="built_in">export</span> PS1=<span class="string">'\[\e[01;32m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ '</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ -n <span class="string">"<span class="variable">$BASH_VERSION</span>"</span> ]; <span class="keyword">then</span></span><br><span class="line">        prompt_color_on</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">        prompt_color_on</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">CentOS</span><br><span class="line"><span class="comment"># cat &gt;&gt; /etc/profile.d/prompt.sh &lt;&lt; EOF</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">prompt_color_on</span></span> ()&#123;</span><br><span class="line">        <span class="keyword">if</span> [ $(id -u) -eq 0 ]; <span class="keyword">then</span></span><br><span class="line"><span class="comment">#                export PROMPT='%F&#123;10&#125;%n@%m%f:%F&#123;12&#125;%~%f%# '</span></span><br><span class="line"><span class="comment">#                export PROMPT="%F&#123;135&#125;%n%f@%F&#123;166&#125;%m%f %F&#123;118&#125;%~%f \# "</span></span><br><span class="line">                <span class="built_in">export</span> PS1=<span class="string">'[\[\e[01;31m\]\u@\h\[\e[01;31m\] \[\e[01;31m\]\w\[\e[00m\]]# '</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line"><span class="comment">#                export PROMPT='%F&#123;10&#125;%n@%m%f:%F&#123;12&#125;%~%f\$ '</span></span><br><span class="line"><span class="comment">#                export PROMPT="%F&#123;135&#125;%n%f@%F&#123;166&#125;%m%f %F&#123;118&#125;%~%f %$ "</span></span><br><span class="line">                <span class="built_in">export</span> PS1=<span class="string">'[\[\e[01;32m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[00m\]\$ '</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ -n <span class="string">"<span class="variable">$BASH_VERSION</span>"</span> ]; <span class="keyword">then</span></span><br><span class="line">        prompt_color_on</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">        prompt_color_on</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>设置byobu</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ apt install byobu -y</span><br><span class="line">$ byobu-select-backend</span><br><span class="line">1 tmux</span><br><span class="line">$ byobu-enable</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><a href="https://zhuanlan.zhihu.com/p/43920548" target="_blank" rel="noopener">设置虚拟机共享宿主机目录</a>，能share自然不copy。</p>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/sharewithVM.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/sharewithVM.png"></p>
+<h2 id="0x06-设置x11转发"><a href="#0x06-设置x11转发" class="headerlink" title="0x06 设置x11转发"></a>0x06 设置x11转发</h2><p><a href="https://superuser.com/questions/1332709/setting-up-x11-forwarding-over-ssh-on-windows-10-subsystem-for-linux" target="_blank" rel="noopener">xorg - Setting up X11 forwarding over SSH on Windows 10 Subsystem for Linux? - Super User</a></p>
+<h2 id="0x07-结语"><a href="#0x07-结语" class="headerlink" title="0x07 结语"></a>0x07 结语</h2><p>摆脱wsl一大步</p>
+<h2 id="0x08-更新"><a href="#0x08-更新" class="headerlink" title="0x08 更新"></a>0x08 更新</h2><p>2021/07/10 真的有更新，换成Ubuntu20.04了，并且把fish换成了zsh，配置文件直接拷了kali的出来，高亮插件和自动补全的都有。 并且设定了新的自动挂载分享文件。</p>
+<pre><code><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.host:/         /mnt/hgfs               fuse.vmhgfs-fuse allow_other,defaults,nonempty   0       0</span><br></pre></td></tr></table></figure></code></pre><h2 id="0x09-鸣谢"><a href="#0x09-鸣谢" class="headerlink" title="0x09 鸣谢"></a>0x09 鸣谢</h2><ul>
+<li><a href="https://ywnz.com/linuxjc/2024.html" target="_blank" rel="noopener">Ubuntu Server 18.04下sudo速度很慢原因及解决办法_Linux教程_云网牛站</a></li>
+<li><a href="https://windows10.pro/bash-on-ubuntu-on-windows/" target="_blank" rel="noopener">Win10安装Ubuntu子系统教程（附安装图形化界面） - Windows10.Pro</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/36200924?group_id=973992048701894656" target="_blank" rel="noopener">[18.04/美化] 总结一下Ubuntu安装完之后都会做的事情 - 知乎</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/43920548" target="_blank" rel="noopener">[VMware]主机与虚拟机共享文件 - 知乎</a></li>
+<li><a href="https://cloud.tencent.com/developer/article/1666878" target="_blank" rel="noopener">Windows 开机自启 VMware 虚拟机 - 云+社区 - 腾讯云</a></li>
+<li><a href="https://github.com/oh-my-fish/oh-my-fish](https://github.com/oh-my-fish/oh-my-fish)" target="_blank" rel="noopener">oh-my-fish/oh-my-fish: The Fish Shell Framework</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/51008087" target="_blank" rel="noopener">你不需要花哨的命令提示符 - 知乎</a></li>
+<li><a href="https://stackoverflow.com/questions/30447631/fish-shell-eq-and-a-in-if-statement" target="_blank" rel="noopener">git - fish shell -eq and -a in if statement - Stack Overflow</a></li>
+<li><a href="https://stackoverflow.com/questions/30703860/how-do-i-unset-a-variable-in-the-fish-shell" target="_blank" rel="noopener">How do I unset a variable in the fish shell? - Stack Overflow</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2020/09/13 - 20:09
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2025/12/01 - 08:12
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Dev/2020-09-13-How-to-work-with-Unreliable-MS.html" title="如何在Windows中正確地使用“真正的”Linux">https://blog.madebug.net/Dev/2020-09-13-How-to-work-with-Unreliable-MS.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Ubuntu/" rel="tag"># Ubuntu </a>
+              <a href="/tags/fish/" rel="tag"># fish </a>
+              <a href="/tags/MicroSoft/" rel="tag"># MicroSoft</a>
+              <a href="/tags/WSL/" rel="tag"># WSL </a>
+              <a href="/tags/Proxy/" rel="tag"># Proxy </a>
+              <a href="/tags/VMware/" rel="tag"># VMware </a>
+              <a href="/tags/Nodejs/" rel="tag"># Nodejs </a>
+              <a href="/tags/npm/" rel="tag"># npm </a>
+              <a href="/tags/Windows/" rel="tag"># Windows </a>
+              <a href="/tags/byobu/" rel="tag"># byobu </a>
+              <a href="/tags/apt/" rel="tag"># apt </a>
+              <a href="/tags/bash/" rel="tag"># bash </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2020-09-12-hello-true-iPXE-Kickstart.html" rel="prev" title="iPXE+Kickstart搭建無人值守自動化安裝環境">
+      <i class="fa fa-chevron-left"></i> iPXE+Kickstart搭建無人值守自動化安裝環境
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2020-10-01-learning-sendmail-I.html" rel="next" title="sendmail的深入瞭解I">
+      sendmail的深入瞭解I <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-初衷"><span class="nav-text">0x00 初衷</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-设置VMware虚拟机"><span class="nav-text">0x01 设置VMware虚拟机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-设置WSL"><span class="nav-text">0x02 设置WSL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-设置Windows-Terminal"><span class="nav-text">0x03 设置Windows Terminal</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-VMware-VM开机自启"><span class="nav-text">0x04 VMware VM开机自启</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-个人Ubuntu的使用设置"><span class="nav-text">0x05 个人Ubuntu的使用设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06-设置x11转发"><span class="nav-text">0x06 设置x11转发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x07-结语"><span class="nav-text">0x07 结语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x08-更新"><span class="nav-text">0x08 更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x09-鸣谢"><span class="nav-text">0x09 鸣谢</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : '2a23d4ed8727b850597db8cff2862bfb',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

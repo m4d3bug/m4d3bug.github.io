@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=EB Garamond:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.madebug.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文旨在嘗試驗證自己的一個奇葩想法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基於Zerotier搭建&quot;跨供應商&quot;的K8S集群带阻嘗試">
+<meta property="og:url" content="https://blog.madebug.net/Ops/2020-06-21-Kubernetes-Dislikes-ZeroTier.html">
+<meta property="og:site_name" content="m4d3bug&#39;s blog">
+<meta property="og:description" content="本文旨在嘗試驗證自己的一個奇葩想法。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/kubernetes%26zerotier.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/failedzerotier.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8s-status.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8scurl.png">
+<meta property="article:published_time" content="2020-06-21T00:02:51.000Z">
+<meta property="article:modified_time" content="2020-07-11T18:33:33.000Z">
+<meta property="article:author" content="m4d3bug">
+<meta property="article:tag" content="Linux ">
+<meta property="article:tag" content="Kubernetes ">
+<meta property="article:tag" content="Network ">
+<meta property="article:tag" content="UDP ">
+<meta property="article:tag" content="P2P ">
+<meta property="article:tag" content="Zerotier ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/kubernetes%26zerotier.png">
+
+<link rel="canonical" href="https://blog.madebug.net/Ops/2020-06-21-Kubernetes-Dislikes-ZeroTier.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>基於Zerotier搭建"跨供應商"的K8S集群带阻嘗試 | m4d3bug's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="m4d3bug's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">m4d3bug's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">DevSecOps</p>
+  </div>
+  
+  <div class="site-nav" id="google_translate_element">
+  </div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+  </script>  
+   
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.madebug.net/Ops/2020-06-21-Kubernetes-Dislikes-ZeroTier.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="m4d3bug">
+      <meta itemprop="description" content="博觀而約取，厚積而薄發。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="m4d3bug's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          基於Zerotier搭建"跨供應商"的K8S集群带阻嘗試
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-21 00:02:51" itemprop="dateCreated datePublished" datetime="2020-06-21T00:02:51+00:00">2020-06-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-11 18:33:33" itemprop="dateModified" datetime="2020-07-11T18:33:33+00:00">2020-07-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Ops/" itemprop="url" rel="index"><span itemprop="name">Ops </span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/kubernetes%26zerotier.png" width=50% /></center>
+
+<p>本文旨在嘗試驗證自己的一個<del><font color=#808080>奇葩</font></del>想法。</p>
+<a id="more"></a>
+
+<h2 id="0x00-機器情況"><a href="#0x00-機器情況" class="headerlink" title="0x00 機器情況"></a>0x00 機器情況</h2><hr>
+<table>
+<thead>
+<tr>
+<th>供應商</th>
+<th>規格</th>
+<th>機房位置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>騰訊雲</td>
+<td>2C8G</td>
+<td>中國上海</td>
+</tr>
+<tr>
+<td>搬瓦工</td>
+<td>2C2G</td>
+<td>美國洛杉磯</td>
+</tr>
+<tr>
+<td>Ucloud</td>
+<td>1C1G</td>
+<td>中國香港</td>
+</tr>
+</tbody></table>
+<h2 id="0x01-ZeroTier部分"><a href="#0x01-ZeroTier部分" class="headerlink" title="0x01 ZeroTier部分"></a>0x01 ZeroTier部分</h2><hr>
+<h3 id="加入ZeroTier組網"><a href="#加入ZeroTier組網" class="headerlink" title="加入ZeroTier組網"></a>加入ZeroTier組網</h3><h4 id="安裝軟體"><a href="#安裝軟體" class="headerlink" title="安裝軟體"></a>安裝軟體</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># curl -s https://install.zerotier.com/ | sudo bash</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="加入網絡"><a href="#加入網絡" class="headerlink" title="加入網絡"></a>加入網絡</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># zerotier-cli join xxxxxxxxxxxxxxxx</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="機器網絡狀況"><a href="#機器網絡狀況" class="headerlink" title="機器網絡狀況"></a>機器網絡狀況</h4><p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/machinesNetworks.png"></p>
+<h4 id="寫入靜態IP-和hostname"><a href="#寫入靜態IP-和hostname" class="headerlink" title="寫入靜態IP 和hostname"></a>寫入靜態IP 和hostname</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cat &gt;&gt; /etc/hosts &lt;&lt; EOF</span></span><br><span class="line">10.9.8.118 master.m4d3bug.com master </span><br><span class="line">10.9.8.65  node1.m4d3bug.com  node1</span><br><span class="line">10.9.8.129 node2.m4d3bug.com  node2</span><br><span class="line">EOF</span><br><span class="line"><span class="comment"># hostnamectl set-hostname xxx.m4d3bug.com</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-K8S-部分"><a href="#0x02-K8S-部分" class="headerlink" title="0x02 K8S 部分"></a>0x02 K8S 部分</h2><hr>
+<h3 id="系統預設定"><a href="#系統預設定" class="headerlink" title="系統預設定"></a>系統預設定</h3><h4 id="確保selinux為寬容模式"><a href="#確保selinux為寬容模式" class="headerlink" title="確保selinux為寬容模式"></a>確保selinux為寬容模式</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># setenforce 0</span></span><br><span class="line">setenforce: SELinux is disabled</span><br></pre></td></tr></table></figure>
+
+<h4 id="關閉firewalld"><a href="#關閉firewalld" class="headerlink" title="關閉firewalld"></a>關閉firewalld</h4><p>云供應商們基本都關掉了，所以沒什麽回顯。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># systemctl disable firewalld</span></span><br><span class="line"><span class="comment"># systemctl stop firewalld</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="选择性關閉swap"><a href="#选择性關閉swap" class="headerlink" title="选择性關閉swap"></a>选择性關閉swap</h4><p>在master節點以外操作。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># swapoff -a</span></span><br><span class="line"><span class="comment"># vi /etc/fstab</span></span><br><span class="line">...</span><br><span class="line"><span class="comment"># disable swap line</span></span><br><span class="line"><span class="comment">#/swap none swap sw 0 0</span></span><br><span class="line"><span class="comment"># mount -a</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="設置并啓用内核參數"><a href="#設置并啓用内核參數" class="headerlink" title="設置并啓用内核參數"></a>設置并啓用内核參數</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cat &lt;&lt;EOF &gt; /etc/sysctl.d/k8s.conf</span></span><br><span class="line">net.bridge.bridge-nf-call-ip6tables = 1</span><br><span class="line">net.bridge.bridge-nf-call-iptables = 1</span><br><span class="line">EOF</span><br><span class="line"><span class="comment"># modprobe br_netfilter</span></span><br><span class="line"><span class="comment"># sysctl -p /etc/sysctl.d/k8s.conf</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="開始安裝"><a href="#開始安裝" class="headerlink" title="開始安裝"></a>開始安裝</h3><h4 id="安裝Docker軟體"><a href="#安裝Docker軟體" class="headerlink" title="安裝Docker軟體"></a>安裝Docker軟體</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># yum-config-manager \</span></span><br><span class="line">    --add-repo \</span><br><span class="line">    https://download.docker.com/linux/centos/docker-ce.repo</span><br><span class="line"><span class="comment"># yum install -y docker-ce docker-ce-cli containerd.io</span></span><br><span class="line"><span class="comment"># docker -v </span></span><br><span class="line">Docker version 19.03.12, build 48a66213fe</span><br><span class="line"><span class="comment"># systemctl start docker</span></span><br><span class="line"><span class="comment"># systemctl enable docker</span></span><br><span class="line">Created symlink from /etc/systemd/system/multi-user.target.wants/docker.service to /usr/lib/systemd/system/docker.service.</span><br></pre></td></tr></table></figure>
+
+<h4 id="加入代理設定到Docker中"><a href="#加入代理設定到Docker中" class="headerlink" title="加入代理設定到Docker中"></a>加入代理設定到Docker中</h4><p>順便説一嘴，可以在ZeroTier組網裏起一個代理。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># mkdir /usr/lib/systemd/system/docker.service.d</span></span><br><span class="line"><span class="comment"># cat &gt;&gt; /usr/lib/systemd/system/docker.service.d/http-proxy.conf &lt;&lt; EOF</span></span><br><span class="line">[Service]</span><br><span class="line">Environment=<span class="string">"HTTP_PROXY=http://10.9.8.10:1081/"</span></span><br><span class="line">Environment=<span class="string">"HTTPS_PROXY=http://10.9.8.10:1081/"</span></span><br><span class="line">Environment=<span class="string">"NO_PROXY=localhost,localhost.localdomain,localhost4,localhost4.localdomain4,10.0.0.0/8"</span></span><br><span class="line">EOF</span><br><span class="line"><span class="comment"># cat &gt; /etc/docker/daemon.json &lt;&lt;EOF</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"exec-opts"</span>: [<span class="string">"native.cgroupdriver=systemd"</span>],</span><br><span class="line">    <span class="string">"log-driver"</span>: <span class="string">"json-file"</span>,</span><br><span class="line">    <span class="string">"log-opts"</span>: &#123;</span><br><span class="line">    <span class="string">"max-size"</span>: <span class="string">"100m"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"storage-driver"</span>: <span class="string">"overlay2"</span></span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"><span class="comment"># systemctl daemon-reload</span></span><br><span class="line"><span class="comment"># systemctl restart docker</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="加入谷歌倉庫"><a href="#加入谷歌倉庫" class="headerlink" title="加入谷歌倉庫"></a>加入谷歌倉庫</h4><p>同樣加入ZeroTier中的代理地址。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cat &lt;&lt;'EOF' &gt; /etc/yum.repos.d/kubernetes.repo</span></span><br><span class="line">[kubernetes]</span><br><span class="line">name=Kubernetes</span><br><span class="line">baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-<span class="variable">$basearch</span></span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=1</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg</span><br><span class="line">proxy=http://10.9.8.10:1081</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<h4 id="獲得必須的軟體及鏡像"><a href="#獲得必須的軟體及鏡像" class="headerlink" title="獲得必須的軟體及鏡像"></a>獲得必須的軟體及鏡像</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># yum -y install kubeadm kubelet kubectl</span></span><br><span class="line"><span class="comment">#  rpm -qa |grep kube*</span></span><br><span class="line">kubectl-1.18.8-0.x86_64</span><br><span class="line">kubernetes-cni-0.8.6-0.x86_64</span><br><span class="line">kubeadm-1.18.8-0.x86_64</span><br><span class="line">kubelet-1.18.8-0.x86_64</span><br><span class="line"><span class="comment"># systemctl enable kubelet</span></span><br><span class="line"><span class="comment"># kubeadm config images pull</span></span><br></pre></td></tr></table></figure>
+
+<p>master節點只是一隻小鷄鷄，所以就不關它的swap了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># vim &#x2F;etc&#x2F;sysconfig&#x2F;kubelet</span><br><span class="line">KUBELET_EXTRA_ARGS&#x3D;--fail-swap-on&#x3D;false</span><br></pre></td></tr></table></figure>
+
+<h4 id="安裝集群"><a href="#安裝集群" class="headerlink" title="安裝集群"></a>安裝集群</h4><p>在v1.8.0之後的版本，kubeadm提供了一種<a href="https://kubernetes.io/zh/docs/reference/setup-tools/kubeadm/kubeadm-init/" target="_blank" rel="noopener">分階段的構建方式</a>，構建etcd是其中的一個phase，在啓動前我們需要對其中的參數進行修改。</p>
+<ul>
+<li><p>定制該版本的kubeadm-config.yml</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># kubeadm config print init-defaults  &gt; kubeadm-config.yaml</span></span><br><span class="line"><span class="comment"># vim kubeadm-config.yaml</span></span><br><span class="line">apiVersion: kubeadm.k8s.io/v1beta2</span><br><span class="line">bootstrapTokens:</span><br><span class="line">- groups:</span><br><span class="line">  - system:bootstrappers:kubeadm:default-node-token</span><br><span class="line">  token: abcdef.0123456789abcdef</span><br><span class="line">  ttl: 24h0m0s</span><br><span class="line">  usages:</span><br><span class="line">  - signing</span><br><span class="line">  - authentication</span><br><span class="line">kind: InitConfiguration</span><br><span class="line">localAPIEndpoint:</span><br><span class="line">  advertiseAddress: 10.9.8.118             &lt;---網卡ip</span><br><span class="line">  bindPort: 6443</span><br><span class="line">nodeRegistration:</span><br><span class="line">  criSocket: /var/run/dockershim.sock</span><br><span class="line">  name: master.m4d3bug.com</span><br><span class="line">  taints:</span><br><span class="line">  - effect: NoSchedule</span><br><span class="line">    key: node-role.kubernetes.io/master</span><br><span class="line">---</span><br><span class="line">apiServer:</span><br><span class="line">  timeoutForControlPlane: 4m0s</span><br><span class="line">apiVersion: kubeadm.k8s.io/v1beta2</span><br><span class="line">certificatesDir: /etc/kubernetes/pki</span><br><span class="line">clusterName: kubernetes</span><br><span class="line">controllerManager: &#123;&#125;</span><br><span class="line">dns:</span><br><span class="line">  <span class="built_in">type</span>: CoreDNS</span><br><span class="line">etcd:</span><br><span class="line">  <span class="built_in">local</span>:</span><br><span class="line">    dataDir: /var/lib/etcd</span><br><span class="line">imageRepository: k8s.gcr.io</span><br><span class="line">kind: ClusterConfiguration</span><br><span class="line">kubernetesVersion: v1.18.0</span><br><span class="line">networking:</span><br><span class="line">  dnsDomain: cluster.local</span><br><span class="line">  serviceSubnet: 10.96.0.0/12</span><br><span class="line">  podSubnet: 10.244.0.0/16                 &lt;---pod子網範圍</span><br><span class="line">scheduler: &#123;&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>preflight階段</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># kubeadm init phase preflight --config kubeadm-config.yaml --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Swap</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>kubelet-start階段</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># kubeadm init phase kubelet-start --config kubeadm-config.yaml</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>cert階段</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># kubeadm init phase certs all --config kubeadm-config.yaml</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>kubeconfig階段</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># kubeadm init phase kubeconfig all --config kubeadm-config.yaml</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>control-plane階段</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># kubeadm init phase control-plane all --config kubeadm-config.yaml</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>etcd 階段 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># kubeadm init phase etcd local --config kubeadm-config.yaml</span></span><br><span class="line"><span class="comment"># vim /etc/kubernetes/manifests/etcd.yaml</span></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  annotations:</span><br><span class="line">    kubeadm.kubernetes.io/etcd.advertise-client-urls: https://10.9.8.118:2379</span><br><span class="line">  creationTimestamp: null</span><br><span class="line">  labels:</span><br><span class="line">    component: etcd</span><br><span class="line">    tier: control-plane</span><br><span class="line">  name: etcd</span><br><span class="line">  namespace: kube-system</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - <span class="built_in">command</span>:</span><br><span class="line">    - etcd</span><br><span class="line">    - --advertise-client-urls=https://10.9.8.118:2379</span><br><span class="line">    - --cert-file=/etc/kubernetes/pki/etcd/server.crt</span><br><span class="line">    - --client-cert-auth=<span class="literal">true</span></span><br><span class="line">    - --data-dir=/var/lib/etcd</span><br><span class="line">    - --initial-advertise-peer-urls=https://10.9.8.118:2380</span><br><span class="line">    - --initial-cluster=master.m4d3bug.com=https://10.9.8.118:2380</span><br><span class="line">    - --key-file=/etc/kubernetes/pki/etcd/server.key</span><br><span class="line">    - --listen-client-urls=https://0.0.0.0:2379        &lt;--- 改爲0.0.0.0</span><br><span class="line">    - --listen-metrics-urls=http://127.0.0.1:2381</span><br><span class="line">    - --listen-peer-urls=https://0.0.0.0:2380          &lt;--- 改爲0.0.0.0</span><br><span class="line">    - --name=master.m4d3bug.com</span><br><span class="line">    - --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt</span><br><span class="line">    - --peer-client-cert-auth=<span class="literal">true</span></span><br><span class="line">    - --peer-key-file=/etc/kubernetes/pki/etcd/peer.key</span><br><span class="line">    - --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt</span><br><span class="line">    - --snapshot-count=10000</span><br><span class="line">    - --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt</span><br><span class="line">    image: k8s.gcr.io/etcd:3.4.3-0</span><br><span class="line">    imagePullPolicy: IfNotPresent</span><br><span class="line">    livenessProbe:</span><br><span class="line">      failureThreshold: 8</span><br><span class="line">      httpGet:</span><br><span class="line">        host: 127.0.0.1</span><br><span class="line">        path: /health</span><br><span class="line">        port: 2381</span><br><span class="line">        scheme: HTTP</span><br><span class="line">      initialDelaySeconds: 15</span><br><span class="line">      timeoutSeconds: 15</span><br><span class="line">    name: etcd</span><br><span class="line">    resources: &#123;&#125;</span><br><span class="line">    volumeMounts:</span><br><span class="line">    - mountPath: /var/lib/etcd</span><br><span class="line">      name: etcd-data</span><br><span class="line">    - mountPath: /etc/kubernetes/pki/etcd</span><br><span class="line">      name: etcd-certs</span><br><span class="line">  hostNetwork: <span class="literal">true</span></span><br><span class="line">  priorityClassName: system-cluster-critical</span><br><span class="line">  volumes:</span><br><span class="line">  - hostPath:</span><br><span class="line">      path: /etc/kubernetes/pki/etcd</span><br><span class="line">      <span class="built_in">type</span>: DirectoryOrCreate</span><br><span class="line">    name: etcd-certs</span><br><span class="line">  - hostPath:</span><br><span class="line">      path: /var/lib/etcd</span><br><span class="line">      <span class="built_in">type</span>: DirectoryOrCreate</span><br><span class="line">    name: etcd-data</span><br><span class="line">status: &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># echo "export KUBECONFIG=/etc/kubernetes/admin.conf" &gt;&gt; ~/.bash_profile</span></span><br><span class="line"><span class="comment"># source ~/.bash_profile</span></span><br><span class="line"><span class="comment"># kubectl apply -f /etc/kubernetes/manifests/etcd.yaml</span></span><br><span class="line"><span class="comment"># kubeadm init --skip-phases=preflight,certs,kubeconfig,kubelet-start,control-plane,etcd --config kubeadm-config.yaml</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>之後就如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Your Kubernetes control-plane has initialized successfully!</span><br><span class="line"></span><br><span class="line">To start using your cluster, you need to run the following as a regular user:</span><br><span class="line"></span><br><span class="line">  mkdir -p <span class="variable">$HOME</span>/.kube</span><br><span class="line">  sudo cp -i /etc/kubernetes/admin.conf <span class="variable">$HOME</span>/.kube/config</span><br><span class="line">  sudo chown $(id -u):$(id -g) <span class="variable">$HOME</span>/.kube/config</span><br><span class="line"></span><br><span class="line">You should now deploy a pod network to the cluster.</span><br><span class="line">Run <span class="string">"kubectl apply -f [podnetwork].yaml"</span> with one of the options listed at:</span><br><span class="line">  https://kubernetes.io/docs/concepts/cluster-administration/addons/</span><br><span class="line"></span><br><span class="line">Then you can join any number of worker nodes by running the following on each as root:</span><br><span class="line"></span><br><span class="line">kubeadm join 10.9.8.118:6443 --token abcdef.0123456789abcdef \</span><br><span class="line">    --discovery-token-ca-cert-hash sha256:f14e90eda52b285b41ddb5d34a4dcf21f55ed66831015c4ca1a996cf17754143</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>部署flannel </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span></span><br><span class="line"><span class="comment"># kubectl apply -f kube-flannel.yml</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="排障"><a href="#排障" class="headerlink" title="排障"></a>排障</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">查看pod日志</span><br><span class="line"><span class="comment"># kubectl --namespace kube-system logs kube-controller-manager-master.m4d3bug.com</span></span><br><span class="line">查看pod的過程</span><br><span class="line"><span class="comment"># kubectl describe pod kube-controller-manager-master.m4d3bug.com --namespace=kube-system</span></span><br><span class="line">打印加入的命令</span><br><span class="line"><span class="comment"># kubeadm token create --print-join-command</span></span><br><span class="line">重置集群</span><br><span class="line"><span class="comment"># kubeadm reset</span></span><br><span class="line"><span class="comment"># ifconfig cni0 down</span></span><br><span class="line"><span class="comment"># ip link delete cni0</span></span><br><span class="line"><span class="comment"># ifconfig flannel.1 down</span></span><br><span class="line"><span class="comment"># ip link delete flannel.1</span></span><br><span class="line"><span class="comment"># rm -rf /var/lib/cni/</span></span><br><span class="line"><span class="comment"># rm -rf /var/lib/etcd</span></span><br><span class="line"><span class="comment"># rm -rf /etc/cni/net.d</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><hr>
+<p>一套下來，UDP的通信可靠性還是名不虛傳，除非等待HTTP3.0/quic協議普及吧，這樣子運營商也許就不會對UDP那麽狠了，所以奉勸各位還是別折騰這條路了，後面或許會嘗試使用<a href="https://feisky.xyz/posts/2015-03-02-setting-up-gre-for-kubernetes/" target="_blank" rel="noopener">GRE方式</a>來再嘗試一次。以下是部署后情況：</p>
+<p>可以見到，即使加入成功也都是充斥著大量因爲timeout造成的failed的信息在其中。</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/failedzerotier.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/failedzerotier.png"></p>
+<p>其後，通過睡了一覺，白天時分，QOS緩和的時候，順利將剩下搬瓦工節點加入。</p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8s-status.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8s-status.png"></p>
+<p>但也證明，SDN跨運營商，以node為最小單位組建K8S集群是可行的，但是需要💰。因此不難理解爲什麽現在混合雲架構都是傾向于以一個帶master節點集群為最小單位組建集群。<del><font color=#808080>或許可以試試每個節點都是單master的去污點化部署。</font></del></p>
+<p><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8scurl.png" alt="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/k8scurl.png"></p>
+<h2 id="鳴謝"><a href="#鳴謝" class="headerlink" title="鳴謝"></a>鳴謝</h2><hr>
+<ul>
+<li><a href="https://zhangguanzhang.github.io/2018/09/24/k8s-some-vpc-cluster/" target="_blank" rel="noopener">跨VPC或者跨云供应商搭建K8S集群正确姿势</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/106793809" target="_blank" rel="noopener">跨VPC或者跨云供应商搭建K8S集群正确姿势-番外篇</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/74134318" target="_blank" rel="noopener">Kubernetes——部署基于公网的k8s集群</a></li>
+<li><a href="https://developer.aliyun.com/article/763983" target="_blank" rel="noopener">使用 kubeadm 快速部署 K8S V1.18</a></li>
+<li><a href="http://www.zsythink.net/archives/1199/" target="_blank" rel="noopener">iptables详解（1）：iptables概念</a></li>
+<li><a href="https://mp.weixin.qq.com/s/PD1CCkKZgtZD7pAZEqF-rw" target="_blank" rel="noopener">10 分钟部署一个 Kubernetes 集群</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>m4d3bug
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publish Time:</strong>
+    2020/06/21 - 00:06
+  </li>
+  <li class="post-copyright-author">
+    <strong>Modify Time:</strong>
+    2020/07/11 - 18:07
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.madebug.net/Ops/2020-06-21-Kubernetes-Dislikes-ZeroTier.html" title="基於Zerotier搭建&quot;跨供應商&quot;的K8S集群带阻嘗試">https://blog.madebug.net/Ops/2020-06-21-Kubernetes-Dislikes-ZeroTier.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux </a>
+              <a href="/tags/Kubernetes/" rel="tag"># Kubernetes </a>
+              <a href="/tags/Network/" rel="tag"># Network </a>
+              <a href="/tags/UDP/" rel="tag"># UDP </a>
+              <a href="/tags/P2P/" rel="tag"># P2P </a>
+              <a href="/tags/Zerotier/" rel="tag"># Zerotier </a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Ops/2020-06-15-Use-Zerotier-to-build-a-intranet-in-China.html" rel="prev" title="使用Zerotier基於國内網絡組建局域網">
+      <i class="fa fa-chevron-left"></i> 使用Zerotier基於國内網絡組建局域網
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Ops/2020-06-25-Funny-With-Linux-I-about-progress.html" rel="next" title="趣談Linux操作系統筆記I（之剖析系統進程）">
+      趣談Linux操作系統筆記I（之剖析系統進程） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-機器情況"><span class="nav-text">0x00 機器情況</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-ZeroTier部分"><span class="nav-text">0x01 ZeroTier部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#加入ZeroTier組網"><span class="nav-text">加入ZeroTier組網</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安裝軟體"><span class="nav-text">安裝軟體</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加入網絡"><span class="nav-text">加入網絡</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#機器網絡狀況"><span class="nav-text">機器網絡狀況</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#寫入靜態IP-和hostname"><span class="nav-text">寫入靜態IP 和hostname</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-K8S-部分"><span class="nav-text">0x02 K8S 部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#系統預設定"><span class="nav-text">系統預設定</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#確保selinux為寬容模式"><span class="nav-text">確保selinux為寬容模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#關閉firewalld"><span class="nav-text">關閉firewalld</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#选择性關閉swap"><span class="nav-text">选择性關閉swap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#設置并啓用内核參數"><span class="nav-text">設置并啓用内核參數</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#開始安裝"><span class="nav-text">開始安裝</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安裝Docker軟體"><span class="nav-text">安裝Docker軟體</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加入代理設定到Docker中"><span class="nav-text">加入代理設定到Docker中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加入谷歌倉庫"><span class="nav-text">加入谷歌倉庫</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#獲得必須的軟體及鏡像"><span class="nav-text">獲得必須的軟體及鏡像</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安裝集群"><span class="nav-text">安裝集群</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#排障"><span class="nav-text">排障</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#結語"><span class="nav-text">結語</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#鳴謝"><span class="nav-text">鳴謝</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="m4d3bug"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">m4d3bug</p>
+  <div class="site-description" itemprop="description">博觀而約取，厚積而薄發。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/m4d3bug" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:m4d3bug@gmail.com" title="G-Mail → mailto:m4d3bug@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>G-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/m4d3bug" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;m4d3bug" rel="noopener" target="_blank"><i class="fab fa-telegram fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.server-world.info/en/" title="https:&#x2F;&#x2F;www.server-world.info&#x2F;en&#x2F;" rel="noopener" target="_blank">ServerWorld</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/ericnie" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;ericnie" rel="noopener" target="_blank">ericnie的技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/process-h" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;process-h" rel="noopener" target="_blank">寻找的路上</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0ne0ne.com/" title="https:&#x2F;&#x2F;www.0ne0ne.com" rel="noopener" target="_blank">OneOneの日常</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.cnblogs.com/reid21" title="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;reid21" rel="noopener" target="_blank">Reid21</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://feichashao.com/" title="https:&#x2F;&#x2F;feichashao.com" rel="noopener" target="_blank">肥叉烧</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://cbnode.com/" title="https:&#x2F;&#x2F;cbnode.com&#x2F;" rel="noopener" target="_blank">cbnode</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ackdo.com/" title="http:&#x2F;&#x2F;ackdo.com" rel="noopener" target="_blank">AckDo.com</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://linyuxiang087241.github.io/" title="https:&#x2F;&#x2F;linyuxiang087241.github.io&#x2F;" rel="noopener" target="_blank">ylin's blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://lewisdenny.io/" title="https:&#x2F;&#x2F;lewisdenny.io&#x2F;" rel="noopener" target="_blank">Lewis' blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://meiyan-zheng.github.io/meiyanblog/" title="https:&#x2F;&#x2F;meiyan-zheng.github.io&#x2F;meiyanblog&#x2F;" rel="noopener" target="_blank">Meiyan's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">m4d3bug</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">197k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:59</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0d4f63a6991663a1496a',
+      clientSecret: '10391033a1429264fc1387c574a157e57a1d2767',
+      repo        : 'm4d3bug.github.io',
+      owner       : 'm4d3bug',
+      admin       : ['m4d3bug'],
+      id          : '6d01a12d4efc55403793eec78a4e4853',
+	  proxy		  : 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+        language: 'en',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
