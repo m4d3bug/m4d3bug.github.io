@@ -1,5 +1,3 @@
-## OSP的网络
-
 ---
 title: OSP的网络
 mathjax: true
@@ -17,7 +15,7 @@ tags:
 
 <center><img src="https://raw.githubusercontent.com/m4d3bug/images-of-website/master/blog/RHOSO_18.0_ml2_OVN_ovngateway_on_OCP_with_memo.jpg" width=50% /></center>
 
-### 0x01 起因
+## 0x00️⃣ 起因
 
 事情的起因是，客户的场景没有ovnController, 并且结合了SRIOV/DPDK的场景。但是没有见过所以用此文记录一下其中的详情。
 
@@ -28,13 +26,13 @@ tags:
 Neutron network --+-- 东西流量 private network (tenant network) 
                   |
                   +-- 南北流量 provider network --+-- non-external provider network 
-                                         |
-                                         +-- external provider network
+                                                 |
+                                                 +-- external provider network
 ```
 - 东西流量是指 instance-instance 流量 
 - 南北流量是指 instance-external 流量 --- 本文重点
 
-### 0x02 北向中 OVN Controller 的工作类型
+## 0x01️⃣ 北向中 OVN Controller 的工作类型
 
 - 有ovnController --- 连接instance需要通过OVN Gateway等组件转发到二层网络
 - 无ovnController --- 连接instance需要通过provider network例如BGP等二层网络
@@ -94,7 +92,7 @@ https://docs.redhat.com/en/documentation/red_hat_openstack_services_on_openshift
 移除所有ovnController内容
 ```
 
-### 0x03 南向中 neutron 的使用
+## 0x02️⃣ 南向中 neutron 的使用
 
 较为复杂的北向结构探讨完了，以下是南向的一些情况
 ```
@@ -120,7 +118,7 @@ openstack network create public --provider-network-type vlan --provider-physical
 openstack network create public --provider-network-type vlan --provider-physical-network datacentre --provider-segment 104 --external
 ```
 
-## 0x04 结语
+## 0x03️⃣ 结语
 
 对OVN的整体架构有了更深刻的认知。
 
