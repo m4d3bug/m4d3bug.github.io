@@ -39,9 +39,10 @@ jobs:
           hexo g
 
       # 注入 translate.js 网页翻译（改 CI 产物，不动 Hexo 源码；忽略 pre/code 代码块）
+      # 注意：不要用 client.edge 通道（其依赖的 edge.microsoft.com/translate/auth 已失效返回 404），默认通道即可
       - name: Inject translate.js
         run: |
-          grep -rl '</body>' public --include='*.html' | xargs sed -i 's#</body>#<script src="https://cdn.staticfile.net/translate.js/3.18.66/translate.js"></script><script>translate.language.setLocal("chinese_simplified");translate.service.use("client.edge");translate.ignore.tag.push("pre");translate.ignore.tag.push("code");translate.listener.start();translate.execute();</script></body>#'
+          grep -rl '</body>' public --include='*.html' | xargs sed -i 's#</body>#<script src="https://cdn.staticfile.net/translate.js/3.18.66/translate.js"></script><script>translate.language.setLocal("chinese_simplified");translate.ignore.tag.push("pre");translate.ignore.tag.push("code");translate.listener.start();translate.execute();</script></body>#'
 
       # 部署到 GitHub Pages
       - name: Upload GitHub Repository
