@@ -40,9 +40,10 @@ jobs:
 
       # 注入 translate.js 网页翻译（改 CI 产物，不动 Hexo 源码；忽略 pre/code 代码块）
       # 注意：不要用 client.edge 通道（其依赖的 edge.microsoft.com/translate/auth 已失效返回 404），默认通道即可
+      # #translate 容器用 CSS 固定到右上角并加 🌐 提示，right:70px 避开 NexT 右上角搜索图标
       - name: Inject translate.js
         run: |
-          grep -rl '</body>' public --include='*.html' | xargs sed -i 's#</body>#<script src="https://cdn.staticfile.net/translate.js/3.18.66/translate.js"></script><script>translate.language.setLocal("chinese_simplified");translate.ignore.tag.push("pre");translate.ignore.tag.push("code");translate.listener.start();translate.execute();</script></body>#'
+          grep -rl '</body>' public --include='*.html' | xargs sed -i 's@</body>@<style>#translate{position:fixed;top:12px;right:70px;z-index:9999;background:#fff;border:1px solid #ddd;border-radius:6px;padding:3px 8px;box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:13px;line-height:24px}#translate::before{content:"🌐 翻译/Translate:";margin-right:4px;color:#555}</style><script src="https://cdn.staticfile.net/translate.js/3.18.66/translate.js"></script><script>translate.language.setLocal("chinese_simplified");translate.ignore.tag.push("pre");translate.ignore.tag.push("code");translate.listener.start();translate.execute();</script></body>@'
 
       # 部署到 GitHub Pages
       - name: Upload GitHub Repository
