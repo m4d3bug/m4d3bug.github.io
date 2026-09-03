@@ -5,6 +5,9 @@ on:
   push:
     branches: 
       - gh-pages
+
+permissions:
+  contents: write
   
 jobs:
   Blog_CI:
@@ -47,6 +50,6 @@ jobs:
           git config user.email "m4d3bug@gmail.com"     #username改为你github的注册邮箱
           git add .
           git commit -m "GitHub Actions Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
-          git push --force --quiet "https://${{ secrets.ACCESS_TOKEN }}@$GITHUB_REPO" master:master
+          git push --force --quiet "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@$GITHUB_REPO" master:master
 
 
