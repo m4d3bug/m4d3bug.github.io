@@ -5,6 +5,7 @@ on:
   push:
     branches: 
       - gh-pages
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -36,6 +37,11 @@ jobs:
         run: |
           hexo clean 
           hexo g
+
+      # 注入 translate.js 网页翻译（改 CI 产物，不动 Hexo 源码；忽略 pre/code 代码块）
+      - name: Inject translate.js
+        run: |
+          grep -rl '</body>' public --include='*.html' | xargs sed -i 's#</body>#<script src="https://cdn.staticfile.net/translate.js/3.18.66/translate.js"></script><script>translate.language.setLocal("chinese_simplified");translate.service.use("client.edge");translate.ignore.tag.push("pre");translate.ignore.tag.push("code");translate.listener.start();translate.execute();</script></body>#'
 
       # 部署到 GitHub Pages
       - name: Upload GitHub Repository
